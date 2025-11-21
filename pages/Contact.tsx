@@ -32,7 +32,7 @@ const Contact: React.FC<Props> = ({ t }) => {
                 >
                    66 6 66
                 </a>
-                <span className="text-sm text-gray-400 uppercase tracking-[0.3em]">Orhei &bull; Moldova</span>
+                <span className="text-sm text-gray-400 uppercase tracking-[0.3em]">{t.contact.location}</span>
              </div>
 
              {/* Call Action Button */}
@@ -49,7 +49,7 @@ const Contact: React.FC<Props> = ({ t }) => {
 
              {/* Social Media / Facebook */}
              <div className="pt-10 border-t border-white/10">
-                <p className="text-gray-400 mb-4 text-sm">Urmărește-ne pe rețelele sociale</p>
+                <p className="text-gray-400 mb-4 text-sm">{t.contact.social}</p>
                 <a 
                   href="https://www.facebook.com/profile.php?id=61558158336366" 
                   target="_blank" 

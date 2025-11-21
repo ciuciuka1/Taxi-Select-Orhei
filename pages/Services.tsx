@@ -37,13 +37,13 @@ const Services: React.FC<Props> = ({ t }) => {
               <p className="text-gray-300 leading-relaxed text-lg">{t.services.cityDesc}</p>
               <ul className="mt-6 space-y-3 text-gray-400">
                 <li className="flex items-center gap-3">
-                  <span className="text-brand-gold">●</span> Timp de sosire 3-7 minute
+                  <span className="text-brand-gold">●</span> {t.services.cityList.time}
                 </li>
                 <li className="flex items-center gap-3">
-                  <span className="text-brand-gold">●</span> Tarife transparente
+                  <span className="text-brand-gold">●</span> {t.services.cityList.rates}
                 </li>
                 <li className="flex items-center gap-3">
-                  <span className="text-brand-gold">●</span> Mașini curate și confortabile
+                  <span className="text-brand-gold">●</span> {t.services.cityList.cars}
                 </li>
               </ul>
             </div>
@@ -56,7 +56,7 @@ const Services: React.FC<Props> = ({ t }) => {
               <p className="text-gray-300 leading-relaxed text-lg">{t.services.airportDesc}</p>
               <div className="mt-6 p-4 bg-brand-orange/10 border-l-4 border-brand-orange rounded-r-lg">
                 <p className="text-brand-orange text-sm italic">
-                  Recomandăm rezervarea cu 24 de ore înainte pentru a garanta disponibilitatea exactă.
+                  {t.services.airportWarning}
                 </p>
               </div>
             </div>
@@ -85,14 +85,14 @@ const Services: React.FC<Props> = ({ t }) => {
               <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 to-transparent"></div>
               {/* Badge overlay */}
               <div className="absolute bottom-4 left-4 bg-brand-red/90 backdrop-blur px-4 py-1 rounded text-white font-bold text-sm">
-                Orice Direcție
+                {t.services.interBadge}
               </div>
             </div>
             <div className="order-1 md:order-2">
               <h2 className="text-3xl font-serif font-bold text-brand-red mb-4">{t.services.inter}</h2>
               <p className="text-gray-300 leading-relaxed text-lg">{t.services.interDesc}</p>
               <p className="mt-4 text-gray-400">
-                Oferim scaune pentru copii și spațiu generos pentru bagaje, asigurând o călătorie plăcută în orice colț al Moldovei.
+                {t.services.interExtra}
               </p>
             </div>
           </div>

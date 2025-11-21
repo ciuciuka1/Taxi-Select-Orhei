@@ -1,18 +1,23 @@
 import React from 'react';
+import { TranslationStructure } from '../types';
 
-const Terms: React.FC = () => {
+interface Props {
+  t: TranslationStructure;
+}
+
+const Terms: React.FC<Props> = ({ t }) => {
   return (
     <div className="pt-32 pb-20 px-6 relative z-10 bg-brand-dark min-h-screen text-gray-300">
       <div className="container mx-auto max-w-3xl">
-        <h1 className="font-serif text-3xl text-white mb-8">Termeni și Condiții</h1>
+        <h1 className="font-serif text-3xl text-white mb-8">{t.terms.title}</h1>
         <div className="prose prose-invert">
-           <p>Acești termeni guvernează utilizarea serviciilor Taxi Select Orhei.</p>
-           <h3 className="text-white mt-4">1. Comenzi</h3>
-           <p>Comenzile se efectuează exclusiv telefonic. Timpul estimat este informativ.</p>
-           <h3 className="text-white mt-4">2. Responsabilitate</h3>
-           <p>Compania nu răspunde pentru întârzieri cauzate de trafic sau condiții meteo extreme.</p>
-           <h3 className="text-white mt-4">3. Comportament</h3>
-           <p>Ne rezervăm dreptul de a refuza transportul persoanelor în stare de ebrietate avansată sau agresive.</p>
+           <p>{t.terms.intro}</p>
+           <h3 className="text-white mt-4">{t.terms.p1Title}</h3>
+           <p>{t.terms.p1Text}</p>
+           <h3 className="text-white mt-4">{t.terms.p2Title}</h3>
+           <p>{t.terms.p2Text}</p>
+           <h3 className="text-white mt-4">{t.terms.p3Title}</h3>
+           <p>{t.terms.p3Text}</p>
         </div>
       </div>
     </div>

@@ -61,8 +61,8 @@ const App: React.FC = () => {
             <Route path="/services" element={<Services t={t} />} />
             <Route path="/about" element={<About t={t} />} />
             <Route path="/contact" element={<Contact t={t} />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms t={t} />} />
+            <Route path="/privacy" element={<Privacy t={t} />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
