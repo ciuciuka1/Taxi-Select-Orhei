@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="https://fonts.gstatic.com/s/i/materialicons/local_taxi/v1/24px.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#102E50" />
+    <meta name="description" content="Taxi Select Orhei - Servicii de transport pasageri 24/7. Rapid, sigur și confortabil. Sună acum: 0 235 66 6 66." />
+    
+    <!-- Fonts: Playfair Display (Serif/Brand) and Inter (Sans/UI) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            screens: {
+              'xs': '375px',
+            },
+            colors: {
+              brand: {
+                dark: '#102E50',
+                gold: '#F5C45E',
+                orange: '#E78B48',
+                red: '#BE3D2A',
+              }
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              serif: ['Playfair Display', 'serif'],
+            },
+            animation: {
+              'fadeInUp': 'fadeInUp 1s ease-out forwards',
+              'float': 'float 6s ease-in-out infinite',
+              'spin-slow': 'spin-slow 12s linear infinite',
+              'rain': 'rain 0.8s linear infinite',
+              'cloud-move': 'float 4s ease-in-out infinite',
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'vibrate-smooth': 'vibrate-smooth 2.5s ease-in-out infinite',
+              'wiggle': 'wiggle 2s ease-in-out infinite',
+            },
+            keyframes: {
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-6px)' },
+              },
+              'spin-slow': {
+                'from': { transform: 'rotate(0deg)' },
+                'to': { transform: 'rotate(360deg)' },
+              },
+              'rain': {
+                '0%': { transform: 'translateY(-4px)', opacity: '0' },
+                '30%': { opacity: '1' },
+                '100%': { transform: 'translateY(8px)', opacity: '0' },
+              },
+              'vibrate-smooth': {
+                '0%, 100%': { transform: 'translate(0, 0) rotate(0deg)' },
+                '5%': { transform: 'translate(-2px, 1px) rotate(-2deg)' },
+                '10%': { transform: 'translate(2px, -1px) rotate(2deg)' },
+                '15%': { transform: 'translate(-2px, -1px) rotate(-2deg)' },
+                '20%': { transform: 'translate(2px, 1px) rotate(2deg)' },
+                '25%': { transform: 'translate(-1px, 2px) rotate(-1deg)' },
+                '30%': { transform: 'translate(1px, -2px) rotate(1deg)' },
+                '35%': { transform: 'translate(0, 0) rotate(0deg)' },
+              },
+              'wiggle': {
+                '0%, 100%': { transform: 'scale(1)' },
+                '50%': { transform: 'scale(1.15)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <title>Taxi Select Orhei</title>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+  }
+}
+</script>
+</head>
+  <body class="bg-brand-dark text-white antialiased overflow-x-hidden selection:bg-brand-gold selection:text-brand-dark">
+    <div id="root"></div>
+  </body>
+</html>
