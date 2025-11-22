@@ -199,7 +199,8 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
                    <p className="text-gray-400 text-xs uppercase mb-1 tracking-widest">Dispecerat 24/7</p>
                    <a href="tel:+37323566666" className="text-2xl font-bold text-white block font-serif tracking-wide">0 235 66 6 66</a>
                  </div>
-                 <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 group-hover:scale-110 transition-transform">
+                 {/* Mobile Menu Button - Reverted to Brand Gold */}
+                 <div className="w-12 h-12 rounded-full bg-brand-gold text-brand-dark flex items-center justify-center shadow-lg shadow-brand-gold/20 group-hover:scale-110 transition-transform">
                     <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.91.97.97 0 007.61 3H4.21a1 1 0 00-.98 1.05c.2 10.53 8.67 19.01 19.23 19.21a1 1 0 001.05-.98v-3.39a.99.99 0 00-.5-2.51z"/></svg>
                  </div>
               </div>

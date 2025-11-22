@@ -40,10 +40,12 @@ const Home: React.FC<Props> = ({ t }) => {
             <div className="animate-fadeInUp mt-24 md:mt-32" style={{ animationDelay: '0.5s' }}>
               <a 
                 href="tel:+37323566666"
-                className="inline-block bg-gradient-to-r from-brand-gold to-brand-orange hover:from-white hover:to-gray-200 text-brand-dark font-bold text-lg md:text-xl px-10 py-4 rounded-full transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(245,196,94,0.4)] hover:shadow-[0_0_40px_rgba(245,196,94,0.7)] border-2 border-transparent relative overflow-hidden group"
+                className="inline-block bg-gradient-to-r from-brand-gold to-brand-orange hover:from-brand-gold hover:to-yellow-500 text-brand-dark font-bold text-lg md:text-xl px-12 py-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-[0_0_20px_rgba(245,196,94,0.4)] hover:shadow-[0_0_40px_rgba(245,196,94,0.6)] border-2 border-transparent relative overflow-hidden group ring-2 ring-brand-gold/50 ring-offset-2 ring-offset-brand-dark"
               >
-                <span className="relative z-10 flex items-center">
-                  {t.hero.cta} <span className="ml-3 group-hover:translate-x-2 transition-transform">→</span>
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out rotate-12 scale-150"></div>
+                <span className="relative z-10 flex items-center tracking-wider">
+                   <svg className="w-5 h-5 mr-3 fill-current animate-pulse" viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.91.97.97 0 007.61 3H4.21a1 1 0 00-.98 1.05c.2 10.53 8.67 19.01 19.23 19.21a1 1 0 001.05-.98v-3.39a.99.99 0 00-.5-2.51z"/></svg>
+                  {t.hero.cta} 
                 </span>
               </a>
             </div>
@@ -145,7 +147,7 @@ const Home: React.FC<Props> = ({ t }) => {
         </div>
       </section>
 
-      {/* Call to Action - MOUNTAIN SECTION - OPTIMIZED */}
+      {/* Call to Action - MOUNTAIN SECTION - Reverted to Brand Colors */}
       <section className="relative z-10 w-full min-h-[80vh] flex flex-col justify-end items-center bg-[#020617] overflow-hidden border-t border-white/5">
          
          {/* 1. The Mountain Image */}
@@ -172,8 +174,8 @@ const Home: React.FC<Props> = ({ t }) => {
               className="inline-flex flex-col items-center justify-center group/phone cursor-pointer"
               aria-label="Call Taxi Select Now"
             >
-              {/* Number */}
-              <h2 className="font-serif text-5xl md:text-8xl lg:text-9xl font-bold mb-2 transition-all duration-500 drop-shadow-2xl text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-brand-gold/40 group-hover/phone:to-brand-gold group-hover/phone:scale-105 leading-tight">
+              {/* Number with Brand Gold style */}
+              <h2 className="font-serif text-5xl md:text-8xl lg:text-9xl font-bold mb-2 transition-transform duration-500 transform group-hover/phone:scale-105 group-hover/phone:-translate-y-2 drop-shadow-2xl text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-brand-gold/40 group-hover/phone:to-brand-gold leading-tight">
                 66 6 66
               </h2>
               
@@ -187,9 +189,10 @@ const Home: React.FC<Props> = ({ t }) => {
               </div>
 
               <div className="mt-12 opacity-0 group-hover/phone:opacity-100 transform translate-y-4 group-hover/phone:translate-y-0 transition-all duration-500 ease-out">
-                 <span className="bg-white/90 backdrop-blur text-brand-dark font-extrabold px-8 py-3 rounded-full text-lg shadow-[0_0_30px_rgba(255,255,255,0.3)] flex items-center gap-2 border border-white">
-                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 animate-vibrate-smooth text-brand-dark" viewBox="0 0 24 24" fill="currentColor">
-                     <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/>
+                 {/* Brand Button (Reverted from Green) */}
+                 <span className="bg-gradient-to-r from-brand-gold to-brand-orange text-brand-dark font-extrabold px-8 py-3 rounded-full text-lg shadow-[0_0_30px_rgba(245,196,94,0.5)] flex items-center gap-3 border border-brand-gold/30 hover:shadow-[0_0_50px_rgba(245,196,94,0.8)] transition-shadow duration-300">
+                   <svg className="w-6 h-6 animate-vibrate-smooth fill-current" viewBox="0 0 24 24">
+                      <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.91.97.97 0 007.61 3H4.21a1 1 0 00-.98 1.05c.2 10.53 8.67 19.01 19.23 19.21a1 1 0 001.05-.98v-3.39a.99.99 0 00-.5-2.51z"/>
                    </svg>
                    {t.contact.callAction}
                  </span>

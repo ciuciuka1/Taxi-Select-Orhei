@@ -5,14 +5,38 @@
     <link rel="icon" type="image/svg+xml" href="https://fonts.gstatic.com/s/i/materialicons/local_taxi/v1/24px.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#020617" />
-    <meta name="description" content="Taxi Select Orhei - Servicii de transport pasageri 24/7. Rapid, sigur și confortabil. Sună acum: 0 235 66 6 66." />
     
-    <!-- Fonts: Playfair Display (Serif/Brand) and Inter (Sans/UI) -->
+    <!-- SEO PRIMARY METADATA -->
+    <title>Taxi Select Orhei - Comandă Taxi Rapid | 0 235 66 6 66</title>
+    <meta name="description" content="Cel mai rapid Taxi din Orhei. Disponibil 24/7, mașini confortabile, transfer aeroport Chișinău și curse interurbane. Siguranță și prețuri corecte. Sună acum!" />
+    <meta name="keywords" content="taxi orhei, taxi select, taxi 66666, taxi moldova, transport pasageri orhei, taxi aeroport chisinau, taxi ieftin orhei" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="author" content="Taxi Select Orhei" />
+    <link rel="canonical" href="https://taxiselect-orhei.md/" />
+
+    <!-- GEO TAGS FOR LOCAL SEO (Vital for Taxi) -->
+    <meta name="geo.region" content="MD-OR" />
+    <meta name="geo.placename" content="Orhei" />
+    <meta name="geo.position" content="47.3831;28.8231" />
+    <meta name="ICBM" content="47.3831, 28.8231" />
+
+    <!-- OPEN GRAPH / FACEBOOK -->
+    <meta property="og:type" content="business.business" />
+    <meta property="og:title" content="Taxi Select Orhei - Rapiditate și Siguranță" />
+    <meta property="og:description" content="Comandă taxi în Orhei la orice oră. Servicii premium la prețuri standard. 0 235 66 6 66." />
+    <meta property="og:url" content="https://taxiselect-orhei.md/" />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=1200&q=80" />
+    <meta property="business:contact_data:street_address" content="Orhei" />
+    <meta property="business:contact_data:locality" content="Orhei" />
+    <meta property="business:contact_data:country_name" content="Moldova" />
+    <meta property="business:contact_data:phone_number" content="+37323566666" />
+
+    <!-- FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS (CDN used for theme config preservation, though build process is recommended for production) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -23,11 +47,11 @@
             },
             colors: {
               brand: {
-                dark: '#020617', // Updated to Deep Midnight (Matches Hero/Animation)
+                dark: '#020617',
                 gold: '#F5C45E',
                 orange: '#E78B48',
                 red: '#BE3D2A',
-                slate: '#0f172a', // Secondary dark for cards
+                slate: '#0f172a',
               }
             },
             fontFamily: {
@@ -37,12 +61,17 @@
             animation: {
               'fadeInUp': 'fadeInUp 1s ease-out forwards',
               'float': 'float 6s ease-in-out infinite',
-              'spin-slow': 'spin-slow 12s linear infinite',
-              'rain': 'rain 0.8s linear infinite',
-              'cloud-move': 'float 4s ease-in-out infinite',
+              'rain': 'rain 0.6s linear infinite',
+              'snow-fall': 'snow-fall 3s ease-in-out infinite',
+              'flash': 'flash 3s infinite',
+              'sun-spin': 'spin-slow 12s linear infinite',
               'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
               'vibrate-smooth': 'vibrate-smooth 2.5s ease-in-out infinite',
               'wiggle': 'wiggle 2s ease-in-out infinite',
+              'drift': 'drift 8s ease-in-out infinite alternate',
+              'drift-reverse': 'drift-reverse 8s ease-in-out infinite alternate',
+              'fog-flow': 'fog-flow 6s linear infinite',
+              'twinkle': 'twinkle 3s ease-in-out infinite',
             },
             keyframes: {
               fadeInUp: {
@@ -53,14 +82,41 @@
                 '0%, 100%': { transform: 'translateY(0)' },
                 '50%': { transform: 'translateY(-6px)' },
               },
+              drift: {
+                '0%': { transform: 'translateX(-5px)' },
+                '100%': { transform: 'translateX(5px)' },
+              },
+              'drift-reverse': {
+                '0%': { transform: 'translateX(5px)' },
+                '100%': { transform: 'translateX(-5px)' },
+              },
+              'fog-flow': {
+                '0%': { transform: 'translateX(-8px)', opacity: '0.6' },
+                '50%': { transform: 'translateX(8px)', opacity: '0.9' },
+                '100%': { transform: 'translateX(-8px)', opacity: '0.6' },
+              },
+              'twinkle': {
+                '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+                '50%': { opacity: '0.4', transform: 'scale(0.7)' },
+              },
               'spin-slow': {
                 'from': { transform: 'rotate(0deg)' },
                 'to': { transform: 'rotate(360deg)' },
               },
               'rain': {
-                '0%': { transform: 'translateY(-4px)', opacity: '0' },
-                '30%': { opacity: '1' },
-                '100%': { transform: 'translateY(8px)', opacity: '0' },
+                '0%': { transform: 'translateY(-6px)', opacity: '0' },
+                '20%': { opacity: '1' },
+                '90%': { opacity: '1' },
+                '100%': { transform: 'translateY(12px)', opacity: '0' },
+              },
+              'snow-fall': {
+                '0%': { transform: 'translateY(-5px) translateX(-2px)', opacity: '0' },
+                '50%': { opacity: '1', transform: 'translateY(5px) translateX(2px)' },
+                '100%': { transform: 'translateY(15px) translateX(-2px)', opacity: '0' },
+              },
+              'flash': {
+                '0%, 92%, 96%, 100%': { opacity: '0' },
+                '94%': { opacity: '1' },
               },
               'vibrate-smooth': {
                 '0%, 100%': { transform: 'translate(0, 0) rotate(0deg)' },
@@ -97,7 +153,8 @@
 }
 </script>
 </head>
-  <body class="bg-brand-dark text-white antialiased overflow-x-hidden selection:bg-brand-gold selection:text-brand-dark">
+  <!-- Added select-none to prevent text selection -->
+  <body class="bg-brand-dark text-white antialiased overflow-x-hidden selection:bg-transparent selection:text-white select-none" oncontextmenu="return false;">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

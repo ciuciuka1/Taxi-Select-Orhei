@@ -28,28 +28,32 @@ const Contact: React.FC<Props> = ({ t }) => {
                 {t.contact.text}
              </p>
              
-             {/* Phone Section - HIGH VISIBILITY */}
-             <div className="flex flex-col items-center justify-center space-y-4 mb-12 relative z-10">
+             {/* Phone Section - SMOOTH ANIMATION */}
+             <div className="flex flex-col items-center justify-center space-y-4 mb-12 relative z-10 group/phone">
                 <a 
                    href="tel:+37323566666"
-                   className="text-6xl md:text-8xl font-black text-white font-serif drop-shadow-[0_0_25px_rgba(245,196,94,0.5)] hover:text-brand-gold transition-colors duration-300 tracking-wider hover:scale-105 transform"
+                   className="text-6xl md:text-8xl font-black text-white font-serif drop-shadow-[0_0_25px_rgba(245,196,94,0.5)] hover:text-brand-gold transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] tracking-wider group-hover/phone:scale-110 group-hover/phone:-translate-y-2 transform inline-block"
                 >
                    66 6 66
                 </a>
-                <span className="text-sm text-gray-400 uppercase tracking-[0.4em] font-medium border-t border-white/20 pt-4 w-full max-w-xs block">
+                <span className="text-sm text-gray-400 uppercase tracking-[0.4em] font-medium border-t border-white/20 pt-4 w-full max-w-xs block group-hover/phone:border-brand-gold/50 transition-colors duration-500">
                   {t.contact.location}
                 </span>
              </div>
 
-             {/* Call Action Button - BRAND GRADIENT */}
+             {/* Call Action Button - GREEN GRADIENT */}
              <div className="flex justify-center mb-12 relative z-10">
                 <a 
                    href="tel:+37323566666"
-                   className="group relative bg-gradient-to-r from-brand-orange via-red-500 to-brand-red text-white font-bold py-5 px-16 rounded-full transition-all duration-300 shadow-[0_4px_25px_rgba(231,139,72,0.5)] hover:shadow-[0_4px_40px_rgba(231,139,72,0.8)] hover:-translate-y-1 flex items-center gap-3 overflow-hidden"
+                   className="group relative bg-gradient-to-r from-green-600 to-green-500 text-white font-bold py-5 px-16 rounded-full transition-all duration-300 shadow-[0_4px_25px_rgba(34,197,94,0.4)] hover:shadow-[0_4px_40px_rgba(34,197,94,0.7)] hover:-translate-y-1 flex items-center gap-3 overflow-hidden border border-green-400/20"
+                   aria-label="Sună Acum"
                 >
-                   <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></span>
-                   <span className="animate-pulse text-2xl mr-2">📞</span> 
-                   <span className="relative text-xl uppercase tracking-widest font-black text-white">{t.contact.callAction}</span>
+                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out rotate-12 scale-150"></div>
+                   
+                   <svg className="w-8 h-8 fill-current animate-vibrate-smooth relative z-10" viewBox="0 0 24 24">
+                      <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.91.97.97 0 007.61 3H4.21a1 1 0 00-.98 1.05c.2 10.53 8.67 19.01 19.23 19.21a1 1 0 001.05-.98v-3.39a.99.99 0 00-.5-2.51z"/>
+                   </svg>
+                   <span className="relative z-10 text-2xl uppercase tracking-widest font-black text-white text-shadow-sm">{t.contact.callAction}</span>
                 </a>
              </div>
 

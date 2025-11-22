@@ -7,6 +7,7 @@ import { translations } from './i18n/translations';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import PulseCallButton from './components/PulseCallButton';
+import SecurityWrapper from './components/SecurityWrapper';
 
 // Pages
 import Home from './pages/Home';
@@ -45,29 +46,31 @@ const App: React.FC = () => {
   const t = translations[lang];
 
   return (
-    <HashRouter>
-      <ScrollToTop />
-      
-      {/* Content Layer */}
-      <div className="relative min-h-screen flex flex-col">
-        <Header t={t} lang={lang} setLang={handleSetLang} />
+    <SecurityWrapper>
+      <HashRouter>
+        <ScrollToTop />
         
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home t={t} />} />
-            <Route path="/services" element={<Services t={t} />} />
-            <Route path="/about" element={<About t={t} />} />
-            <Route path="/contact" element={<Contact t={t} />} />
-            <Route path="/terms" element={<Terms t={t} />} />
-            <Route path="/privacy" element={<Privacy t={t} />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
+        {/* Content Layer */}
+        <div className="relative min-h-screen flex flex-col">
+          <Header t={t} lang={lang} setLang={handleSetLang} />
+          
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/" element={<Home t={t} />} />
+              <Route path="/services" element={<Services t={t} />} />
+              <Route path="/about" element={<About t={t} />} />
+              <Route path="/contact" element={<Contact t={t} />} />
+              <Route path="/terms" element={<Terms t={t} />} />
+              <Route path="/privacy" element={<Privacy t={t} />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
 
-        <Footer t={t} />
-        <PulseCallButton />
-      </div>
-    </HashRouter>
+          <Footer t={t} />
+          <PulseCallButton />
+        </div>
+      </HashRouter>
+    </SecurityWrapper>
   );
 };
 
