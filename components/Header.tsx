@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Language, TranslationStructure } from '../types';
 import LanguageSwitcher from './LanguageSwitcher';
 import WeatherWidget from './WeatherWidget';
@@ -14,6 +14,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,6 +39,19 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
     return () => { document.body.style.overflow = 'unset'; };
   }, [mobileMenuOpen]);
 
+  const handleNavClick = (path: string, e: React.MouseEvent) => {
+    if (path === '/') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (location.pathname !== '/') {
+            // If not on home, let the Link handle it naturally, but the scroll above helps
+        } else {
+            // If ALREADY on home, prevent default link behavior and just scroll
+            e.preventDefault(); 
+        }
+    }
+    setMobileMenuOpen(false);
+  };
+
   const navLinks = [
     { path: '/', label: t.nav.home },
     { path: '/services', label: t.nav.services },
@@ -60,7 +74,11 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
         
         {/* Branding + Weather Wrapper */}
         <div className="flex items-center gap-3 md:gap-4 shrink-0 relative z-50">
-          <Link to="/" className="relative group flex flex-col" onClick={() => setMobileMenuOpen(false)}>
+          <Link 
+            to="/" 
+            className="relative group flex flex-col" 
+            onClick={(e) => handleNavClick('/', e)}
+          >
               <span className="font-serif text-2xl md:text-3xl font-bold text-white tracking-wide group-hover:scale-105 transition-transform duration-300 drop-shadow-lg">
                 TAXI<span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-orange">SELECT</span>
               </span>
@@ -81,6 +99,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
             <Link
               key={link.path}
               to={link.path}
+              onClick={(e) => handleNavClick(link.path, e)}
               className={`text-sm font-medium tracking-wide transition-all duration-300 relative group py-2 ${
                 location.pathname === link.path ? 'text-brand-gold' : 'text-white hover:text-brand-gold'
               }`}
@@ -131,6 +150,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
                 <Link
                   key={link.path}
                   to={link.path}
+                  onClick={(e) => handleNavClick(link.path, e)}
                   className={`text-3xl font-serif font-bold py-5 border-b border-white/5 flex items-center justify-between group ${
                     location.pathname === link.path ? 'text-brand-gold pl-2' : 'text-white hover:text-brand-gold hover:pl-2'
                   } transition-all duration-300`}

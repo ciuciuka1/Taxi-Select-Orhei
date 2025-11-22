@@ -7,7 +7,6 @@ import { translations } from './i18n/translations';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import PulseCallButton from './components/PulseCallButton';
-import HyperCanvas from './animations/HyperCanvas';
 
 // Pages
 import Home from './pages/Home';
@@ -48,8 +47,6 @@ const App: React.FC = () => {
   return (
     <HashRouter>
       <ScrollToTop />
-      {/* Background Layer */}
-      <HyperCanvas />
       
       {/* Content Layer */}
       <div className="relative min-h-screen flex flex-col">

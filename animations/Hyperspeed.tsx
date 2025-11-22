@@ -50,14 +50,9 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({
   const appRef = useRef<any>(null);
 
   useEffect(() => {
+    // Ensure cleanup of previous instance if it exists
     if (appRef.current) {
       appRef.current.dispose();
-      const container = document.getElementById('lights');
-      if (container) {
-        while (container.firstChild) {
-          container.removeChild(container.firstChild);
-        }
-      }
     }
 
     // Uniforms definitions
@@ -819,10 +814,14 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({
         this.container = container;
         this.renderer = new THREE.WebGLRenderer({
           antialias: false,
-          alpha: true
+          alpha: true,
+          powerPreference: "high-performance" // Request better GPU for desktop, but handle pixel ratio for mobile
         });
+        
+        // OPTIMIZATION: Cap pixel ratio to 2 to prevent overheating/lag on high-DPI mobile devices
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        
         this.renderer.setSize(container.offsetWidth, container.offsetHeight, false);
-        this.renderer.setPixelRatio(window.devicePixelRatio);
         this.composer = new EffectComposer(this.renderer);
         container.append(this.renderer.domElement);
 
@@ -885,6 +884,7 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({
       }
 
       onWindowResize() {
+        if (this.disposed || !this.container) return;
         const width = this.container.offsetWidth;
         const height = this.container.offsetHeight;
 
@@ -1054,14 +1054,14 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({
 
         window.removeEventListener('resize', this.onWindowResize.bind(this));
         if (this.container) {
-          this.container.removeEventListener('mousedown', this.onMouseDown);
-          this.container.removeEventListener('mouseup', this.onMouseUp);
-          this.container.removeEventListener('mouseout', this.onMouseUp);
-
-          this.container.removeEventListener('touchstart', this.onTouchStart);
-          this.container.removeEventListener('touchend', this.onTouchEnd);
-          this.container.removeEventListener('touchcancel', this.onTouchEnd);
-          this.container.removeEventListener('contextmenu', this.onContextMenu);
+            const el = this.container;
+            el.removeEventListener('mousedown', this.onMouseDown);
+            el.removeEventListener('mouseup', this.onMouseUp);
+            el.removeEventListener('mouseout', this.onMouseUp);
+            el.removeEventListener('touchstart', this.onTouchStart);
+            el.removeEventListener('touchend', this.onTouchEnd);
+            el.removeEventListener('touchcancel', this.onTouchEnd);
+            el.removeEventListener('contextmenu', this.onContextMenu);
         }
       }
 
@@ -1085,6 +1085,8 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({
 
     (function () {
       const container = document.getElementById('lights');
+      if (!container) return;
+      
       const options = { ...effectOptions };
       options.distortion = distortions[options.distortion];
 
@@ -1107,11 +1109,11 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({
       style={{ 
         width: '100%', 
         height: '100%', 
-        position: 'fixed', 
+        position: 'absolute',
         top: 0, 
         left: 0, 
         overflow: 'hidden', 
-        zIndex: 0 // Background level
+        zIndex: 0
       }} 
     />
   );
