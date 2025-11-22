@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Language, TranslationStructure } from '../types';
 import LanguageSwitcher from './LanguageSwitcher';
 import WeatherWidget from './WeatherWidget';
@@ -14,13 +14,28 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    const updateScroll = () => {
+      const scrollY = window.scrollY;
+      if (Math.abs(scrollY - lastScrollY) > 10 || scrollY < 50) {
+         setIsScrolled(scrollY > 50);
+         lastScrollY = scrollY;
+      }
+      ticking = false;
     };
-    window.addEventListener('scroll', handleScroll);
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateScroll);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -42,10 +57,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
   const handleNavClick = (path: string, e: React.MouseEvent) => {
     if (path === '/') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        if (location.pathname !== '/') {
-            // If not on home, let the Link handle it naturally, but the scroll above helps
-        } else {
-            // If ALREADY on home, prevent default link behavior and just scroll
+        if (location.pathname === '/') {
             e.preventDefault(); 
         }
     }
@@ -69,7 +81,6 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
             : 'bg-transparent py-4 md:py-6 border-transparent'
       }`}
     >
-      {/* Added significant gap-16 at md breakpoint to force separation between Weather and Home */}
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center gap-6 md:gap-16 lg:gap-24 relative">
         
         {/* Branding + Weather Wrapper */}
@@ -78,6 +89,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
             to="/" 
             className="relative group flex flex-col" 
             onClick={(e) => handleNavClick('/', e)}
+            aria-label="Taxi Select Home"
           >
               <span className="font-serif text-2xl md:text-3xl font-bold text-white tracking-wide group-hover:scale-105 transition-transform duration-300 drop-shadow-lg">
                 TAXI<span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-orange">SELECT</span>
@@ -87,7 +99,6 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
               </span>
           </Link>
           
-          {/* Weather Widget */}
           <div className="hidden xs:block origin-left">
             <WeatherWidget />
           </div>
@@ -114,7 +125,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
           <LanguageSwitcher currentLang={lang} setLang={setLang} />
         </nav>
 
-        {/* Mobile Right Section (Weather on very small screens + Burger) */}
+        {/* Mobile Right Section */}
         <div className="flex items-center gap-4 md:hidden relative z-50">
            <div className="xs:hidden">
              <WeatherWidget />
@@ -124,7 +135,8 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
           <button
             className="text-white focus:outline-none p-2 hover:text-brand-gold transition-colors relative"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label={mobileMenuOpen ? "Close Menu" : "Open Menu"}
+            aria-label={mobileMenuOpen ? "Închide Meniul" : "Deschide Meniul"}
+            aria-expanded={mobileMenuOpen}
           >
              <div className="w-6 h-6 relative flex items-center justify-center">
                 <span className={`absolute h-0.5 w-6 bg-current transform transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 delay-75' : '-translate-y-2'}`}></span>
@@ -134,17 +146,14 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
           </button>
         </div>
 
-        {/* Mobile Menu Overlay - REDESIGNED */}
+        {/* Mobile Menu Overlay */}
         <div
           className={`fixed inset-0 bg-brand-dark z-40 flex flex-col transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] md:hidden ${
             mobileMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
           }`}
           style={{ top: 0, height: '100dvh' }} 
         >
-          {/* Scrollable Content Area */}
           <div className="flex flex-col h-full pt-28 pb-8 px-6 overflow-y-auto">
-            
-            {/* Navigation Links */}
             <nav className="flex flex-col space-y-2 mt-4">
               {navLinks.map((link, idx) => (
                 <Link
@@ -175,21 +184,16 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
               ))}
             </nav>
 
-            {/* Spacer pushes content to bottom */}
             <div className="flex-grow"></div>
 
-            {/* Bottom Section: Language & Contact */}
             <div 
                 className={`flex flex-col space-y-6 mt-8 transition-all duration-700 delay-300 ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
             >
-              
-              {/* Language Switcher */}
               <div className="flex items-center justify-between border-t border-white/10 pt-6">
-                <span className="text-gray-400 text-sm uppercase tracking-wider font-medium">Limbă / Язык / Language</span>
+                <span className="text-gray-400 text-sm uppercase tracking-wider font-medium">Language</span>
                 <LanguageSwitcher currentLang={lang} setLang={setLang} />
               </div>
 
-              {/* Quick Contact Info Card */}
               <div className="bg-white/5 rounded-xl p-5 border border-white/10 flex items-center justify-between group hover:bg-white/10 transition-colors">
                  <div>
                    <p className="text-gray-400 text-xs uppercase mb-1 tracking-widest">Dispecerat 24/7</p>
@@ -200,7 +204,6 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
                  </div>
               </div>
 
-              {/* Social Link */}
                <div className="text-center pb-4">
                   <a 
                     href="https://www.facebook.com/profile.php?id=61558158336366" 
@@ -209,7 +212,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
                     className="text-sm text-gray-500 hover:text-brand-gold transition-colors flex items-center justify-center gap-2"
                   >
                     <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                    Urmărește-ne pe Facebook
+                    Facebook
                   </a>
                </div>
             </div>

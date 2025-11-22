@@ -31,24 +31,14 @@ const HyperCanvas: React.FC = () => {
         carShiftX: [-0.8, 0.8],
         carFloorSeparation: [0, 5],
         colors: {
-          // Adjusted environment colors to blend seamlessly with the #102E50 background
-          roadColor: 0x081424, // Deep Navy Black (instead of pure black) for smoother transition
-          islandColor: 0x0a1a2a, // Dark Navy Island
-          background: 0x102E50, // Brand Dark (Main Background)
-          
-          // Road markings
-          shoulderLines: 0xF5C45E, // Brand Gold
-          brokenLines: 0xA5B5C5, // Light Blue-Grey (Subtle contrast)
-          
-          // Traffic Colors - Logical & Branded
-          // Left side (Oncoming): Headlights - White & Gold
-          leftCars: [0xFFFFFF, 0xF5C45E, 0xF8E3A0], 
-          
-          // Right side (Departing): Taillights - Brand Red & Orange
-          rightCars: [0xBE3D2A, 0xE78B48, 0xD35400],
-          
-          // Vertical Sticks - Defining the tunnel with Brand Gold
-          sticks: 0xF5C45E, 
+          roadColor: 0x080808, // Pitch Black Asphalt (Realistic)
+          islandColor: 0x0a0a0a, // Dark Grey separation
+          background: 0x020617, // Deepest Midnight Blue (Almost Black) - Fits Brand Dark
+          shoulderLines: 0x334155, // Slate Grey (Subtle border, not neon)
+          brokenLines: 0x475569, // Steel Grey (Realistic lane markings)
+          leftCars: [0xFFFFFF, 0xE2E8F0, 0xF5C45E], // Xenon White, Silver, and subtle Brand Gold highlights
+          rightCars: [0xDC2626, 0x991B1B, 0x7F1D1D], // Deep Ruby Red (Realistic Taillights)
+          sticks: 0xF5C45E, // Brand Gold for street lights only (Elegant accent)
         }
       }}
     />

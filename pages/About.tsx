@@ -56,7 +56,7 @@ const About: React.FC<Props> = ({ t }) => {
             {features.map((feature, index) => (
               <div 
                 key={index} 
-                className={`group relative bg-[#0D2541]/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl flex flex-col`}
+                className={`group relative bg-brand-slate/50 backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl flex flex-col`}
                 style={{ animationDelay: `${index * 0.2}s` }}
               >
                 {/* Image Area */}
@@ -66,7 +66,7 @@ const About: React.FC<Props> = ({ t }) => {
                     alt={feature.title}
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 saturate-[0.8] group-hover:saturate-100"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0D2541] via-transparent to-transparent opacity-90"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-slate via-transparent to-transparent opacity-90"></div>
                 </div>
 
                 {/* Content Area */}

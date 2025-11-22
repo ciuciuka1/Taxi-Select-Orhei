@@ -16,7 +16,7 @@ const Contact: React.FC<Props> = ({ t }) => {
       />
       <div className="pt-32 pb-20 px-6 relative z-10 bg-brand-dark min-h-screen flex items-center">
         <div className="container mx-auto max-w-3xl text-center">
-          <div className="bg-[#0D2541]/90 backdrop-blur-md border border-white/10 p-12 rounded-2xl shadow-2xl relative overflow-hidden">
+          <div className="bg-brand-slate/80 backdrop-blur-md border border-white/10 p-12 rounded-2xl shadow-2xl relative overflow-hidden">
              
              {/* Decorative Background Glow */}
              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-brand-gold/10 blur-[50px] rounded-full"></div>
