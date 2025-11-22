@@ -28,6 +28,16 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
     setMobileMenuOpen(false);
   }, [location]);
 
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [mobileMenuOpen]);
+
   const navLinks = [
     { path: '/', label: t.nav.home },
     { path: '/services', label: t.nav.services },
@@ -38,17 +48,19 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
   return (
     <header
       className={`fixed w-full top-0 z-40 transition-all duration-500 border-b ${
-        isScrolled || mobileMenuOpen 
-          ? 'bg-brand-dark/90 backdrop-blur-md shadow-lg py-2 border-white/5' 
-          : 'bg-transparent py-4 md:py-6 border-transparent'
+        mobileMenuOpen
+          ? 'bg-brand-dark border-white/10' 
+          : isScrolled 
+            ? 'bg-brand-dark/90 backdrop-blur-md shadow-lg py-2 border-white/5' 
+            : 'bg-transparent py-4 md:py-6 border-transparent'
       }`}
     >
       {/* Added significant gap-16 at md breakpoint to force separation between Weather and Home */}
-      <div className="container mx-auto px-4 md:px-6 flex justify-between items-center gap-6 md:gap-16 lg:gap-24">
+      <div className="container mx-auto px-4 md:px-6 flex justify-between items-center gap-6 md:gap-16 lg:gap-24 relative">
         
         {/* Branding + Weather Wrapper */}
-        <div className="flex items-center gap-3 md:gap-4 shrink-0">
-          <Link to="/" className="z-50 relative group flex flex-col">
+        <div className="flex items-center gap-3 md:gap-4 shrink-0 relative z-50">
+          <Link to="/" className="relative group flex flex-col" onClick={() => setMobileMenuOpen(false)}>
               <span className="font-serif text-2xl md:text-3xl font-bold text-white tracking-wide group-hover:scale-105 transition-transform duration-300 drop-shadow-lg">
                 TAXI<span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-orange">SELECT</span>
               </span>
@@ -84,50 +96,103 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
         </nav>
 
         {/* Mobile Right Section (Weather on very small screens + Burger) */}
-        <div className="flex items-center gap-4 md:hidden">
+        <div className="flex items-center gap-4 md:hidden relative z-50">
            <div className="xs:hidden">
              <WeatherWidget />
            </div>
            
           {/* Mobile Toggle */}
           <button
-            className="z-50 text-white focus:outline-none p-2 hover:text-brand-gold transition-colors"
+            className="text-white focus:outline-none p-2 hover:text-brand-gold transition-colors relative"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle Menu"
+            aria-label={mobileMenuOpen ? "Close Menu" : "Open Menu"}
           >
-            <svg
-              className="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {mobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-              )}
-            </svg>
+             <div className="w-6 h-6 relative flex items-center justify-center">
+                <span className={`absolute h-0.5 w-6 bg-current transform transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 delay-75' : '-translate-y-2'}`}></span>
+                <span className={`absolute h-0.5 w-6 bg-current transform transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : 'opacity-100'}`}></span>
+                <span className={`absolute h-0.5 w-6 bg-current transform transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 delay-75' : 'translate-y-2'}`}></span>
+             </div>
           </button>
         </div>
 
-        {/* Mobile Menu Overlay */}
+        {/* Mobile Menu Overlay - REDESIGNED */}
         <div
-          className={`fixed inset-0 bg-brand-dark/98 backdrop-blur-xl flex flex-col items-center justify-center space-y-8 transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1) md:hidden ${
+          className={`fixed inset-0 bg-brand-dark z-40 flex flex-col transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] md:hidden ${
             mobileMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
           }`}
+          style={{ top: 0, height: '100dvh' }} 
         >
-          {navLinks.map((link, idx) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className="text-3xl font-serif font-bold text-white hover:text-brand-gold transition-transform hover:scale-110"
-              style={{ transitionDelay: `${idx * 100}ms` }}
+          {/* Scrollable Content Area */}
+          <div className="flex flex-col h-full pt-28 pb-8 px-6 overflow-y-auto">
+            
+            {/* Navigation Links */}
+            <nav className="flex flex-col space-y-2 mt-4">
+              {navLinks.map((link, idx) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`text-3xl font-serif font-bold py-5 border-b border-white/5 flex items-center justify-between group ${
+                    location.pathname === link.path ? 'text-brand-gold pl-2' : 'text-white hover:text-brand-gold hover:pl-2'
+                  } transition-all duration-300`}
+                  style={{ 
+                      transitionDelay: `${idx * 50}ms`,
+                      opacity: mobileMenuOpen ? 1 : 0,
+                      transform: mobileMenuOpen ? 'translateX(0)' : 'translateX(20px)'
+                  }}
+                >
+                  <span>{link.label}</span>
+                  <svg 
+                    className={`w-6 h-6 transform transition-transform duration-300 ${
+                      location.pathname === link.path ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'
+                    }`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              ))}
+            </nav>
+
+            {/* Spacer pushes content to bottom */}
+            <div className="flex-grow"></div>
+
+            {/* Bottom Section: Language & Contact */}
+            <div 
+                className={`flex flex-col space-y-6 mt-8 transition-all duration-700 delay-300 ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
             >
-              {link.label}
-            </Link>
-          ))}
-          <div className="mt-12 p-2 border border-white/10 rounded-lg">
-            <LanguageSwitcher currentLang={lang} setLang={setLang} />
+              
+              {/* Language Switcher */}
+              <div className="flex items-center justify-between border-t border-white/10 pt-6">
+                <span className="text-gray-400 text-sm uppercase tracking-wider font-medium">Limbă / Язык / Language</span>
+                <LanguageSwitcher currentLang={lang} setLang={setLang} />
+              </div>
+
+              {/* Quick Contact Info Card */}
+              <div className="bg-white/5 rounded-xl p-5 border border-white/10 flex items-center justify-between group hover:bg-white/10 transition-colors">
+                 <div>
+                   <p className="text-gray-400 text-xs uppercase mb-1 tracking-widest">Dispecerat 24/7</p>
+                   <a href="tel:+37323566666" className="text-2xl font-bold text-white block font-serif tracking-wide">0 235 66 6 66</a>
+                 </div>
+                 <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.91.97.97 0 007.61 3H4.21a1 1 0 00-.98 1.05c.2 10.53 8.67 19.01 19.23 19.21a1 1 0 001.05-.98v-3.39a.99.99 0 00-.5-2.51z"/></svg>
+                 </div>
+              </div>
+
+              {/* Social Link */}
+               <div className="text-center pb-4">
+                  <a 
+                    href="https://www.facebook.com/profile.php?id=61558158336366" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-gray-500 hover:text-brand-gold transition-colors flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    Urmărește-ne pe Facebook
+                  </a>
+               </div>
+            </div>
           </div>
         </div>
       </div>
