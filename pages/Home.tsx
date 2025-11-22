@@ -13,8 +13,8 @@ const Home: React.FC<Props> = ({ t }) => {
       <SeoHead title={t.meta.title} description={t.meta.description} />
       
       {/* Hero Section */}
-      {/* Increased bottom padding to allow safe overlap of cards on desktop, and proper spacing on mobile */}
-      <section className="relative min-h-screen flex items-center justify-center pt-32 pb-24 md:pb-48 px-6">
+      {/* Removed large bottom padding (md:pb-48) since we no longer overlap cards */}
+      <section className="relative min-h-screen flex items-center justify-center pt-32 pb-20 px-6">
         <div className="relative z-10 max-w-4xl mx-auto text-center perspective-1000">
           <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
             {t.hero.title}
@@ -34,13 +34,21 @@ const Home: React.FC<Props> = ({ t }) => {
             </a>
           </div>
         </div>
+        
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce opacity-70">
+          <svg className="w-6 h-6 text-white" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+          </svg>
+        </div>
       </section>
 
-      {/* Quick Services Grid */}
-      <section className="relative z-10 bg-brand-dark py-12 px-6">
+      {/* Quick Services Grid - MOVED DOWN */}
+      {/* Increased padding (py-24) to separate distinctively from Hero */}
+      <section className="relative z-10 bg-brand-dark py-24 px-6 border-t border-white/5 shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
         <div className="container mx-auto">
-          {/* Responsive margin: Positive mt-12 on mobile (no overlap), Negative -mt-32 on desktop (overlap) */}
-          <div className="grid md:grid-cols-3 gap-8 mt-12 md:-mt-32">
+          {/* Removed negative margins so it sits strictly below the Hero */}
+          <div className="grid md:grid-cols-3 gap-8">
             {[
               { title: t.services.city, desc: t.services.cityDesc, icon: '🏙️' },
               { title: t.services.inter, desc: t.services.interDesc, icon: '🛣️' },
