@@ -15,6 +15,7 @@ export const translations: Record<Language, TranslationStructure> = {
     },
     home: {
       experience: "Experiență Premium",
+      experienceDesc: "Confort și siguranță la standarde ridicate pentru fiecare călătorie.",
       safetyBadge: "SIGURANȚĂ",
     },
     services: {
@@ -93,6 +94,7 @@ export const translations: Record<Language, TranslationStructure> = {
     },
     home: {
       experience: "Премиум Опыт",
+      experienceDesc: "Комфорт и безопасность высоких стандартов для каждой поездки.",
       safetyBadge: "БЕЗОПАСНОСТЬ",
     },
     services: {
@@ -171,6 +173,7 @@ export const translations: Record<Language, TranslationStructure> = {
     },
     home: {
       experience: "Premium Experience",
+      experienceDesc: "High standards of comfort and safety for every journey.",
       safetyBadge: "SAFETY",
     },
     services: {

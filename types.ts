@@ -14,6 +14,7 @@ export interface TranslationStructure {
   };
   home: {
     experience: string;
+    experienceDesc: string;
     safetyBadge: string;
   };
   services: {
