@@ -6,6 +6,7 @@ export interface TranslationStructure {
     services: string;
     about: string;
     contact: string;
+    dispatcher: string;
   };
   hero: {
     title: string;

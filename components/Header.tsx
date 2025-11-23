@@ -196,7 +196,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
 
               <div className="bg-white/5 rounded-xl p-5 border border-white/10 flex items-center justify-between group hover:bg-white/10 transition-colors">
                  <div>
-                   <p className="text-gray-400 text-xs uppercase mb-1 tracking-widest">Dispecerat 24/7</p>
+                   <p className="text-gray-400 text-xs uppercase mb-1 tracking-widest">{t.nav.dispatcher}</p>
                    <a href="tel:+37323566666" className="text-2xl font-bold text-white block font-serif tracking-wide">0 235 66 6 66</a>
                  </div>
                  {/* Mobile Menu Button - Reverted to Brand Gold */}

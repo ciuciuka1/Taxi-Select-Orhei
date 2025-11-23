@@ -7,6 +7,7 @@ export const translations: Record<Language, TranslationStructure> = {
       services: "Servicii",
       about: "Despre Noi",
       contact: "Contact",
+      dispatcher: "Dispecerat 24/7",
     },
     hero: {
       title: "Rapiditate. Siguranță. Confort.",
@@ -86,6 +87,7 @@ export const translations: Record<Language, TranslationStructure> = {
       services: "Услуги",
       about: "О нас",
       contact: "Контакты",
+      dispatcher: "Диспетчер 24/7",
     },
     hero: {
       title: "Скорость. Безопасность. Комфорт.",
@@ -165,6 +167,7 @@ export const translations: Record<Language, TranslationStructure> = {
       services: "Services",
       about: "About Us",
       contact: "Contact",
+      dispatcher: "Dispatch 24/7",
     },
     hero: {
       title: "Speed. Safety. Comfort.",
