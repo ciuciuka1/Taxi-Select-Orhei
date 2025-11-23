@@ -6,6 +6,9 @@ interface HyperspeedProps {
   effectOptions?: any;
 }
 
+const LOOK_AT_AMP = new THREE.Vector3(-2, -5, 0);
+const LOOK_AT_OFFSET = new THREE.Vector3(0, 0, -10);
+
 const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const appInstance = useRef<any>(null);
@@ -15,24 +18,14 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
     if (!container) return;
 
     const options = {
-      onSpeedUp: () => {},
-      onSlowDown: () => {},
-      distortion: 'turbulentDistortion',
       length: 400,
       roadWidth: 10,
       islandWidth: 2,
-      lanesPerRoad: 3,
       fov: 90,
       fovSpeedUp: 150,
       speedUp: 2,
       carLightsFade: 0.4,
-      totalSideLightSticks: 20,
       lightPairsPerRoadWay: 40,
-      shoulderLinesWidthPercentage: 0.05,
-      brokenLinesWidthPercentage: 0.1,
-      brokenLinesLengthPercentage: 0.5,
-      lightStickWidth: [0.12, 0.5],
-      lightStickHeight: [1.3, 1.7],
       movingAwaySpeed: [60, 80],
       movingCloserSpeed: [-120, -160],
       carLightsLength: [400 * 0.03, 400 * 0.2],
@@ -43,17 +36,13 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
       colors: {
         roadColor: 0x081424,
         islandColor: 0x0a1a2a,
-        background: 0x020617, // Matched with Tailwind bg-brand-dark
-        shoulderLines: 0xF5C45E,
-        brokenLines: 0x4B6584,
+        background: 0x020617,
         leftCars: [0xFFFFFF, 0xF5C45E, 0xFFEAA7],
-        rightCars: [0xBE3D2A, 0xE78B48, 0xC0392B],
-        sticks: 0xF5C45E
+        rightCars: [0xBE3D2A, 0xE78B48, 0xC0392B]
       },
       ...effectOptions
     };
 
-    // --- SHADER DEFINITIONS (Optimized) ---
     const turbulentUniforms = {
       uFreq: { value: new THREE.Vector4(4, 8, 8, 1) },
       uAmp: { value: new THREE.Vector4(25, 5, 10, 10) }
@@ -94,14 +83,61 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
         const nsin = (val: number) => Math.sin(val) * 0.5 + 0.5;
         const getX = (p: number) => Math.cos(Math.PI * p * uFreq.x + time) * uAmp.x + Math.pow(Math.cos(Math.PI * p * uFreq.y + time * (uFreq.y / uFreq.x)), 2) * uAmp.y;
         const getY = (p: number) => -nsin(Math.PI * p * uFreq.z + time) * uAmp.z - Math.pow(nsin(Math.PI * p * uFreq.w + time / (uFreq.z / uFreq.w)), 5) * uAmp.w;
-        let distortion = new THREE.Vector3(getX(progress) - getX(progress + 0.007), getY(progress) - getY(progress + 0.007), 0);
-        let lookAtAmp = new THREE.Vector3(-2, -5, 0);
-        let lookAtOffset = new THREE.Vector3(0, 0, -10);
-        return distortion.multiply(lookAtAmp).add(lookAtOffset);
+        const distortion = new THREE.Vector3(getX(progress) - getX(progress + 0.007), getY(progress) - getY(progress + 0.007), 0);
+        return distortion.multiply(LOOK_AT_AMP).add(LOOK_AT_OFFSET);
       }
     };
 
-    // --- ROAD CLASS ---
+    // CLEANED SHADER: Removed all logic for "sideLines", "uLanes", "uShoulderLines". 
+    // It now simply renders the base color with fog.
+    const roadFragment = `
+      #define USE_FOG;
+      varying vec2 vUv; 
+      uniform vec3 uColor;
+      uniform float uTime;
+      ${THREE.ShaderChunk['fog_pars_fragment']}
+      void main() {
+        vec2 uv = vUv;
+        vec3 color = vec3(uColor);
+        gl_FragColor = vec4(color, 1.);
+        ${THREE.ShaderChunk['fog_fragment']}
+      }
+    `;
+
+    const islandFragment = `
+      #define USE_FOG;
+      varying vec2 vUv;
+      uniform vec3 uColor;
+      uniform float uTime;
+      ${THREE.ShaderChunk['fog_pars_fragment']}
+      void main() {
+        vec2 uv = vUv;
+        vec3 color = vec3(uColor);
+        gl_FragColor = vec4(color, 1.);
+        ${THREE.ShaderChunk['fog_fragment']}
+      }
+    `;
+
+    const roadVertex = `
+      #define USE_FOG;
+      uniform float uTime;
+      ${THREE.ShaderChunk['fog_pars_vertex']}
+      uniform float uTravelLength;
+      varying vec2 vUv;
+      #include <getDistortion_vertex>
+      void main() {
+        vec3 transformed = position.xyz;
+        vec3 distortion = getDistortion((transformed.y + uTravelLength / 2.) / uTravelLength);
+        transformed.x += distortion.x;
+        transformed.z += distortion.y;
+        transformed.y += -1. * distortion.z;
+        vec4 mvPosition = modelViewMatrix * vec4(transformed, 1.);
+        gl_Position = projectionMatrix * mvPosition;
+        vUv = uv;
+        ${THREE.ShaderChunk['fog_vertex']}
+      }
+    `;
+
     class Road {
       webgl: any; options: any; uTime: any; leftRoadWay: any; rightRoadWay: any; island: any;
       constructor(webgl: any, options: any) { this.webgl = webgl; this.options = options; this.uTime = { value: 0 }; }
@@ -110,16 +146,9 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
         const segments = 100;
         const geometry = new THREE.PlaneGeometry(isRoad ? options.roadWidth : options.islandWidth, options.length, 20, segments);
         let uniforms: any = { uTravelLength: { value: options.length }, uColor: { value: new THREE.Color(isRoad ? options.colors.roadColor : options.colors.islandColor) }, uTime: this.uTime };
-        if (isRoad) {
-          uniforms = Object.assign(uniforms, {
-            uLanes: { value: options.lanesPerRoad },
-            uBrokenLinesColor: { value: new THREE.Color(options.colors.brokenLines) },
-            uShoulderLinesColor: { value: new THREE.Color(options.colors.shoulderLines) },
-            uShoulderLinesWidthPercentage: { value: options.shoulderLinesWidthPercentage },
-            uBrokenLinesLengthPercentage: { value: options.brokenLinesLengthPercentage },
-            uBrokenLinesWidthPercentage: { value: options.brokenLinesWidthPercentage }
-          });
-        }
+        
+        // Removed uLanes and uShoulderLines logic here. It is now just a plain surface.
+        
         const material = new THREE.ShaderMaterial({
           fragmentShader: isRoad ? roadFragment : islandFragment,
           vertexShader: roadVertex,
@@ -138,14 +167,6 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
       update(time: number) { this.uTime.value = time; }
     }
 
-    const roadBaseFragment = `#define USE_FOG;\nvarying vec2 vUv;\nuniform vec3 uColor;\nuniform float uTime;\n#include <roadMarkings_vars>\n${THREE.ShaderChunk['fog_pars_fragment']}\nvoid main() {\nvec2 uv = vUv;\nvec3 color = vec3(uColor);\n#include <roadMarkings_fragment>\ngl_FragColor = vec4(color, 1.);\n${THREE.ShaderChunk['fog_fragment']}\n}`;
-    const islandFragment = roadBaseFragment.replace('#include <roadMarkings_fragment>', '').replace('#include <roadMarkings_vars>', '');
-    const roadMarkings_vars = `uniform float uLanes;\nuniform vec3 uBrokenLinesColor;\nuniform vec3 uShoulderLinesColor;\nuniform float uShoulderLinesWidthPercentage;\nuniform float uBrokenLinesWidthPercentage;\nuniform float uBrokenLinesLengthPercentage;\nhighp float random(vec2 co) { highp float a = 12.9898; highp float b = 78.233; highp float c = 43758.5453; highp float dt = dot(co.xy, vec2(a, b)); highp float sn = mod(dt, 3.14); return fract(sin(sn) * c); }`;
-    const roadMarkings_fragment = `uv.y = mod(uv.y + uTime * 0.05, 1.);\nfloat laneWidth = 1.0 / uLanes;\nfloat brokenLineWidth = laneWidth * uBrokenLinesWidthPercentage;\nfloat laneEmptySpace = 1. - uBrokenLinesLengthPercentage;\nfloat brokenLines = step(1.0 - brokenLineWidth, fract(uv.x * 2.0)) * step(laneEmptySpace, fract(uv.y * 10.0));\nfloat sideLines = step(1.0 - brokenLineWidth, fract((uv.x - laneWidth * (uLanes - 1.0)) * 2.0)) + step(brokenLineWidth, uv.x);\nbrokenLines = mix(brokenLines, sideLines, uv.x);\ncolor = mix(color, uBrokenLinesColor, brokenLines);\ncolor = mix(color, uShoulderLinesColor, sideLines);`;
-    const roadFragment = roadBaseFragment.replace('#include <roadMarkings_fragment>', roadMarkings_fragment).replace('#include <roadMarkings_vars>', roadMarkings_vars);
-    const roadVertex = `#define USE_FOG;\nuniform float uTime;\n${THREE.ShaderChunk['fog_pars_vertex']}\nuniform float uTravelLength;\nvarying vec2 vUv;\n#include <getDistortion_vertex>\nvoid main() {\nvec3 transformed = position.xyz;\nvec3 distortion = getDistortion((transformed.y + uTravelLength / 2.) / uTravelLength);\ntransformed.x += distortion.x;\ntransformed.z += distortion.y;\ntransformed.y += -1. * distortion.z;\nvec4 mvPosition = modelViewMatrix * vec4(transformed, 1.);\ngl_Position = projectionMatrix * mvPosition;\nvUv = uv;\n${THREE.ShaderChunk['fog_vertex']}\n}`;
-
-    // --- CAR LIGHTS CLASS ---
     class CarLights {
       webgl: any; options: any; colors: any; speed: any; fade: any; mesh: any;
       constructor(webgl: any, options: any, colors: any, speed: any, fade: any) { this.webgl = webgl; this.options = options; this.colors = colors; this.speed = speed; this.fade = fade; }
@@ -155,14 +176,20 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
         let geometry = new THREE.TubeGeometry(curve, 40, 1, 8, false);
         let instanced = new THREE.InstancedBufferGeometry().copy(geometry);
         instanced.instanceCount = options.lightPairsPerRoadWay * 2;
-        let laneWidth = options.roadWidth / options.lanesPerRoad;
+        
+        // Removed laneWidth calculation based on uLanes since lanes don't exist visually anymore. 
+        // We just use a distribution logic.
+        // Assuming 3 lanes for distribution logic only, but not rendering lines.
+        let lanesPerRoad = 3; 
+        let laneWidth = options.roadWidth / lanesPerRoad;
+        
         let aOffset = [], aMetrics = [], aColor = [];
         let colors = Array.isArray(this.colors) ? this.colors.map(c => new THREE.Color(c)) : new THREE.Color(this.colors);
         const pickRandom = (arr: any) => (Array.isArray(arr) ? arr[Math.floor(Math.random() * arr.length)] : arr);
         const random = (base: any) => (Array.isArray(base) ? Math.random() * (base[1] - base[0]) + base[0] : Math.random() * base);
         for (let i = 0; i < options.lightPairsPerRoadWay; i++) {
           let radius = random(options.carLightsRadius), length = random(options.carLightsLength), speed = random(this.speed);
-          let carLane = i % options.lanesPerRoad, laneX = carLane * laneWidth - options.roadWidth / 2 + laneWidth / 2 + random(options.carShiftX) * laneWidth;
+          let carLane = i % lanesPerRoad, laneX = carLane * laneWidth - options.roadWidth / 2 + laneWidth / 2 + random(options.carShiftX) * laneWidth;
           let carWidth = random(options.carWidthPercentage) * laneWidth, offsetY = random(options.carFloorSeparation) + radius * 1.3, offsetZ = -random(options.length);
           aOffset.push(laneX - carWidth / 2, offsetY, offsetZ, laneX + carWidth / 2, offsetY, offsetZ);
           aMetrics.push(radius, length, speed, radius, length, speed);
@@ -187,7 +214,6 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
       update(time: number) { this.mesh.material.uniforms.uTime.value = time; }
     }
 
-    // --- APP CLASS ---
     class App {
       container: any; options: any; renderer: any; composer: any; camera: any; scene: any; fogUniforms: any; clock: any; assets: any; road: any; leftCarLights: any; rightCarLights: any; fovTarget: number; speedUpTarget: number; speedUp: number; timeOffset: number; animationId: number = 0; isMobile: boolean;
       constructor(container: any, options: any) {
@@ -195,8 +221,8 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
         this.options = options;
         this.isMobile = window.innerWidth < 768;
         this.options.distortion = distortionConfig;
-        this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: "default" }); // "default" is safer for battery/thermal
-        const dpr = this.isMobile ? 1 : Math.min(window.devicePixelRatio, 1.5); // Cap DPR for performance
+        this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: "default" });
+        const dpr = this.isMobile ? 1 : Math.min(window.devicePixelRatio, 1.5);
         this.renderer.setPixelRatio(dpr);
         this.renderer.setSize(container.offsetWidth, container.offsetHeight, false);
         container.appendChild(this.renderer.domElement);

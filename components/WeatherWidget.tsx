@@ -42,11 +42,8 @@ const WeatherWidget: React.FC = () => {
 
   // LOGICA PENTRU DESCRIEREA TEXTUALĂ COMPLETĂ (24 TIPURI)
   const getWeatherDescription = (code: number, temp: number, wind: number) => {
-    // 1. Condiții Extreme de Temperatură
     if (temp >= 30) return "Caniculă";
     if (temp <= -10) return "Ger";
-
-    // 2. Condiții Speciale (mapate pe coduri WMO existente)
     if (wind > 60 && code >= 95) return "Cod Roșu: Furtună Violenta";
     if (wind > 80) return "Vânt Puternic (Rafale)";
 
@@ -70,9 +67,9 @@ const WeatherWidget: React.FC = () => {
       case 77: return "Grindină";
       case 80: return "Averse (Ploaie Rapidă)";
       case 81: return "Averse Moderate";
-      case 82: return "Ploaie Torențială (Aversă)"; // Violent
+      case 82: return "Ploaie Torențială (Aversă)";
       case 85: return "Lapoviță";
-      case 86: return "Viscol"; // Averse zapada puternice
+      case 86: return "Viscol"; 
       case 95: return "Furtună cu descărcări electrice";
       case 96: case 99: return "Furtună Violenta cu Grindină";
       default: return "Vreme Variabilă";
@@ -86,39 +83,32 @@ const WeatherWidget: React.FC = () => {
     // DEFINIȚII GRADIENTS & FILTRE
     const defs = (
       <defs>
-        {/* Soare: Gold intens */}
         <radialGradient id="sunCore" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
             <stop offset="0%" stopColor="#FFF7ED" />
             <stop offset="40%" stopColor="#F59E0B" />
             <stop offset="100%" stopColor="#B45309" />
         </radialGradient>
-        {/* Nori Zi: Alb pufos */}
         <linearGradient id="cloudWhite" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="#FFFFFF" />
           <stop offset="100%" stopColor="#CBD5E1" />
         </linearGradient>
-        {/* Nori Ploaie/Noapte: Gri-Albastru */}
         <linearGradient id="cloudGrey" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="#94A3B8" />
           <stop offset="100%" stopColor="#334155" />
         </linearGradient>
-        {/* Nori Furtună: Foarte întunecat */}
         <linearGradient id="cloudDarkStorm" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="#475569" />
           <stop offset="100%" stopColor="#0F172A" />
         </linearGradient>
-        {/* Ploaie: NEON CYAN PENTRU VIZIBILITATE MAXIMĂ PE NEGRU */}
         <linearGradient id="rainNeon" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="#22D3EE" stopOpacity="0" />
           <stop offset="50%" stopColor="#06B6D4" stopOpacity="1" />
           <stop offset="100%" stopColor="#0891B2" stopOpacity="0" />
         </linearGradient>
-        {/* Luna */}
         <radialGradient id="moonSurface" cx="50%" cy="50%" r="50%">
             <stop offset="40%" stopColor="#F8FAFC" />
             <stop offset="100%" stopColor="#94A3B8" />
         </radialGradient>
-        {/* Canicula */}
         <radialGradient id="heatGlow" cx="50%" cy="50%" r="50%">
            <stop offset="0%" stopColor="#EF4444" stopOpacity="0.4" />
            <stop offset="100%" stopColor="#EF4444" stopOpacity="0" />
@@ -132,23 +122,18 @@ const WeatherWidget: React.FC = () => {
        </g>
     );
 
-    // --- LOGICA DE AFIȘARE ---
-
-    // A. CANICULĂ (Heatwave) - Prioritate 1
     if (temp >= 30) {
       return (
         <svg className={iconClass} viewBox="0 0 64 64">
            {defs}
            <circle cx="32" cy="32" r="28" fill="url(#heatGlow)" className="animate-pulse-slow" />
            <circle cx="32" cy="32" r="14" fill="url(#sunCore)" className="animate-heat-wave drop-shadow-[0_0_20px_rgba(249,115,22,0.8)]" />
-           {/* Heat ripples */}
            <path d="M10 50 Q 15 45, 20 50 T 30 50" stroke="#EF4444" fill="none" opacity="0.6" className="animate-fog-flow" />
            <path d="M34 55 Q 39 50, 44 55 T 54 55" stroke="#EF4444" fill="none" opacity="0.6" className="animate-fog-flow" style={{animationDelay:'0.5s'}} />
         </svg>
       );
     }
 
-    // B. GER (Extreme Cold) - Prioritate 1
     if (temp <= -10) {
       return (
         <svg className={iconClass} viewBox="0 0 64 64">
@@ -160,34 +145,25 @@ const WeatherWidget: React.FC = () => {
       );
     }
 
-    // C. FURTUNĂ / COD ROȘU (Thunderstorm) - 95, 96, 99
     if (code >= 95) {
       return (
         <svg className={iconClass} viewBox="0 0 64 64">
            {defs}
-           {/* Flash Light Background */}
            <rect x="0" y="0" width="64" height="64" fill="white" className="animate-flash" opacity="0.1" />
            <CloudPath x={2} y={2} scale={1.1} fill="url(#cloudDarkStorm)" />
-           
-           {/* Fulger Mare */}
            <path d="M34 32 L26 44 H34 L30 58" stroke="#FACC15" strokeWidth="3" fill="none" className="animate-flash drop-shadow-[0_0_10px_rgba(250,204,21,1)]" strokeLinecap="round" strokeLinejoin="round" />
-           
-           {/* Ploaie Torențială - Cyan Neon */}
            <line x1="18" y1="45" x2="14" y2="58" stroke="#06B6D4" strokeWidth="2.5" strokeLinecap="round" className="animate-rain-heavy" />
            <line x1="48" y1="45" x2="44" y2="58" stroke="#06B6D4" strokeWidth="2.5" strokeLinecap="round" className="animate-rain-heavy" style={{animationDelay: '0.2s'}} />
         </svg>
       );
     }
 
-    // D. AVERSE / PLOAIE TORENȚIALĂ (Showers) - 80, 81, 82
     if (code >= 80 && code <= 82) {
       return (
         <svg className={iconClass} viewBox="0 0 64 64">
            {defs}
            <CloudPath x={6} y={-4} scale={0.9} fill="url(#cloudDarkStorm)" opacity={0.9} />
            <CloudPath x={0} y={0} fill="url(#cloudGrey)" />
-           
-           {/* Picături Groase, Oblice, Cyan Aprins */}
            <g>
              <line x1="20" y1="40" x2="15" y2="55" stroke="#22D3EE" strokeWidth="3" strokeLinecap="round" className="animate-rain-heavy" style={{animationDelay: '0s'}} />
              <line x1="32" y1="38" x2="27" y2="53" stroke="#22D3EE" strokeWidth="3" strokeLinecap="round" className="animate-rain-heavy" style={{animationDelay: '0.1s'}} />
@@ -198,13 +174,11 @@ const WeatherWidget: React.FC = () => {
       );
     }
 
-    // E. PLOAIE (Rain) - 61, 63, 65
     if (code >= 61 && code <= 65) {
       return (
         <svg className={iconClass} viewBox="0 0 64 64">
           {defs}
           <CloudPath x={0} y={0} fill="url(#cloudGrey)" />
-          {/* Ploaie Verticală Cyan */}
           <g> 
             <line x1="22" y1="42" x2="22" y2="54" stroke="#06B6D4" strokeWidth="2" strokeLinecap="round" className="animate-rain-drop" style={{animationDuration: '0.9s'}} />
             <line x1="32" y1="40" x2="32" y2="52" stroke="#06B6D4" strokeWidth="2" strokeLinecap="round" className="animate-rain-drop" style={{animationDuration: '1.1s', animationDelay: '0.3s'}} />
@@ -214,13 +188,11 @@ const WeatherWidget: React.FC = () => {
       );
     }
 
-    // F. LAPOVIȚĂ / GHEAȚĂ (Sleet/Freezing Rain) - 56, 57, 66, 67, 85
     if ([56, 57, 66, 67, 85].includes(code)) {
        return (
         <svg className={iconClass} viewBox="0 0 64 64">
            {defs}
            <CloudPath x={0} y={0} fill="url(#cloudGrey)" />
-           {/* Picatura + Fulg */}
            <line x1="25" y1="42" x2="25" y2="52" stroke="#06B6D4" strokeWidth="2" className="animate-rain-drop" />
            <circle cx="38" cy="48" r="2" fill="white" className="animate-snow-fall" />
            <line x1="38" y1="46" x2="38" y2="50" stroke="white" strokeWidth="1" className="animate-snow-fall" />
@@ -229,13 +201,11 @@ const WeatherWidget: React.FC = () => {
        );
     }
 
-    // G. BURNIȚĂ (Drizzle) - 51, 53, 55
     if (code >= 51 && code <= 55) {
       return (
         <svg className={iconClass} viewBox="0 0 64 64">
           {defs}
           <CloudPath x={0} y={0} fill={isDay ? "url(#cloudWhite)" : "url(#cloudGrey)"} />
-          {/* Picaturi mici, fine */}
           <g> 
             <line x1="24" y1="42" x2="24" y2="46" stroke="#22D3EE" strokeWidth="1.5" strokeLinecap="round" className="animate-rain-drop" />
             <line x1="32" y1="44" x2="32" y2="48" stroke="#22D3EE" strokeWidth="1.5" strokeLinecap="round" className="animate-rain-drop" style={{animationDelay: '0.5s'}} />
@@ -245,7 +215,6 @@ const WeatherWidget: React.FC = () => {
       );
     }
 
-    // H. NINSOARE & VISCOL (Snow/Blizzard) - 71-77, 86
     if ((code >= 71 && code <= 77) || code === 86) {
        const isBlizzard = code === 86 || wind > 40;
        return (
@@ -262,7 +231,6 @@ const WeatherWidget: React.FC = () => {
        );
     }
 
-    // I. CEAȚĂ (Fog) - 45, 48
     if (code === 45 || code === 48) {
       return (
         <svg className={iconClass} viewBox="0 0 64 64">
@@ -273,7 +241,6 @@ const WeatherWidget: React.FC = () => {
       );
     }
 
-    // J. NOROS (Overcast) - 3
     if (code === 3) {
         return (
             <svg className={iconClass} viewBox="0 0 64 64">
@@ -284,7 +251,6 @@ const WeatherWidget: React.FC = () => {
         );
     }
 
-    // K. PARȚIAL NOROS (Partly Cloudy) - 1, 2
     if (code === 1 || code === 2) {
         return (
             <svg className={iconClass} viewBox="0 0 64 64">
@@ -303,7 +269,6 @@ const WeatherWidget: React.FC = () => {
         );
     }
 
-    // L. SENIN (Clear) - 0
     if (isDay) {
         return (
           <svg className={iconClass} viewBox="0 0 64 64">
@@ -329,11 +294,20 @@ const WeatherWidget: React.FC = () => {
     return null;
   };
 
+  // CONSTANTE PENTRU UNIFORMIZARE DESIGN
+  // Fixam h-[58px] si min-w-[140px] pentru a preveni schimbarea formei la incarcare
+  const baseContainerClasses = "rounded-full flex items-center gap-3 pl-4 pr-2 py-1.5 border h-[58px] min-w-[140px] backdrop-blur-xl shadow-lg ring-1 select-none";
+
   if (loading) {
      return (
-        <div className="flex items-center gap-3 pl-3 pr-3 py-1.5 rounded-full border border-white/5 bg-brand-dark/50 backdrop-blur-md min-w-[120px]">
-           <div className="h-4 w-12 bg-white/10 rounded animate-pulse"></div>
-           <div className="h-10 w-10 bg-white/10 rounded-full animate-pulse"></div>
+        <div className="relative group z-50 animate-fadeInUp">
+          <div className={`${baseContainerClasses} border-white/5 bg-brand-dark/50 ring-white/5`}>
+             <div className="flex flex-col items-end justify-center w-full pr-1">
+                 <div className="h-4 w-8 bg-white/10 rounded animate-pulse mb-1"></div>
+                 <div className="h-2 w-10 bg-white/10 rounded animate-pulse"></div>
+             </div>
+             <div className="h-10 w-10 bg-white/10 rounded-full animate-pulse ml-1"></div>
+          </div>
         </div>
      );
   }
@@ -341,16 +315,15 @@ const WeatherWidget: React.FC = () => {
   if (!weather) return null;
 
   return (
-    <div className="relative group cursor-help select-none z-50 transition-all duration-500 animate-fadeInUp">
-      {/* Container Principal */}
-      <div className={`flex items-center gap-3 pl-4 pr-2 py-1.5 rounded-full border bg-gradient-to-r transition-all duration-300 backdrop-blur-xl shadow-lg ring-1 ${
+    <div className="relative group cursor-help select-none z-50 animate-fadeInUp">
+      <div className={`${baseContainerClasses} transition-colors duration-500 bg-gradient-to-r ${
           weather.temperature >= 30 ? "from-red-900/80 to-brand-dark/80 border-red-500/30 ring-red-500/20" :
           weather.temperature <= -10 ? "from-blue-900/80 to-brand-dark/80 border-blue-500/30 ring-blue-500/20" :
           "from-brand-dark/80 to-brand-slate/80 border-white/10 ring-white/5 hover:ring-brand-gold/30"
       }`}>
         
         {/* Info Text */}
-        <div className="flex flex-col items-end justify-center">
+        <div className="flex flex-col items-end justify-center flex-grow">
           <span className={`text-lg font-bold font-serif leading-none tracking-tight shadow-black drop-shadow-md ${
               weather.temperature >= 30 ? "text-red-400" :
               weather.temperature <= -10 ? "text-blue-300" :
@@ -364,7 +337,7 @@ const WeatherWidget: React.FC = () => {
         </div>
 
         {/* Icon */}
-        <div className="transform group-hover:scale-110 transition-transform duration-500 ease-out">
+        <div className="transform group-hover:scale-110 transition-transform duration-500 ease-out shrink-0">
           {getWeatherIcon(weather.weatherCode, weather.isDay, weather.temperature, weather.windSpeed)}
         </div>
       </div>
