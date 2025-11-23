@@ -32,7 +32,7 @@ const Contact: React.FC<Props> = ({ t }) => {
              <div className="flex flex-col items-center justify-center space-y-4 mb-12 relative z-10 group/phone">
                 <a 
                    href="tel:+37323566666"
-                   className="text-5xl xs:text-6xl md:text-8xl font-black text-white font-serif drop-shadow-[0_0_25px_rgba(245,196,94,0.5)] hover:text-brand-gold transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] tracking-wider group-hover/phone:scale-110 group-hover/phone:-translate-y-2 transform inline-block"
+                   className="text-5xl xs:text-6xl md:text-8xl font-black text-white font-serif drop-shadow-[0_0_25px_rgba(245,196,94,0.5)] hover:text-brand-gold transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] tracking-wider group-hover/phone:scale-110 group-hover/phone:-translate-y-2 transform inline-block active:scale-95 active:duration-75"
                 >
                    66 6 66
                 </a>
@@ -52,7 +52,7 @@ const Contact: React.FC<Props> = ({ t }) => {
                      py-4 px-8 md:py-5 md:px-16 
                      rounded-full 
                      transition-all duration-300 
-                     shadow-[0_4px_25px_rgba(34,197,94,0.4)] hover:shadow-[0_4px_40px_rgba(34,197,94,0.7)] hover:-translate-y-1 
+                     shadow-[0_4px_25px_rgba(34,197,94,0.4)] hover:shadow-[0_4px_40px_rgba(34,197,94,0.7)] hover:-translate-y-1 active:scale-95 active:duration-75
                      flex items-center justify-center gap-3 md:gap-4 
                      overflow-hidden 
                      border border-green-400/20
@@ -80,7 +80,7 @@ const Contact: React.FC<Props> = ({ t }) => {
                   href="https://www.facebook.com/profile.php?id=61558158336366" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 text-white bg-[#1877F2] hover:bg-[#166fe5] px-6 py-3 rounded-lg transition-colors shadow-lg font-medium hover:shadow-blue-500/30"
+                  className="inline-flex items-center gap-3 text-white bg-[#1877F2] hover:bg-[#166fe5] px-6 py-3 rounded-lg transition-colors shadow-lg font-medium hover:shadow-blue-500/30 active:scale-95 active:duration-75"
                 >
                   <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>

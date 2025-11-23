@@ -41,7 +41,7 @@ const Home: React.FC<Props> = ({ t }) => {
             <div className="animate-fadeInUp mt-6 md:mt-12" style={{ animationDelay: '0.5s' }}>
               <a 
                 href="tel:+37323566666"
-                className="inline-flex items-center justify-center bg-gradient-to-r from-brand-gold to-brand-orange hover:from-brand-gold hover:to-yellow-500 text-brand-dark font-bold text-lg md:text-xl px-8 py-3 md:px-12 md:py-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-[0_0_20px_rgba(245,196,94,0.4)] hover:shadow-[0_0_40px_rgba(245,196,94,0.6)] border-2 border-transparent relative overflow-hidden group ring-2 ring-brand-gold/50 ring-offset-2 ring-offset-brand-dark"
+                className="inline-flex items-center justify-center bg-gradient-to-r from-brand-gold to-brand-orange hover:from-brand-gold hover:to-yellow-500 text-brand-dark font-bold text-lg md:text-xl px-8 py-3 md:px-12 md:py-4 rounded-full transition-all duration-300 transform hover:scale-105 active:scale-95 active:duration-75 shadow-[0_0_20px_rgba(245,196,94,0.4)] hover:shadow-[0_0_40px_rgba(245,196,94,0.6)] border-2 border-transparent relative overflow-hidden group ring-2 ring-brand-gold/50 ring-offset-2 ring-offset-brand-dark"
               >
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out rotate-12 scale-150"></div>
                 <span className="relative z-10 flex items-center tracking-wider whitespace-nowrap">
@@ -65,21 +65,54 @@ const Home: React.FC<Props> = ({ t }) => {
       <section className="relative z-10 bg-brand-dark py-20 md:py-24 px-4 md:px-6 border-t border-white/5 shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
         <div className="container mx-auto">
           
-          {/* Quick Service Icons */}
+          {/* Quick Service Icons (Updated: Full Background Cards) */}
           <div className="grid md:grid-cols-3 gap-6 md:gap-8 mb-20 md:mb-32">
             {[
-              { title: t.services.city, desc: t.services.cityDesc, icon: '🏙️' },
-              { title: t.services.inter, desc: t.services.interDesc, icon: '🛣️' },
-              { title: t.services.airport, desc: t.services.airportDesc, icon: '✈️' }
+              { 
+                title: t.services.city, 
+                desc: t.services.cityDesc, 
+                image: "https://images.unsplash.com/photo-1432611185496-76ccd1dc5efe?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+              },
+              { 
+                title: t.services.inter, 
+                desc: t.services.interDesc, 
+                image: "https://images.unsplash.com/photo-1641907624750-d08806c872c4?q=80&w=824&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+              },
+              { 
+                title: t.services.airport, 
+                desc: t.services.airportDesc, 
+                image: "https://images.unsplash.com/photo-1635668422708-11c28ca70419?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+              }
             ].map((service, idx) => (
               <Link 
                 to="/services" 
                 key={idx}
-                className="group p-6 md:p-8 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-brand-gold/30 flex flex-col items-center text-center"
+                className="group relative overflow-hidden rounded-3xl h-[400px] border border-white/10 shadow-xl transition-all duration-500 hover:shadow-brand-gold/20 hover:border-brand-gold/40 hover:-translate-y-2 active:scale-95 active:duration-75 flex flex-col justify-end"
               >
-                <div className="text-4xl mb-4 transform group-hover:scale-110 transition-transform duration-300">{service.icon}</div>
-                <h3 className="text-xl font-serif font-bold text-white mb-2 group-hover:text-brand-gold transition-colors">{service.title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{service.desc}</p>
+                {/* Background Image */}
+                <img 
+                  src={service.image} 
+                  alt={service.title} 
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  loading="lazy"
+                />
+
+                {/* Gradient Overlay for Readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-80"></div>
+
+                {/* Content Overlay */}
+                <div className="relative z-10 p-8 text-center flex flex-col items-center justify-end h-full">
+                  {/* Decorative Line */}
+                  <div className="w-12 h-1 bg-brand-gold mb-4 rounded-full transform scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                  
+                  <h3 className="text-2xl md:text-3xl font-serif font-bold text-white mb-3 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] group-hover:text-brand-gold transition-colors duration-300">
+                    {service.title}
+                  </h3>
+                  
+                  <p className="text-gray-200 text-sm md:text-base leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] font-medium opacity-90 group-hover:opacity-100 transform translate-y-0 group-hover:-translate-y-1 transition-all duration-300">
+                    {service.desc}
+                  </p>
+                </div>
               </Link>
             ))}
           </div>

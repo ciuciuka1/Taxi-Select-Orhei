@@ -8,6 +8,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import PulseCallButton from './components/PulseCallButton';
 import SecurityWrapper from './components/SecurityWrapper';
+import Preloader from './components/Preloader';
 
 // Pages
 import Home from './pages/Home';
@@ -30,8 +31,37 @@ const ScrollToTop = () => {
   return null;
 };
 
+// Component to handle page transitions
+const AnimatedRoutes: React.FC<{ t: any }> = ({ t }) => {
+  const location = useLocation();
+
+  return (
+    <div key={location.pathname} className="animate-pageFade">
+      <Routes location={location}>
+        <Route path="/" element={<Home t={t} />} />
+        <Route path="/services" element={<Services t={t} />} />
+        <Route path="/about" element={<About t={t} />} />
+        <Route path="/contact" element={<Contact t={t} />} />
+        <Route path="/terms" element={<Terms t={t} />} />
+        <Route path="/privacy" element={<Privacy t={t} />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('ro');
+  const [loading, setLoading] = useState(true);
+
+  // Initial Preloader Logic
+  useEffect(() => {
+    // Simulate loading time (e.g. waiting for fonts/three.js init)
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500); 
+    return () => clearTimeout(timer);
+  }, []);
 
   // Persist language selection
   useEffect(() => {
@@ -50,23 +80,17 @@ const App: React.FC = () => {
 
   return (
     <SecurityWrapper>
+       <Preloader isLoading={loading} />
+      
       <HashRouter>
         <ScrollToTop />
         
         {/* Content Layer */}
-        <div className="relative min-h-screen flex flex-col">
+        <div className={`relative min-h-screen flex flex-col transition-opacity duration-700 ${loading ? 'opacity-0' : 'opacity-100'}`}>
           <Header t={t} lang={lang} setLang={handleSetLang} />
           
           <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Home t={t} />} />
-              <Route path="/services" element={<Services t={t} />} />
-              <Route path="/about" element={<About t={t} />} />
-              <Route path="/contact" element={<Contact t={t} />} />
-              <Route path="/terms" element={<Terms t={t} />} />
-              <Route path="/privacy" element={<Privacy t={t} />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+             <AnimatedRoutes t={t} />
           </main>
 
           <Footer t={t} />

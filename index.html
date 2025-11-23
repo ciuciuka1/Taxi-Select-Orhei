@@ -61,6 +61,7 @@
             },
             animation: {
               'fadeInUp': 'fadeInUp 1s ease-out forwards',
+              'pageFade': 'pageFade 0.4s ease-out forwards', /* New Page Transition */
               'float': 'float 6s ease-in-out infinite',
               'rain-drop': 'rain-drop 0.8s linear infinite', 
               'rain-heavy': 'rain-heavy 0.4s linear infinite', /* Torentiala/Aversa */
@@ -73,22 +74,30 @@
               'heat-wave': 'heat-wave 2s ease-in-out infinite', /* Canicula */
               'cold-pulse': 'pulse-glow 4s ease-in-out infinite', /* Ger */
               'vibrate-smooth': 'vibrate-smooth 2.5s ease-in-out infinite',
-              'wiggle-7s': 'wiggle-7s 7s ease-in-out infinite', /* New 7s interval vibration */
+              'wiggle-7s': 'wiggle-7s 7s ease-in-out infinite',
               'drift': 'drift 8s ease-in-out infinite alternate',
               'drift-reverse': 'drift-reverse 8s ease-in-out infinite alternate',
               'fog-flow': 'fog-flow 6s linear infinite',
               'twinkle': 'twinkle 3s ease-in-out infinite',
+              'preloader-hide': 'fadeOut 0.5s ease-in-out forwards',
             },
             keyframes: {
               fadeInUp: {
                 '0%': { opacity: '0', transform: 'translateY(20px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
               },
+              pageFade: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              fadeOut: {
+                '0%': { opacity: '1', visibility: 'visible' },
+                '100%': { opacity: '0', visibility: 'hidden' },
+              },
               float: {
                 '0%, 100%': { transform: 'translateY(0)' },
                 '50%': { transform: 'translateY(-6px)' },
               },
-              /* New Keyframe for intermittent 7s vibration */
               'wiggle-7s': {
                  '0%, 85%': { transform: 'rotate(0deg)' },
                  '86%': { transform: 'rotate(-3deg)' },
@@ -120,21 +129,18 @@
                 'from': { transform: 'rotate(0deg)' },
                 'to': { transform: 'rotate(360deg)' },
               },
-              /* PLOAIE NORMALA */
               'rain-drop': {
                 '0%': { transform: 'translate(0px, -10px)', opacity: '0' },
                 '10%': { opacity: '1' },
                 '90%': { opacity: '1' },
                 '100%': { transform: 'translate(-2px, 20px)', opacity: '0' },
               },
-              /* PLOAIE TORENTIALA / AVERSA (Mai rapida, mai oblica) */
               'rain-heavy': {
                 '0%': { transform: 'translate(0px, -15px)', opacity: '0' },
                 '20%': { opacity: '1' },
                 '80%': { opacity: '1' },
                 '100%': { transform: 'translate(-6px, 25px)', opacity: '0' },
               },
-              /* VISCOL (Zapada orizontala) */
               'blizzard': {
                 '0%': { transform: 'translate(10px, -5px)', opacity: '0' },
                 '20%': { opacity: '1' },
@@ -157,7 +163,6 @@
                 '0%, 100%': { opacity: '1', filter: 'brightness(1)' },
                 '50%': { opacity: '0.8', filter: 'brightness(1.2)' },
               },
-              /* CANICULA (Distorsiune de caldura) */
               'heat-wave': {
                 '0%, 100%': { transform: 'scale(1)', filter: 'blur(0px)' },
                 '50%': { transform: 'scale(1.1)', filter: 'blur(0.5px)' },
@@ -177,6 +182,29 @@
         }
       }
     </script>
+    <style>
+      /* Custom Premium Scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #020617; /* Brand Dark */
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #1e293b; /* Slate-800 */
+        border-radius: 5px;
+        border: 2px solid #020617; /* Padding effect */
+        transition: background 0.3s ease;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(to bottom, #F5C45E, #E78B48); /* Brand Gold Gradient */
+      }
+      /* Firefox */
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: #1e293b #020617;
+      }
+    </style>
     <title>Taxi Select Orhei</title>
   <script type="importmap">
 {
