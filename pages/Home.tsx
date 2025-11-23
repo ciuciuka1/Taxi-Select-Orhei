@@ -15,7 +15,7 @@ const Home: React.FC<Props> = ({ t }) => {
     <>
       <SeoHead title={t.meta.title} description={t.meta.description} />
       
-      {/* Hero Section - Full Screen Adaptive (100dvh) */}
+      {/* Hero Section - Strict Full Screen Adaptive (100dvh) with overflow hidden */}
       <section className="relative h-[100dvh] w-full flex flex-col items-center justify-center overflow-hidden bg-brand-dark">
         
         {/* Animation Layer */}
@@ -28,17 +28,20 @@ const Home: React.FC<Props> = ({ t }) => {
         {/* Gradient Overlay */}
         <div className="absolute inset-0 z-0 bg-gradient-to-b from-brand-dark/60 via-transparent to-brand-dark/90 pointer-events-none"></div>
 
-        {/* Content Layer */}
-        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col items-center justify-center pt-16 md:pt-0">
-          <div className="max-w-4xl mx-auto text-center perspective-1000">
-            <h1 className="font-serif text-4xl xs:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 md:mb-6 leading-tight drop-shadow-[0_4px_6px_rgba(0,0,0,0.9)] animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
+        {/* Content Layer - Adjusted spacing for strict fit */}
+        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col items-center justify-center">
+          <div className="max-w-4xl mx-auto text-center perspective-1000 mt-0 md:mt-0">
+            {/* Title - slightly smaller on extra small screens to ensure fit */}
+            <h1 className="font-serif text-4xl xs:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-3 xs:mb-4 md:mb-6 leading-tight drop-shadow-[0_4px_6px_rgba(0,0,0,0.9)] animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
               {t.hero.title}
             </h1>
-            <p className="text-base xs:text-lg md:text-2xl text-gray-100 mb-8 md:mb-10 font-light tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] animate-fadeInUp px-2" style={{ animationDelay: '0.3s' }}>
+            
+            {/* Subtitle - tighter margins on mobile */}
+            <p className="text-base xs:text-lg md:text-2xl text-gray-100 mb-6 xs:mb-8 md:mb-10 font-light tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] animate-fadeInUp px-2" style={{ animationDelay: '0.3s' }}>
               {t.hero.subtitle}
             </p>
             
-            <div className="animate-fadeInUp mt-6 md:mt-12" style={{ animationDelay: '0.5s' }}>
+            <div className="animate-fadeInUp mt-2 md:mt-12" style={{ animationDelay: '0.5s' }}>
               <a 
                 href="tel:+37323566666"
                 className="inline-flex items-center justify-center bg-gradient-to-r from-brand-gold to-brand-orange hover:from-brand-gold hover:to-yellow-500 text-brand-dark font-bold text-lg md:text-xl px-8 py-3 md:px-12 md:py-4 rounded-full transition-all duration-300 transform hover:scale-105 active:scale-95 active:duration-75 shadow-[0_0_20px_rgba(245,196,94,0.4)] hover:shadow-[0_0_40px_rgba(245,196,94,0.6)] border-2 border-transparent relative overflow-hidden group ring-2 ring-brand-gold/50 ring-offset-2 ring-offset-brand-dark"
@@ -53,8 +56,8 @@ const Home: React.FC<Props> = ({ t }) => {
           </div>
         </div>
         
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce opacity-70 z-20 pointer-events-none">
+        {/* Scroll Indicator - Moved slightly up to be safe */}
+        <div className="absolute bottom-8 xs:bottom-12 left-1/2 transform -translate-x-1/2 animate-bounce opacity-70 z-20 pointer-events-none">
           <svg className="w-6 h-6 md:w-8 md:h-8 text-white drop-shadow-lg" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
             <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
           </svg>
@@ -65,7 +68,7 @@ const Home: React.FC<Props> = ({ t }) => {
       <section className="relative z-10 bg-brand-dark py-20 md:py-24 px-4 md:px-6 border-t border-white/5 shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
         <div className="container mx-auto">
           
-          {/* Quick Service Icons (Updated: Full Background Cards) */}
+          {/* Quick Service Icons (Full Background Cards) */}
           <div className="grid md:grid-cols-3 gap-6 md:gap-8 mb-20 md:mb-32">
             {[
               { 
