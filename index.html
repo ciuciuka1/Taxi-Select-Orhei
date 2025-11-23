@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="https://fonts.gstatic.com/s/i/materialicons/local_taxi/v1/24px.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#020617" />
     
     <!-- SEO PRIMARY METADATA -->
@@ -183,6 +183,16 @@
       }
     </script>
     <style>
+      /* Global Smooth Scrolling Fixes */
+      html, body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overscroll-behavior-y: none; /* Prevents rubber-band effect on mobile */
+        -webkit-overflow-scrolling: touch;
+      }
+
       /* Custom Premium Scrollbar */
       ::-webkit-scrollbar {
         width: 10px;

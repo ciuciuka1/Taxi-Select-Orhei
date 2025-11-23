@@ -15,8 +15,11 @@ const Home: React.FC<Props> = ({ t }) => {
     <>
       <SeoHead title={t.meta.title} description={t.meta.description} />
       
-      {/* Hero Section - Strict Full Screen Adaptive (100dvh) with overflow hidden */}
-      <section className="relative h-[100dvh] w-full flex flex-col items-center justify-center overflow-hidden bg-brand-dark">
+      {/* Hero Section - Strict Full Screen Adaptive (100svh) with overflow hidden 
+          Changed from 100dvh to 100svh (Small Viewport Height) to prevent jumpy resizing 
+          when mobile address bars retract during scroll. 
+      */}
+      <section className="relative h-[100svh] w-full flex flex-col items-center justify-center overflow-hidden bg-brand-dark">
         
         {/* Animation Layer */}
         <div className="absolute inset-0 z-0 bg-brand-dark">
