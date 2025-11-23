@@ -4,6 +4,7 @@ interface WeatherData {
   temperature: number;
   weatherCode: number;
   isDay: boolean;
+  windSpeed: number;
 }
 
 const WeatherWidget: React.FC = () => {
@@ -12,16 +13,19 @@ const WeatherWidget: React.FC = () => {
 
   const fetchWeather = async () => {
     try {
+      const uniqueParam = `${Date.now()}`;
       const response = await fetch(
-        'https://api.open-meteo.com/v1/forecast?latitude=47.3831&longitude=28.8231&current=temperature_2m,weather_code,is_day&timezone=auto',
-        { cache: 'no-store' }
+        `https://api.open-meteo.com/v1/forecast?latitude=47.3831&longitude=28.8231&current=temperature_2m,weather_code,is_day,wind_speed_10m&timezone=auto&timeformat=unixtime&t=${uniqueParam}`
       );
+      
       if (!response.ok) throw new Error('Weather API Error');
       const data = await response.json();
+      
       setWeather({
         temperature: Math.round(data.current.temperature_2m),
         weatherCode: data.current.weather_code,
-        isDay: data.current.is_day === 1
+        isDay: data.current.is_day === 1,
+        windSpeed: data.current.wind_speed_10m
       });
     } catch (error) {
       console.error("Failed to fetch weather", error);
@@ -32,176 +36,293 @@ const WeatherWidget: React.FC = () => {
 
   useEffect(() => {
     fetchWeather();
-    const interval = setInterval(fetchWeather, 300000); // 5 mins
+    const interval = setInterval(fetchWeather, 60000); 
     return () => clearInterval(interval);
   }, []);
 
-  // WMO Code Mapping
-  const getWeatherDescription = (code: number, isDay: boolean) => {
+  // LOGICA PENTRU DESCRIEREA TEXTUALĂ COMPLETĂ (24 TIPURI)
+  const getWeatherDescription = (code: number, temp: number, wind: number) => {
+    // 1. Condiții Extreme de Temperatură
+    if (temp >= 30) return "Caniculă";
+    if (temp <= -10) return "Ger";
+
+    // 2. Condiții Speciale (mapate pe coduri WMO existente)
+    if (wind > 60 && code >= 95) return "Cod Roșu: Furtună Violenta";
+    if (wind > 80) return "Vânt Puternic (Rafale)";
+
     switch (code) {
-      case 0: return isDay ? "Cer senin" : "Noapte senină";
-      case 1: return "Predominant senin";
-      case 2: return "Parțial noros";
-      case 3: return "Înnorat";
+      case 0: return "Senin";
+      case 1: return "Majoritar Senin";
+      case 2: return "Parțial Noros";
+      case 3: return "Noros (Acoperit)";
       case 45: case 48: return "Ceață";
-      case 51: case 53: case 55: return "Burniță";
-      case 56: case 57: return "Burniță înghețată";
-      case 61: case 63: return "Ploaie";
-      case 65: return "Ploaie torențială";
-      case 66: case 67: return "Ploaie înghețată";
-      case 71: case 73: return "Ninsoare";
-      case 75: return "Ninsoare abundentă";
+      case 51: return "Burniță Slabă";
+      case 53: return "Burniță Moderată";
+      case 55: return "Burniță Densă";
+      case 56: case 57: return "Gheață (Ploaie Înghețată)";
+      case 61: return "Ploaie Slabă";
+      case 63: return "Ploaie Moderată";
+      case 65: return "Ploaie Torențială";
+      case 66: case 67: return "Ploaie Înghețată";
+      case 71: return "Ninsoare Slabă";
+      case 73: return "Ninsoare Moderată";
+      case 75: return "Ninsoare Abundentă";
       case 77: return "Grindină";
-      case 80: case 81: return "Averse";
-      case 82: return "Averse violente";
-      case 85: case 86: return "Averse de zăpadă";
-      case 95: return "Furtună";
-      case 96: case 99: return "Furtună cu grindină";
+      case 80: return "Averse (Ploaie Rapidă)";
+      case 81: return "Averse Moderate";
+      case 82: return "Ploaie Torențială (Aversă)"; // Violent
+      case 85: return "Lapoviță";
+      case 86: return "Viscol"; // Averse zapada puternice
+      case 95: return "Furtună cu descărcări electrice";
+      case 96: case 99: return "Furtună Violenta cu Grindină";
       default: return "Vreme Variabilă";
     }
   };
 
-  // Visual Logic - Animated SVGs
-  const getWeatherIcon = (code: number, isDay: boolean) => {
-    const iconClasses = "w-6 h-6 drop-shadow-md filter";
-    const strokeCap = { strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+  // --- GRAFICĂ METEO "ULTRA-REALISTĂ" ---
+  const getWeatherIcon = (code: number, isDay: boolean, temp: number, wind: number) => {
+    const iconClass = "w-12 h-12 filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]"; 
 
-    // 1. Thunderstorm (95-99) - Flashing Bolt + Rain
-    if (code >= 95) {
+    // DEFINIȚII GRADIENTS & FILTRE
+    const defs = (
+      <defs>
+        {/* Soare: Gold intens */}
+        <radialGradient id="sunCore" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="0%" stopColor="#FFF7ED" />
+            <stop offset="40%" stopColor="#F59E0B" />
+            <stop offset="100%" stopColor="#B45309" />
+        </radialGradient>
+        {/* Nori Zi: Alb pufos */}
+        <linearGradient id="cloudWhite" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#FFFFFF" />
+          <stop offset="100%" stopColor="#CBD5E1" />
+        </linearGradient>
+        {/* Nori Ploaie/Noapte: Gri-Albastru */}
+        <linearGradient id="cloudGrey" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#94A3B8" />
+          <stop offset="100%" stopColor="#334155" />
+        </linearGradient>
+        {/* Nori Furtună: Foarte întunecat */}
+        <linearGradient id="cloudDarkStorm" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#475569" />
+          <stop offset="100%" stopColor="#0F172A" />
+        </linearGradient>
+        {/* Ploaie: NEON CYAN PENTRU VIZIBILITATE MAXIMĂ PE NEGRU */}
+        <linearGradient id="rainNeon" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#22D3EE" stopOpacity="0" />
+          <stop offset="50%" stopColor="#06B6D4" stopOpacity="1" />
+          <stop offset="100%" stopColor="#0891B2" stopOpacity="0" />
+        </linearGradient>
+        {/* Luna */}
+        <radialGradient id="moonSurface" cx="50%" cy="50%" r="50%">
+            <stop offset="40%" stopColor="#F8FAFC" />
+            <stop offset="100%" stopColor="#94A3B8" />
+        </radialGradient>
+        {/* Canicula */}
+        <radialGradient id="heatGlow" cx="50%" cy="50%" r="50%">
+           <stop offset="0%" stopColor="#EF4444" stopOpacity="0.4" />
+           <stop offset="100%" stopColor="#EF4444" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+    );
+
+    const CloudPath = ({ x=0, y=0, scale=1, opacity=1, fill="url(#cloudWhite)", className="" }: any) => (
+       <g transform={`translate(${x}, ${y}) scale(${scale})`} opacity={opacity} className={className}>
+          <path d="M25,30 a10,10 0 0,1 18,0 a8,8 0 0,1 6,7 a5,5 0 0,1 -2,9 h-25 a8,8 0 0,1 -8,-8 a8,8 0 0,1 8,-8 z" fill={fill} />
+       </g>
+    );
+
+    // --- LOGICA DE AFIȘARE ---
+
+    // A. CANICULĂ (Heatwave) - Prioritate 1
+    if (temp >= 30) {
       return (
-        <svg className={iconClasses} viewBox="0 0 64 64">
-           <path d="M44 32a10 10 0 1 1-20 0 8 8 0 1 1-16 0c0 8 6 10 10 10h20c8 0 10-4 10-10s-4-10-4-10z" fill="#4B5563" />
-           {/* Flash Bolt */}
-           <path d="M34 38 L26 50 H34 L30 62" stroke="#F59E0B" strokeWidth="3" fill="none" className="animate-flash" {...strokeCap} />
-           {/* Fast Rain */}
-           <line x1="20" y1="46" x2="16" y2="54" stroke="#60A5FA" strokeWidth="2" className="animate-rain" style={{animationDuration: '0.4s'}} {...strokeCap} />
-           <line x1="44" y1="46" x2="40" y2="54" stroke="#60A5FA" strokeWidth="2" className="animate-rain" style={{animationDuration: '0.5s', animationDelay: '0.1s'}} {...strokeCap} />
+        <svg className={iconClass} viewBox="0 0 64 64">
+           {defs}
+           <circle cx="32" cy="32" r="28" fill="url(#heatGlow)" className="animate-pulse-slow" />
+           <circle cx="32" cy="32" r="14" fill="url(#sunCore)" className="animate-heat-wave drop-shadow-[0_0_20px_rgba(249,115,22,0.8)]" />
+           {/* Heat ripples */}
+           <path d="M10 50 Q 15 45, 20 50 T 30 50" stroke="#EF4444" fill="none" opacity="0.6" className="animate-fog-flow" />
+           <path d="M34 55 Q 39 50, 44 55 T 54 55" stroke="#EF4444" fill="none" opacity="0.6" className="animate-fog-flow" style={{animationDelay:'0.5s'}} />
         </svg>
       );
     }
 
-    // 2. Snow (71-77, 85-86) - Swaying Flakes
-    if ((code >= 71 && code <= 77) || code === 85 || code === 86) {
-       return (
-        <svg className={iconClasses} viewBox="0 0 64 64">
-           <path d="M46 38a10 10 0 1 1-20 0 8 8 0 1 1-16 0c0 10 6 14 10 14h20c8 0 12-6 12-12s-4-10-6-12z" fill="#D1D5DB" />
-           {/* Swaying Snowflakes */}
-           <circle cx="20" cy="50" r="2" fill="white" className="animate-snow-fall" style={{animationDuration: '3s'}} />
-           <circle cx="32" cy="54" r="2.5" fill="white" className="animate-snow-fall" style={{animationDuration: '3.5s', animationDelay: '1s'}} />
-           <circle cx="44" cy="50" r="2" fill="white" className="animate-snow-fall" style={{animationDuration: '2.8s', animationDelay: '2s'}} />
+    // B. GER (Extreme Cold) - Prioritate 1
+    if (temp <= -10) {
+      return (
+        <svg className={iconClass} viewBox="0 0 64 64">
+           {defs}
+           <circle cx="32" cy="32" r="25" fill="#3B82F6" opacity="0.2" className="animate-cold-pulse" />
+           <path d="M32 10 L32 54 M10 32 L54 32 M16 16 L48 48 M16 48 L48 16" stroke="white" strokeWidth="2" strokeLinecap="round" className="animate-spin-slow" />
+           <circle cx="32" cy="32" r="5" fill="white" />
         </svg>
-       );
+      );
     }
 
-    // 3. Freezing Rain / Ice (56, 57, 66, 67)
-    if ([56, 57, 66, 67].includes(code)) {
+    // C. FURTUNĂ / COD ROȘU (Thunderstorm) - 95, 96, 99
+    if (code >= 95) {
       return (
-        <svg className={iconClasses} viewBox="0 0 64 64">
-          <path d="M44 32a10 10 0 1 1-20 0 8 8 0 1 1-16 0c0 8 6 10 10 10h20c8 0 10-4 10-10s-4-10-4-10z" fill="#9CA3AF" />
-          <line x1="24" y1="46" x2="22" y2="54" stroke="#60A5FA" strokeWidth="2" className="animate-rain" {...strokeCap} />
-          {/* Ice Crystal */}
-          <g className="animate-pulse-slow" transform="translate(38, 52)">
-            <path d="M-4 0 L4 0 M0 -4 L0 4 M-3 -3 L3 3 M-3 3 L3 -3" stroke="white" strokeWidth="1.5" {...strokeCap} />
+        <svg className={iconClass} viewBox="0 0 64 64">
+           {defs}
+           {/* Flash Light Background */}
+           <rect x="0" y="0" width="64" height="64" fill="white" className="animate-flash" opacity="0.1" />
+           <CloudPath x={2} y={2} scale={1.1} fill="url(#cloudDarkStorm)" />
+           
+           {/* Fulger Mare */}
+           <path d="M34 32 L26 44 H34 L30 58" stroke="#FACC15" strokeWidth="3" fill="none" className="animate-flash drop-shadow-[0_0_10px_rgba(250,204,21,1)]" strokeLinecap="round" strokeLinejoin="round" />
+           
+           {/* Ploaie Torențială - Cyan Neon */}
+           <line x1="18" y1="45" x2="14" y2="58" stroke="#06B6D4" strokeWidth="2.5" strokeLinecap="round" className="animate-rain-heavy" />
+           <line x1="48" y1="45" x2="44" y2="58" stroke="#06B6D4" strokeWidth="2.5" strokeLinecap="round" className="animate-rain-heavy" style={{animationDelay: '0.2s'}} />
+        </svg>
+      );
+    }
+
+    // D. AVERSE / PLOAIE TORENȚIALĂ (Showers) - 80, 81, 82
+    if (code >= 80 && code <= 82) {
+      return (
+        <svg className={iconClass} viewBox="0 0 64 64">
+           {defs}
+           <CloudPath x={6} y={-4} scale={0.9} fill="url(#cloudDarkStorm)" opacity={0.9} />
+           <CloudPath x={0} y={0} fill="url(#cloudGrey)" />
+           
+           {/* Picături Groase, Oblice, Cyan Aprins */}
+           <g>
+             <line x1="20" y1="40" x2="15" y2="55" stroke="#22D3EE" strokeWidth="3" strokeLinecap="round" className="animate-rain-heavy" style={{animationDelay: '0s'}} />
+             <line x1="32" y1="38" x2="27" y2="53" stroke="#22D3EE" strokeWidth="3" strokeLinecap="round" className="animate-rain-heavy" style={{animationDelay: '0.1s'}} />
+             <line x1="44" y1="40" x2="39" y2="55" stroke="#22D3EE" strokeWidth="3" strokeLinecap="round" className="animate-rain-heavy" style={{animationDelay: '0.2s'}} />
+             <line x1="26" y1="45" x2="21" y2="60" stroke="#22D3EE" strokeWidth="3" strokeLinecap="round" className="animate-rain-heavy" style={{animationDelay: '0.15s'}} />
+           </g>
+        </svg>
+      );
+    }
+
+    // E. PLOAIE (Rain) - 61, 63, 65
+    if (code >= 61 && code <= 65) {
+      return (
+        <svg className={iconClass} viewBox="0 0 64 64">
+          {defs}
+          <CloudPath x={0} y={0} fill="url(#cloudGrey)" />
+          {/* Ploaie Verticală Cyan */}
+          <g> 
+            <line x1="22" y1="42" x2="22" y2="54" stroke="#06B6D4" strokeWidth="2" strokeLinecap="round" className="animate-rain-drop" style={{animationDuration: '0.9s'}} />
+            <line x1="32" y1="40" x2="32" y2="52" stroke="#06B6D4" strokeWidth="2" strokeLinecap="round" className="animate-rain-drop" style={{animationDuration: '1.1s', animationDelay: '0.3s'}} />
+            <line x1="42" y1="42" x2="42" y2="54" stroke="#06B6D4" strokeWidth="2" strokeLinecap="round" className="animate-rain-drop" style={{animationDuration: '1.0s', animationDelay: '0.6s'}} />
           </g>
         </svg>
       );
     }
 
-    // 4. Rain (61-65, 80-82) - Drops
-    if ((code >= 61 && code <= 65) || (code >= 80 && code <= 82)) {
-      const isHeavy = code === 65 || code === 82;
-      return (
-        <svg className={iconClasses} viewBox="0 0 64 64">
-          <path d="M42 30a10 10 0 1 1-20 0 8 8 0 1 1-16 0c0 8 6 10 10 10h20c8 0 10-4 10-10s-4-10-4-10z" fill={isHeavy ? "#6B7280" : "#9CA3AF"} />
-          <line x1="22" y1="45" x2="22" y2="52" stroke="#60A5FA" strokeWidth="2" className="animate-rain" style={{animationDuration: '0.8s'}} {...strokeCap} />
-          <line x1="32" y1="45" x2="32" y2="52" stroke="#60A5FA" strokeWidth="2" className="animate-rain" style={{animationDuration: '0.8s', animationDelay: '0.3s'}} {...strokeCap} />
-          <line x1="42" y1="45" x2="42" y2="52" stroke="#60A5FA" strokeWidth="2" className="animate-rain" style={{animationDuration: '0.8s', animationDelay: '0.6s'}} {...strokeCap} />
+    // F. LAPOVIȚĂ / GHEAȚĂ (Sleet/Freezing Rain) - 56, 57, 66, 67, 85
+    if ([56, 57, 66, 67, 85].includes(code)) {
+       return (
+        <svg className={iconClass} viewBox="0 0 64 64">
+           {defs}
+           <CloudPath x={0} y={0} fill="url(#cloudGrey)" />
+           {/* Picatura + Fulg */}
+           <line x1="25" y1="42" x2="25" y2="52" stroke="#06B6D4" strokeWidth="2" className="animate-rain-drop" />
+           <circle cx="38" cy="48" r="2" fill="white" className="animate-snow-fall" />
+           <line x1="38" y1="46" x2="38" y2="50" stroke="white" strokeWidth="1" className="animate-snow-fall" />
+           <line x1="36" y1="48" x2="40" y2="48" stroke="white" strokeWidth="1" className="animate-snow-fall" />
         </svg>
-      );
+       );
     }
 
-    // 5. Drizzle (51-55) - Light Drops
+    // G. BURNIȚĂ (Drizzle) - 51, 53, 55
     if (code >= 51 && code <= 55) {
       return (
-        <svg className={iconClasses} viewBox="0 0 64 64">
-          <path d="M44 32a10 10 0 1 1-20 0 8 8 0 1 1-16 0c0 8 6 10 10 10h20c8 0 10-4 10-10s-4-10-4-10z" fill="#D1D5DB" />
-          <line x1="24" y1="46" x2="24" y2="50" stroke="#93C5FD" strokeWidth="2" className="animate-rain" style={{animationDuration: '1.5s'}} {...strokeCap} />
-          <line x1="40" y1="46" x2="40" y2="50" stroke="#93C5FD" strokeWidth="2" className="animate-rain" style={{animationDuration: '1.5s', animationDelay: '0.5s'}} {...strokeCap} />
+        <svg className={iconClass} viewBox="0 0 64 64">
+          {defs}
+          <CloudPath x={0} y={0} fill={isDay ? "url(#cloudWhite)" : "url(#cloudGrey)"} />
+          {/* Picaturi mici, fine */}
+          <g> 
+            <line x1="24" y1="42" x2="24" y2="46" stroke="#22D3EE" strokeWidth="1.5" strokeLinecap="round" className="animate-rain-drop" />
+            <line x1="32" y1="44" x2="32" y2="48" stroke="#22D3EE" strokeWidth="1.5" strokeLinecap="round" className="animate-rain-drop" style={{animationDelay: '0.5s'}} />
+            <line x1="40" y1="42" x2="40" y2="46" stroke="#22D3EE" strokeWidth="1.5" strokeLinecap="round" className="animate-rain-drop" style={{animationDelay: '0.2s'}} />
+          </g>
         </svg>
       );
     }
 
-    // 6. Fog (45, 48) - Flowing Horizontal Lines
+    // H. NINSOARE & VISCOL (Snow/Blizzard) - 71-77, 86
+    if ((code >= 71 && code <= 77) || code === 86) {
+       const isBlizzard = code === 86 || wind > 40;
+       return (
+        <svg className={iconClass} viewBox="0 0 64 64">
+           {defs}
+           <CloudPath x={0} y={0} fill={isDay ? "url(#cloudWhite)" : "url(#cloudGrey)"} />
+           <g fill="white" className={isBlizzard ? "animate-blizzard" : "animate-snow-fall"}>
+              <circle cx="20" cy="45" r="2" />
+              <circle cx="32" cy="50" r="2.5" />
+              <circle cx="44" cy="45" r="2" />
+              {isBlizzard && <circle cx="54" cy="48" r="2" />}
+           </g>
+        </svg>
+       );
+    }
+
+    // I. CEAȚĂ (Fog) - 45, 48
     if (code === 45 || code === 48) {
       return (
-        <svg className={iconClasses} viewBox="0 0 64 64">
-           <path d="M14 28h36" stroke="#9CA3AF" strokeWidth="3" className="animate-fog-flow" style={{animationDuration: '4s'}} {...strokeCap} />
-           <path d="M10 36h44" stroke="#D1D5DB" strokeWidth="3" className="animate-fog-flow" style={{animationDuration: '6s', animationDirection: 'reverse'}} {...strokeCap} />
-           <path d="M16 44h32" stroke="#9CA3AF" strokeWidth="3" className="animate-fog-flow" style={{animationDuration: '5s'}} {...strokeCap} />
+        <svg className={iconClass} viewBox="0 0 64 64">
+           {defs}
+           <path d="M12 35h40" stroke="#94A3B8" strokeWidth="4" strokeLinecap="round" className="animate-fog-flow" style={{animationDuration: '4s'}} opacity="0.7" />
+           <path d="M8 45h48" stroke="#94A3B8" strokeWidth="5" strokeLinecap="round" className="animate-fog-flow" style={{animationDuration: '6s', animationDirection: 'reverse'}} opacity="0.5" />
         </svg>
       );
     }
 
-    // 7. Overcast (3) - Parallax Clouds
+    // J. NOROS (Overcast) - 3
     if (code === 3) {
         return (
-            <svg className={iconClasses} viewBox="0 0 64 64">
-                {/* Back cloud moves right */}
-                <g className="animate-drift-reverse">
-                   <path d="M32 28a8 8 0 1 1-16 0 6 6 0 1 1-12 0c0 8 5 11 8 11h16c6 0 8-5 8-10s-3-8-4-11z" fill="#6B7280" opacity="0.8" />
-                </g>
-                {/* Front cloud moves left */}
-                <g className="animate-drift">
-                   <path d="M46 40a10 10 0 1 1-20 0 8 8 0 1 1-16 0c0 10 6 14 10 14h20c8 0 12-6 12-12s-4-10-6-12z" fill="#9CA3AF" />
-                </g>
+            <svg className={iconClass} viewBox="0 0 64 64">
+                {defs}
+                <CloudPath x={8} y={-5} scale={0.9} fill="url(#cloudGrey)" className="animate-drift-reverse" />
+                <CloudPath x={-2} y={5} fill="url(#cloudWhite)" className="animate-drift" />
             </svg>
         );
     }
 
-    // 8. Partly Cloudy (1, 2)
+    // K. PARȚIAL NOROS (Partly Cloudy) - 1, 2
     if (code === 1 || code === 2) {
         return (
-            <svg className={iconClasses} viewBox="0 0 64 64">
-                <g className={isDay ? "animate-sun-spin origin-[36px_24px]" : "animate-pulse"}>
+            <svg className={iconClass} viewBox="0 0 64 64">
+                {defs}
+                <g transform="translate(6, -6)">
                    {isDay ? (
-                       <circle cx="36" cy="24" r="9" fill="#F5C45E" />
+                       <g className="animate-pulse-glow">
+                          <circle cx="32" cy="32" r="12" fill="url(#sunCore)" />
+                       </g>
                    ) : (
-                       <path d="M36 16a9 9 0 1 0 0 18 7 7 0 1 1 0-18z" fill="#FCD34D" />
+                       <circle cx="32" cy="32" r="10" fill="url(#moonSurface)" />
                    )}
                 </g>
-                <g className="animate-drift">
-                    <path d="M46 44a10 10 0 1 1-20 0 8 8 0 1 1-16 0c0 10 6 14 10 14h20c8 0 12-6 12-12s-4-10-6-12z" fill="#E5E7EB" />
-                </g>
+                <CloudPath x={-2} y={8} scale={0.95} className="animate-float" fill="url(#cloudWhite)" />
             </svg>
         );
     }
 
-    // 9. Clear (0)
+    // L. SENIN (Clear) - 0
     if (isDay) {
         return (
-          <svg className={iconClasses} viewBox="0 0 64 64">
-            <circle cx="32" cy="32" r="10" fill="#F5C45E" className="animate-pulse-slow" />
-            <g className="animate-sun-spin origin-center">
-              {[...Array(8)].map((_, i) => (
-                <line 
-                  key={i}
-                  x1="32" y1="6" x2="32" y2="14" 
-                  stroke="#F5C45E" strokeWidth="3" 
-                  transform={`rotate(${i * 45} 32 32)`} 
-                  {...strokeCap}
-                />
+          <svg className={iconClass} viewBox="0 0 64 64">
+            {defs}
+            <circle cx="32" cy="32" r="14" fill="url(#sunCore)" className="animate-pulse-glow drop-shadow-[0_0_20px_rgba(245,158,11,0.7)]" />
+            <g className="animate-sun-spin origin-[32px_32px]">
+              {[...Array(12)].map((_, i) => (
+                <line key={i} x1="32" y1="8" x2="32" y2="2" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round" transform={`rotate(${i * 30} 32 32)`} />
               ))}
             </g>
           </svg>
         );
     } else {
         return (
-            <svg className={iconClasses} viewBox="0 0 64 64">
-                <path d="M36 18a12 12 0 1 0 0 24 10 10 0 1 1 0-24z" fill="#FCD34D" className="drop-shadow-[0_0_8px_rgba(252,211,77,0.6)]" />
-                <circle cx="12" cy="18" r="1" fill="white" className="animate-twinkle" />
-                <circle cx="52" cy="12" r="1.5" fill="white" className="animate-twinkle" style={{animationDelay: '1s'}} />
-                <circle cx="56" cy="48" r="1" fill="white" className="animate-twinkle" style={{animationDelay: '0.5s'}} />
-                <circle cx="16" cy="42" r="1" fill="white" className="animate-twinkle" style={{animationDelay: '1.5s'}} />
+            <svg className={iconClass} viewBox="0 0 64 64">
+                {defs}
+                <circle cx="32" cy="32" r="12" fill="url(#moonSurface)" className="drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] animate-float" />
+                <circle cx="10" cy="15" r="1" fill="white" className="animate-twinkle" />
+                <circle cx="50" cy="10" r="1.5" fill="white" className="animate-twinkle" style={{animationDelay: '1s'}} />
             </svg>
         );
     }
@@ -210,9 +331,9 @@ const WeatherWidget: React.FC = () => {
 
   if (loading) {
      return (
-        <div className="flex items-center gap-3 pl-3 pr-3 py-1 rounded-full border border-white/5 bg-brand-dark/50 backdrop-blur-md">
-           <div className="h-4 w-8 bg-white/20 rounded animate-pulse"></div>
-           <div className="h-6 w-6 bg-white/20 rounded-full animate-pulse"></div>
+        <div className="flex items-center gap-3 pl-3 pr-3 py-1.5 rounded-full border border-white/5 bg-brand-dark/50 backdrop-blur-md min-w-[120px]">
+           <div className="h-4 w-12 bg-white/10 rounded animate-pulse"></div>
+           <div className="h-10 w-10 bg-white/10 rounded-full animate-pulse"></div>
         </div>
      );
   }
@@ -220,18 +341,39 @@ const WeatherWidget: React.FC = () => {
   if (!weather) return null;
 
   return (
-    <div className="relative group cursor-help select-none z-50">
-      <div className="flex items-center gap-3 pl-3 pr-3 py-1 rounded-full border border-white/5 bg-brand-dark/50 hover:bg-brand-dark/80 transition-all duration-300 backdrop-blur-md shadow-lg">
-        <div className="flex flex-col items-end justify-center -space-y-0.5">
-          <span className="text-sm font-bold text-white font-serif leading-tight">{weather.temperature}°C</span>
-          <span className="text-[10px] text-brand-gold/90 uppercase font-bold tracking-wider">Orhei</span>
+    <div className="relative group cursor-help select-none z-50 transition-all duration-500 animate-fadeInUp">
+      {/* Container Principal */}
+      <div className={`flex items-center gap-3 pl-4 pr-2 py-1.5 rounded-full border bg-gradient-to-r transition-all duration-300 backdrop-blur-xl shadow-lg ring-1 ${
+          weather.temperature >= 30 ? "from-red-900/80 to-brand-dark/80 border-red-500/30 ring-red-500/20" :
+          weather.temperature <= -10 ? "from-blue-900/80 to-brand-dark/80 border-blue-500/30 ring-blue-500/20" :
+          "from-brand-dark/80 to-brand-slate/80 border-white/10 ring-white/5 hover:ring-brand-gold/30"
+      }`}>
+        
+        {/* Info Text */}
+        <div className="flex flex-col items-end justify-center">
+          <span className={`text-lg font-bold font-serif leading-none tracking-tight shadow-black drop-shadow-md ${
+              weather.temperature >= 30 ? "text-red-400" :
+              weather.temperature <= -10 ? "text-blue-300" :
+              "text-white"
+          }`}>
+            {weather.temperature}°C
+          </span>
+          <span className="text-[10px] text-brand-gold font-bold uppercase tracking-widest mt-0.5 opacity-90">
+            Orhei
+          </span>
         </div>
-        <div className="opacity-100 transform group-hover:scale-110 transition-transform">
-          {getWeatherIcon(weather.weatherCode, weather.isDay)}
+
+        {/* Icon */}
+        <div className="transform group-hover:scale-110 transition-transform duration-500 ease-out">
+          {getWeatherIcon(weather.weatherCode, weather.isDay, weather.temperature, weather.windSpeed)}
         </div>
       </div>
-      <div className="absolute top-full right-0 mt-2 w-max px-3 py-1.5 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none border border-white/10 shadow-xl transform translate-y-1 group-hover:translate-y-0 z-[100]">
-        {getWeatherDescription(weather.weatherCode, weather.isDay)}
+
+      {/* Tooltip Detaliat */}
+      <div className="absolute top-full right-0 mt-3 w-max px-4 py-2 bg-[#0a0a0a]/95 text-white text-xs font-medium rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none border border-white/10 shadow-2xl transform translate-y-2 group-hover:translate-y-0 z-[100] backdrop-blur-xl">
+        <span className="uppercase tracking-wide text-brand-gold block text-[10px] mb-0.5">Vremea Acum</span>
+        <span className="text-sm font-bold block">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</span>
+        <div className="absolute -top-1 right-8 w-2 h-2 bg-[#0a0a0a]/95 border-t border-l border-white/10 transform rotate-45"></div>
       </div>
     </div>
   );

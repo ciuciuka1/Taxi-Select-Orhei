@@ -52,6 +52,7 @@
                 orange: '#E78B48',
                 red: '#BE3D2A',
                 slate: '#0f172a',
+                cyan: '#06b6d4', /* Neon Cyan for Rain */
               }
             },
             fontFamily: {
@@ -61,11 +62,17 @@
             animation: {
               'fadeInUp': 'fadeInUp 1s ease-out forwards',
               'float': 'float 6s ease-in-out infinite',
-              'rain': 'rain 0.6s linear infinite',
+              'rain-drop': 'rain-drop 0.8s linear infinite', 
+              'rain-heavy': 'rain-heavy 0.4s linear infinite', /* Torentiala/Aversa */
               'snow-fall': 'snow-fall 3s ease-in-out infinite',
-              'flash': 'flash 3s infinite',
+              'blizzard': 'blizzard 1s linear infinite', /* Viscol */
+              'hail-bounce': 'hail-bounce 0.8s ease-in-out infinite', /* Grindina */
+              'flash': 'flash 4s infinite',
               'sun-spin': 'spin-slow 12s linear infinite',
               'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'pulse-glow': 'pulse-glow 2.5s ease-in-out infinite',
+              'heat-wave': 'heat-wave 2s ease-in-out infinite', /* Canicula */
+              'cold-pulse': 'pulse-glow 4s ease-in-out infinite', /* Ger */
               'vibrate-smooth': 'vibrate-smooth 2.5s ease-in-out infinite',
               'wiggle': 'wiggle 2s ease-in-out infinite',
               'drift': 'drift 8s ease-in-out infinite alternate',
@@ -91,23 +98,45 @@
                 '100%': { transform: 'translateX(-5px)' },
               },
               'fog-flow': {
-                '0%': { transform: 'translateX(-8px)', opacity: '0.6' },
-                '50%': { transform: 'translateX(8px)', opacity: '0.9' },
-                '100%': { transform: 'translateX(-8px)', opacity: '0.6' },
+                '0%': { transform: 'translateX(-10px)', opacity: '0.4' },
+                '50%': { transform: 'translateX(10px)', opacity: '0.8' },
+                '100%': { transform: 'translateX(-10px)', opacity: '0.4' },
               },
               'twinkle': {
                 '0%, 100%': { opacity: '1', transform: 'scale(1)' },
-                '50%': { opacity: '0.4', transform: 'scale(0.7)' },
+                '50%': { opacity: '0.3', transform: 'scale(0.5)' },
               },
               'spin-slow': {
                 'from': { transform: 'rotate(0deg)' },
                 'to': { transform: 'rotate(360deg)' },
               },
-              'rain': {
-                '0%': { transform: 'translateY(-6px)', opacity: '0' },
-                '20%': { opacity: '1' },
+              /* PLOAIE NORMALA */
+              'rain-drop': {
+                '0%': { transform: 'translate(0px, -10px)', opacity: '0' },
+                '10%': { opacity: '1' },
                 '90%': { opacity: '1' },
-                '100%': { transform: 'translateY(12px)', opacity: '0' },
+                '100%': { transform: 'translate(-2px, 20px)', opacity: '0' },
+              },
+              /* PLOAIE TORENTIALA / AVERSA (Mai rapida, mai oblica) */
+              'rain-heavy': {
+                '0%': { transform: 'translate(0px, -15px)', opacity: '0' },
+                '20%': { opacity: '1' },
+                '80%': { opacity: '1' },
+                '100%': { transform: 'translate(-6px, 25px)', opacity: '0' },
+              },
+              /* VISCOL (Zapada orizontala) */
+              'blizzard': {
+                '0%': { transform: 'translate(10px, -5px)', opacity: '0' },
+                '20%': { opacity: '1' },
+                '80%': { opacity: '1' },
+                '100%': { transform: 'translate(-15px, 5px)', opacity: '0' },
+              },
+              /* GRINDINA (Topaie) */
+              'hail-bounce': {
+                '0%': { transform: 'translate(0, -10px)', opacity: '0' },
+                '40%': { opacity: '1', transform: 'translate(-1px, 10px)' },
+                '60%': { transform: 'translate(-2px, 5px)' },
+                '100%': { transform: 'translate(-3px, 15px)', opacity: '0' },
               },
               'snow-fall': {
                 '0%': { transform: 'translateY(-5px) translateX(-2px)', opacity: '0' },
@@ -115,8 +144,20 @@
                 '100%': { transform: 'translateY(15px) translateX(-2px)', opacity: '0' },
               },
               'flash': {
-                '0%, 92%, 96%, 100%': { opacity: '0' },
+                '0%, 90%, 100%': { opacity: '0' },
+                '92%': { opacity: '1' },
+                '93%': { opacity: '0' },
                 '94%': { opacity: '1' },
+                '96%': { opacity: '0' },
+              },
+              'pulse-glow': {
+                '0%, 100%': { opacity: '1', filter: 'brightness(1)' },
+                '50%': { opacity: '0.8', filter: 'brightness(1.2)' },
+              },
+              /* CANICULA (Distorsiune de caldura) */
+              'heat-wave': {
+                '0%, 100%': { transform: 'scale(1)', filter: 'blur(0px)' },
+                '50%': { transform: 'scale(1.1)', filter: 'blur(0.5px)' },
               },
               'vibrate-smooth': {
                 '0%, 100%': { transform: 'translate(0, 0) rotate(0deg)' },

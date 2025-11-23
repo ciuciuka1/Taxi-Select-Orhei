@@ -13,6 +13,8 @@ interface Props {
 const Header: React.FC<Props> = ({ t, lang, setLang }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Cheie unică pentru a forța re-randarea widgetului meteo la cerere
+  const [weatherKey, setWeatherKey] = useState(0); 
   const location = useLocation();
 
   useEffect(() => {
@@ -54,7 +56,11 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
     return () => { document.body.style.overflow = 'unset'; };
   }, [mobileMenuOpen]);
 
+  // Funcție care forțează reîmprospătarea vremii și navighează
   const handleNavClick = (path: string, e: React.MouseEvent) => {
+    // Incrementăm cheia pentru a forța re-mount la WeatherWidget
+    setWeatherKey(prev => prev + 1);
+
     if (path === '/') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         if (location.pathname === '/') {
@@ -100,7 +106,8 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
           </Link>
           
           <div className="hidden xs:block origin-left">
-            <WeatherWidget />
+            {/* Folosim key pentru a forța componenta să se reîncarce complet când dăm click pe Home/Logo */}
+            <WeatherWidget key={weatherKey} />
           </div>
         </div>
 
@@ -128,7 +135,8 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
         {/* Mobile Right Section */}
         <div className="flex items-center gap-4 md:hidden relative z-50">
            <div className="xs:hidden">
-             <WeatherWidget />
+             {/* Și pe mobil forțăm refresh */}
+             <WeatherWidget key={`mobile-${weatherKey}`} />
            </div>
            
           {/* Mobile Toggle */}
