@@ -6,6 +6,7 @@ interface HyperspeedProps {
   effectOptions?: any;
 }
 
+// Move vectors outside to prevent GC
 const LOOK_AT_AMP = new THREE.Vector3(-2, -5, 0);
 const LOOK_AT_OFFSET = new THREE.Vector3(0, 0, -10);
 
@@ -88,8 +89,6 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
       }
     };
 
-    // CLEANED SHADER: Removed all logic for "sideLines", "uLanes", "uShoulderLines". 
-    // It now simply renders the base color with fog.
     const roadFragment = `
       #define USE_FOG;
       varying vec2 vUv; 
@@ -147,8 +146,6 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
         const geometry = new THREE.PlaneGeometry(isRoad ? options.roadWidth : options.islandWidth, options.length, 20, segments);
         let uniforms: any = { uTravelLength: { value: options.length }, uColor: { value: new THREE.Color(isRoad ? options.colors.roadColor : options.colors.islandColor) }, uTime: this.uTime };
         
-        // Removed uLanes and uShoulderLines logic here. It is now just a plain surface.
-        
         const material = new THREE.ShaderMaterial({
           fragmentShader: isRoad ? roadFragment : islandFragment,
           vertexShader: roadVertex,
@@ -177,9 +174,6 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
         let instanced = new THREE.InstancedBufferGeometry().copy(geometry);
         instanced.instanceCount = options.lightPairsPerRoadWay * 2;
         
-        // Removed laneWidth calculation based on uLanes since lanes don't exist visually anymore. 
-        // We just use a distribution logic.
-        // Assuming 3 lanes for distribution logic only, but not rendering lines.
         let lanesPerRoad = 3; 
         let laneWidth = options.roadWidth / lanesPerRoad;
         
@@ -222,8 +216,13 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
         this.isMobile = window.innerWidth < 768;
         this.options.distortion = distortionConfig;
         this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: "default" });
-        const dpr = this.isMobile ? 1 : Math.min(window.devicePixelRatio, 1.5);
+        
+        // VISUAL OPTIMIZATION: 
+        // On mobile, we now use a higher DPR (min 2 or 1.5) to ensure crisp lines (Anti-Aliasing effect).
+        // We offset the performance cost by reducing the geometry in HyperCanvas options.
+        const dpr = Math.min(window.devicePixelRatio, 2);
         this.renderer.setPixelRatio(dpr);
+        
         this.renderer.setSize(container.offsetWidth, container.offsetHeight, false);
         container.appendChild(this.renderer.domElement);
         this.composer = new EffectComposer(this.renderer);
@@ -245,7 +244,8 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
       }
       loadAssets() {
         return new Promise((resolve) => {
-          if (this.isMobile) { resolve(null); return; }
+          // We now allow loading assets on mobile too to ensure SMAA works if needed, 
+          // but simplified for reliability.
           const manager = new THREE.LoadingManager(resolve as any);
           const searchImage = new Image(); const areaImage = new Image();
           this.assets.smaa = {};
@@ -264,9 +264,12 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
       init() {
         this.road.init(); this.leftCarLights.init(); this.leftCarLights.mesh.position.setX(-this.options.roadWidth / 2 - this.options.islandWidth / 2); this.rightCarLights.init(); this.rightCarLights.mesh.position.setX(this.options.roadWidth / 2 + this.options.islandWidth / 2);
         const renderPass = new RenderPass(this.scene, this.camera);
+        // Bloom resolution stays at 0.5 on mobile for performance, as glow doesn't need sharp edges.
         const bloomPass = new EffectPass(this.camera, new BloomEffect({ luminanceThreshold: 0.2, luminanceSmoothing: 0, resolutionScale: this.isMobile ? 0.5 : 1 }));
         this.composer.addPass(renderPass); this.composer.addPass(bloomPass);
-        if (!this.isMobile && this.assets.smaa) {
+        
+        // FORCE SMAA ON MOBILE: This provides the "Superb Smooth" antialiasing.
+        if (this.assets.smaa) {
           const smaaPass = new EffectPass(this.camera, new SMAAEffect({ preset: SMAAPreset.MEDIUM, searchImage: SMAAEffect.searchImageDataURL, areaImage: SMAAEffect.areaImageDataURL }));
           smaaPass.renderToScreen = true; bloomPass.renderToScreen = false; this.composer.addPass(smaaPass);
         } else { bloomPass.renderToScreen = true; }
