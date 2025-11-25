@@ -78,7 +78,7 @@ const WeatherWidget: React.FC = () => {
 
   // --- GRAFICĂ METEO "ULTRA-REALISTĂ" ---
   const getWeatherIcon = (code: number, isDay: boolean, temp: number, wind: number) => {
-    const iconClass = "w-12 h-12 filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]"; 
+    const iconClass = "w-10 h-10 md:w-12 md:h-12 filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]"; 
 
     // DEFINIȚII GRADIENTS & FILTRE
     const defs = (
@@ -295,14 +295,14 @@ const WeatherWidget: React.FC = () => {
   };
 
   // CONSTANTE PENTRU UNIFORMIZARE DESIGN
-  // Fixam h-[58px] si min-w-[140px] pentru a preveni schimbarea formei la incarcare
-  const baseContainerClasses = "rounded-full flex items-center gap-3 pl-4 pr-2 py-1.5 border h-[58px] min-w-[140px] backdrop-blur-xl shadow-lg ring-1 select-none";
+  // Eliminated fixed height/width constraints to allow auto-sizing based on content padding
+  const baseContainerClasses = "rounded-full flex items-center gap-2 pl-5 pr-2 py-2 border backdrop-blur-xl shadow-lg ring-1 select-none w-fit h-auto transition-all duration-300";
 
   if (loading) {
      return (
         <div className="relative group z-50 animate-fadeInUp">
           <div className={`${baseContainerClasses} border-white/5 bg-brand-dark/50 ring-white/5`}>
-             <div className="flex flex-col items-end justify-center w-full pr-1">
+             <div className="flex flex-col items-end justify-center">
                  <div className="h-4 w-8 bg-white/10 rounded animate-pulse mb-1"></div>
                  <div className="h-2 w-10 bg-white/10 rounded animate-pulse"></div>
              </div>
@@ -316,14 +316,14 @@ const WeatherWidget: React.FC = () => {
 
   return (
     <div className="relative group cursor-help select-none z-50 animate-fadeInUp">
-      <div className={`${baseContainerClasses} transition-colors duration-500 bg-gradient-to-r ${
+      <div className={`${baseContainerClasses} bg-gradient-to-r ${
           weather.temperature >= 30 ? "from-red-900/80 to-brand-dark/80 border-red-500/30 ring-red-500/20" :
           weather.temperature <= -10 ? "from-blue-900/80 to-brand-dark/80 border-blue-500/30 ring-blue-500/20" :
           "from-brand-dark/80 to-brand-slate/80 border-white/10 ring-white/5 hover:ring-brand-gold/30"
       }`}>
         
         {/* Info Text */}
-        <div className="flex flex-col items-end justify-center flex-grow">
+        <div className="flex flex-col items-end justify-center">
           <span className={`text-lg font-bold font-serif leading-none tracking-tight shadow-black drop-shadow-md ${
               weather.temperature >= 30 ? "text-red-400" :
               weather.temperature <= -10 ? "text-blue-300" :
@@ -331,13 +331,13 @@ const WeatherWidget: React.FC = () => {
           }`}>
             {weather.temperature}°C
           </span>
-          <span className="text-[10px] text-brand-gold font-bold uppercase tracking-widest mt-0.5 opacity-90">
+          <span className="text-[10px] text-brand-gold font-bold uppercase tracking-widest mt-0.5 opacity-90 whitespace-nowrap">
             Orhei
           </span>
         </div>
 
         {/* Icon */}
-        <div className="transform group-hover:scale-110 transition-transform duration-500 ease-out shrink-0">
+        <div className="transform group-hover:scale-110 transition-transform duration-500 ease-out shrink-0 ml-2">
           {getWeatherIcon(weather.weatherCode, weather.isDay, weather.temperature, weather.windSpeed)}
         </div>
       </div>
