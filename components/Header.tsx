@@ -93,7 +93,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
         <div className="flex items-center gap-3 md:gap-4 shrink-0 relative z-50">
           <Link 
             to="/" 
-            className="relative group flex flex-col" 
+            className="relative group flex flex-col active:scale-95 transition-transform duration-75" 
             onClick={(e) => handleNavClick('/', e)}
             aria-label="Taxi Select Home"
           >
@@ -118,7 +118,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
               key={link.path}
               to={link.path}
               onClick={(e) => handleNavClick(link.path, e)}
-              className={`text-sm font-medium tracking-wide transition-all duration-300 relative group py-2 ${
+              className={`text-sm font-medium tracking-wide transition-all duration-300 relative group py-2 active:scale-95 duration-75 ${
                 location.pathname === link.path ? 'text-brand-gold' : 'text-white hover:text-brand-gold'
               }`}
             >
@@ -141,7 +141,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
            
           {/* Mobile Toggle */}
           <button
-            className="text-white focus:outline-none p-2 hover:text-brand-gold transition-colors relative"
+            className="text-white focus:outline-none p-2 hover:text-brand-gold transition-colors relative active:scale-95 duration-75"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Închide Meniul" : "Deschide Meniul"}
             aria-expanded={mobileMenuOpen}
@@ -168,7 +168,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
                   key={link.path}
                   to={link.path}
                   onClick={(e) => handleNavClick(link.path, e)}
-                  className={`text-3xl font-serif font-bold py-5 border-b border-white/5 flex items-center justify-between group ${
+                  className={`text-3xl font-serif font-bold py-5 border-b border-white/5 flex items-center justify-between group active:scale-95 duration-75 ${
                     location.pathname === link.path ? 'text-brand-gold pl-2' : 'text-white hover:text-brand-gold hover:pl-2'
                   } transition-all duration-300`}
                   style={{ 
@@ -202,7 +202,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
                 <LanguageSwitcher currentLang={lang} setLang={setLang} />
               </div>
 
-              <div className="bg-white/5 rounded-xl p-5 border border-white/10 flex items-center justify-between group hover:bg-white/10 transition-colors">
+              <div className="bg-white/5 rounded-xl p-5 border border-white/10 flex items-center justify-between group hover:bg-white/10 transition-colors active:scale-95 duration-75">
                  <div>
                    <p className="text-gray-400 text-xs uppercase mb-1 tracking-widest">{t.nav.dispatcher}</p>
                    <a href="tel:+37323566666" className="text-2xl font-bold text-white block font-serif tracking-wide">0 235 66 6 66</a>
@@ -218,7 +218,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
                     href="https://www.facebook.com/profile.php?id=61558158336366" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-sm text-gray-500 hover:text-brand-gold transition-colors flex items-center justify-center gap-2"
+                    className="text-sm text-gray-500 hover:text-brand-gold transition-colors flex items-center justify-center gap-2 active:scale-95 duration-75"
                   >
                     <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                     Facebook

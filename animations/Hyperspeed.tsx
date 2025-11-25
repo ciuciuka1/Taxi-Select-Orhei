@@ -171,7 +171,7 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
         const options = this.options;
         let curve = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1));
         let geometry = new THREE.TubeGeometry(curve, 40, 1, 8, false);
-        let instanced = new THREE.InstancedBufferGeometry().copy(geometry);
+        let instanced = new THREE.InstancedBufferGeometry().copy(geometry as any);
         instanced.instanceCount = options.lightPairsPerRoadWay * 2;
         
         let lanesPerRoad = 3; 
@@ -270,7 +270,7 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
         
         // FORCE SMAA ON MOBILE: This provides the "Superb Smooth" antialiasing.
         if (this.assets.smaa) {
-          const smaaPass = new EffectPass(this.camera, new SMAAEffect({ preset: SMAAPreset.MEDIUM, searchImage: SMAAEffect.searchImageDataURL, areaImage: SMAAEffect.areaImageDataURL }));
+          const smaaPass = new EffectPass(this.camera, new SMAAEffect({ preset: SMAAPreset.MEDIUM }));
           smaaPass.renderToScreen = true; bloomPass.renderToScreen = false; this.composer.addPass(smaaPass);
         } else { bloomPass.renderToScreen = true; }
         this.tick();

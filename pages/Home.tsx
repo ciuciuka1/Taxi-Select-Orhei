@@ -43,7 +43,7 @@ const Home: React.FC<Props> = ({ t }) => {
             <div className="animate-fadeInUp mt-2 md:mt-12" style={{ animationDelay: '0.5s' }}>
               <a 
                 href="tel:+37323566666"
-                className="inline-flex items-center justify-center bg-gradient-to-r from-brand-gold to-brand-orange hover:from-brand-gold hover:to-yellow-500 text-brand-dark font-bold text-lg md:text-xl px-8 py-3 md:px-12 md:py-4 rounded-full transition-all duration-300 transform hover:scale-105 active:scale-95 active:duration-75 shadow-[0_0_20px_rgba(245,196,94,0.4)] hover:shadow-[0_0_40px_rgba(245,196,94,0.6)] border-2 border-transparent relative overflow-hidden group ring-2 ring-brand-gold/50 ring-offset-2 ring-offset-brand-dark"
+                className="inline-flex items-center justify-center bg-gradient-to-r from-brand-gold to-brand-orange hover:from-brand-gold hover:to-yellow-500 text-brand-dark font-bold text-lg md:text-xl px-8 py-3 md:px-12 md:py-4 rounded-full transition-all duration-100 transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(245,196,94,0.4)] hover:shadow-[0_0_40px_rgba(245,196,94,0.6)] border-2 border-transparent relative overflow-hidden group ring-2 ring-brand-gold/50 ring-offset-2 ring-offset-brand-dark"
               >
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out rotate-12 scale-150"></div>
                 <span className="relative z-10 flex items-center tracking-wider whitespace-nowrap">
@@ -67,7 +67,7 @@ const Home: React.FC<Props> = ({ t }) => {
       <section className="relative z-10 bg-brand-dark py-20 md:py-24 px-4 md:px-6 border-t border-white/5 shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
         <div className="container mx-auto">
           
-          {/* Service Cards - Full Background */}
+          {/* Service Cards - Full Background Poster Style */}
           <div className="grid md:grid-cols-3 gap-6 md:gap-8 mb-20 md:mb-32">
             {[
               { 
@@ -89,7 +89,7 @@ const Home: React.FC<Props> = ({ t }) => {
               <Link 
                 to="/services" 
                 key={idx}
-                className="group relative overflow-hidden rounded-3xl h-[400px] border border-white/10 shadow-xl transition-all duration-500 hover:shadow-brand-gold/20 hover:border-brand-gold/40 hover:-translate-y-2 active:scale-95 active:duration-75 flex flex-col justify-end"
+                className="group relative overflow-hidden rounded-3xl h-[400px] border border-white/10 shadow-xl transition-all duration-300 hover:shadow-brand-gold/20 hover:border-brand-gold/40 hover:-translate-y-2 active:scale-95 active:duration-75 flex flex-col justify-end"
               >
                 {/* Background Image */}
                 <img 
@@ -99,7 +99,7 @@ const Home: React.FC<Props> = ({ t }) => {
                   loading="lazy"
                 />
 
-                {/* Gradient Overlay */}
+                {/* Gradient Overlay for readability */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-80"></div>
 
                 {/* Content */}
@@ -126,7 +126,7 @@ const Home: React.FC<Props> = ({ t }) => {
                  <div className="absolute inset-0 bg-gray-900">
                     {/* Blurry background for fill */}
                     <img 
-                       src="https://images.unsplash.com/photo-1516733968668-dbdce39c4651?q=80&w=1228&auto=format&fit=crop" 
+                       src="https://images.unsplash.com/photo-1516733968668-dbdce39c4651?q=80&w=1228&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
                        alt="" 
                        className="absolute inset-0 w-full h-full object-cover opacity-30 blur-xl"
                     />
@@ -221,7 +221,7 @@ const Home: React.FC<Props> = ({ t }) => {
                    Taxi Select
                 </h3>
                 
-                <a href="tel:+37323566666" className="block group cursor-pointer mb-8">
+                <a href="tel:+37323566666" className="block group cursor-pointer mb-8 active:scale-95 transition-transform duration-100">
                    <span className="font-serif text-6xl md:text-9xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white via-[#e5e5e5] to-[#999] drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)] transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-105 inline-block">
                       66 6 66
                    </span>

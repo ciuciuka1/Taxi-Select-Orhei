@@ -51,7 +51,7 @@ const Contact: React.FC<Props> = ({ t }) => {
                      text-white font-bold 
                      py-4 px-8 md:py-5 md:px-16 
                      rounded-full 
-                     transition-all duration-300 
+                     transition-all duration-100 
                      shadow-[0_4px_25px_rgba(34,197,94,0.4)] hover:shadow-[0_4px_40px_rgba(34,197,94,0.7)] hover:-translate-y-1 active:scale-95 active:duration-75
                      flex items-center justify-center gap-3 md:gap-4 
                      overflow-hidden 
