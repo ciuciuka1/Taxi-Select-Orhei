@@ -217,9 +217,6 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
         this.options.distortion = distortionConfig;
         this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: "default" });
         
-        // VISUAL OPTIMIZATION: 
-        // On mobile, we now use a higher DPR (min 2 or 1.5) to ensure crisp lines (Anti-Aliasing effect).
-        // We offset the performance cost by reducing the geometry in HyperCanvas options.
         const dpr = Math.min(window.devicePixelRatio, 2);
         this.renderer.setPixelRatio(dpr);
         
@@ -240,12 +237,10 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
         this.fovTarget = options.fov; this.speedUpTarget = 0; this.speedUp = 0; this.timeOffset = 0;
         this.tick = this.tick.bind(this);
         this.onResize = this.onResize.bind(this);
-        window.addEventListener('resize', this.onResize);
+        // We don't just rely on window resize, we use ResizeObserver below
       }
       loadAssets() {
         return new Promise((resolve) => {
-          // We now allow loading assets on mobile too to ensure SMAA works if needed, 
-          // but simplified for reliability.
           const manager = new THREE.LoadingManager(resolve as any);
           const searchImage = new Image(); const areaImage = new Image();
           this.assets.smaa = {};
@@ -264,11 +259,9 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
       init() {
         this.road.init(); this.leftCarLights.init(); this.leftCarLights.mesh.position.setX(-this.options.roadWidth / 2 - this.options.islandWidth / 2); this.rightCarLights.init(); this.rightCarLights.mesh.position.setX(this.options.roadWidth / 2 + this.options.islandWidth / 2);
         const renderPass = new RenderPass(this.scene, this.camera);
-        // Bloom resolution stays at 0.5 on mobile for performance, as glow doesn't need sharp edges.
         const bloomPass = new EffectPass(this.camera, new BloomEffect({ luminanceThreshold: 0.2, luminanceSmoothing: 0, resolutionScale: this.isMobile ? 0.5 : 1 }));
         this.composer.addPass(renderPass); this.composer.addPass(bloomPass);
         
-        // FORCE SMAA ON MOBILE: This provides the "Superb Smooth" antialiasing.
         if (this.assets.smaa) {
           const smaaPass = new EffectPass(this.camera, new SMAAEffect({ preset: SMAAPreset.MEDIUM }));
           smaaPass.renderToScreen = true; bloomPass.renderToScreen = false; this.composer.addPass(smaaPass);
@@ -278,7 +271,10 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
       onResize() {
         if (!this.container) return;
         const width = this.container.offsetWidth; const height = this.container.offsetHeight;
-        this.renderer.setSize(width, height); this.composer.setSize(width, height);
+        // Prevent 0 height crash/invisibility
+        if (width === 0 || height === 0) return; 
+        
+        this.renderer.setSize(width, height, false); this.composer.setSize(width, height);
         this.camera.aspect = width / height; this.camera.updateProjectionMatrix();
       }
       update(delta: number) {
@@ -304,7 +300,6 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
       }
       dispose() {
         cancelAnimationFrame(this.animationId);
-        window.removeEventListener('resize', this.onResize);
         this.renderer.dispose();
         this.composer.dispose();
         this.scene.traverse((object: any) => {
@@ -319,9 +314,28 @@ const Hyperspeed: React.FC<HyperspeedProps> = ({ effectOptions }) => {
 
     const app = new App(container, options);
     appInstance.current = app;
-    app.loadAssets().then(() => app.init());
+    app.loadAssets().then(() => {
+        app.init();
+        // Force initial resize check for mobile browsers where address bar shifts layout
+        app.onResize();
+    });
+
+    // ROBUST RESIZE HANDLING FOR MOBILE
+    const resizeObserver = new ResizeObserver(() => {
+        if(appInstance.current) appInstance.current.onResize();
+    });
+    resizeObserver.observe(container);
+
+    // Additional safety timeouts for mobile init lag
+    const timers = [
+        setTimeout(() => appInstance.current?.onResize(), 100),
+        setTimeout(() => appInstance.current?.onResize(), 500),
+        setTimeout(() => appInstance.current?.onResize(), 1000)
+    ];
 
     return () => {
+      timers.forEach(clearTimeout);
+      resizeObserver.disconnect();
       if (appInstance.current) {
         appInstance.current.dispose();
         appInstance.current = null;
