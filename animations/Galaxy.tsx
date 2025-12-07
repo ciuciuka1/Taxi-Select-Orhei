@@ -1,3 +1,4 @@
+
 import { Renderer, Program, Mesh, Color, Triangle } from 'ogl';
 import { useEffect, useRef } from 'react';
 import './Galaxy.css';
@@ -14,7 +15,7 @@ void main() {
 }
 `;
 
-const fragmentShader = `
+const getFragmentShader = (numLayers: number) => `
 precision highp float;
 
 uniform float uTime;
@@ -38,7 +39,7 @@ uniform bool uTransparent;
 
 varying vec2 vUv;
 
-#define NUM_LAYER 4.0
+#define NUM_LAYER ${numLayers}.0
 #define STAR_COLOR_CUTOFF 0.2
 #define MAT45 mat2(0.7071, -0.7071, 0.7071, 0.7071)
 #define PERIOD 3.0
@@ -214,18 +215,28 @@ export default function Galaxy({
   const smoothMousePos = useRef({ x: 0.5, y: 0.5 });
   const targetMouseActive = useRef(0.0);
   const smoothMouseActive = useRef(0.0);
+  const requestRef = useRef<number>();
 
   useEffect(() => {
     if (!ctnDom.current) return;
     const ctn = ctnDom.current;
+
+    // Detect Device Capabilities
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
     
-    // Mobile Performance Optimization: Cap DPR at 1.5
-    const dpr = Math.min(window.devicePixelRatio, 1.5);
+    // Performance Optimization Strategy:
+    // 1. Cap DPR at 1.0 for mobile to prevent massive pixel processing on 4K/3x screens.
+    // 2. Reduce Shader Layers from 4 to 2 on mobile to halve the GPU workload per pixel.
+    
+    const dpr = isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.5);
+    const shaderLayers = isMobile ? 2 : 4;
 
     const renderer = new Renderer({
       dpr,
       alpha: transparent,
-      premultipliedAlpha: false
+      premultipliedAlpha: false,
+      width: ctn.offsetWidth,
+      height: ctn.offsetHeight,
     });
     const gl = renderer.gl;
 
@@ -240,23 +251,24 @@ export default function Galaxy({
     let program: Program;
 
     function resize() {
-      const scale = 1;
-      renderer.setSize(ctn.offsetWidth * scale, ctn.offsetHeight * scale);
+      // Using clientWidth/Height avoids layout thrashing compared to offsetWidth in some browsers
+      renderer.setSize(ctn.clientWidth, ctn.clientHeight);
       if (program) {
-        program.uniforms.uResolution.value = new Color(
+        program.uniforms.uResolution.value = new Color([
           gl.canvas.width,
           gl.canvas.height,
           gl.canvas.width / gl.canvas.height
-        );
+        ]);
       }
     }
-    window.addEventListener('resize', resize, false);
+    window.addEventListener('resize', resize, { passive: true });
     resize();
 
-    const geometry = new Triangle(gl);
+    const geometry = new Triangle(gl, {});
     program = new Program(gl, {
       vertex: vertexShader,
-      fragment: fragmentShader,
+      // Inject dynamic layer count based on device performance
+      fragment: getFragmentShader(shaderLayers),
       uniforms: {
         uTime: { value: 0 },
         uResolution: {
@@ -284,58 +296,64 @@ export default function Galaxy({
     });
 
     const mesh = new Mesh(gl, { geometry, program });
-    let animateId: number;
 
     function update(t: number) {
-      animateId = requestAnimationFrame(update);
+      requestRef.current = requestAnimationFrame(update);
+      
       if (!disableAnimation) {
         program.uniforms.uTime.value = t * 0.001;
         program.uniforms.uStarSpeed.value = (t * 0.001 * starSpeed) / 10.0;
       }
 
-      const lerpFactor = 0.05;
-      smoothMousePos.current.x += (targetMousePos.current.x - smoothMousePos.current.x) * lerpFactor;
-      smoothMousePos.current.y += (targetMousePos.current.y - smoothMousePos.current.y) * lerpFactor;
+      // Only calculate mouse physics if interaction is enabled and not mobile
+      if (mouseInteraction && !isMobile) {
+        const lerpFactor = 0.05;
+        smoothMousePos.current.x += (targetMousePos.current.x - smoothMousePos.current.x) * lerpFactor;
+        smoothMousePos.current.y += (targetMousePos.current.y - smoothMousePos.current.y) * lerpFactor;
+        smoothMouseActive.current += (targetMouseActive.current - smoothMouseActive.current) * lerpFactor;
 
-      smoothMouseActive.current += (targetMouseActive.current - smoothMouseActive.current) * lerpFactor;
-
-      program.uniforms.uMouse.value[0] = smoothMousePos.current.x;
-      program.uniforms.uMouse.value[1] = smoothMousePos.current.y;
-      program.uniforms.uMouseActiveFactor.value = smoothMouseActive.current;
+        program.uniforms.uMouse.value[0] = smoothMousePos.current.x;
+        program.uniforms.uMouse.value[1] = smoothMousePos.current.y;
+        program.uniforms.uMouseActiveFactor.value = smoothMouseActive.current;
+      }
 
       renderer.render({ scene: mesh });
     }
-    animateId = requestAnimationFrame(update);
+    
+    requestRef.current = requestAnimationFrame(update);
     ctn.appendChild(gl.canvas);
 
-    function handleMouseMove(e: MouseEvent) {
+    // Event Listeners
+    const handleMouseMove = (e: MouseEvent) => {
       const rect = ctn.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
       const y = 1.0 - (e.clientY - rect.top) / rect.height;
       targetMousePos.current = { x, y };
       targetMouseActive.current = 1.0;
-    }
+    };
 
-    function handleMouseLeave() {
+    const handleMouseLeave = () => {
       targetMouseActive.current = 0.0;
-    }
+    };
 
-    if (mouseInteraction) {
-      ctn.addEventListener('mousemove', handleMouseMove);
-      ctn.addEventListener('mouseleave', handleMouseLeave);
+    if (mouseInteraction && !isMobile) {
+      ctn.addEventListener('mousemove', handleMouseMove, { passive: true });
+      ctn.addEventListener('mouseleave', handleMouseLeave, { passive: true });
     }
 
     return () => {
-      cancelAnimationFrame(animateId);
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
       window.removeEventListener('resize', resize);
-      if (mouseInteraction) {
+      if (mouseInteraction && !isMobile) {
         ctn.removeEventListener('mousemove', handleMouseMove);
         ctn.removeEventListener('mouseleave', handleMouseLeave);
       }
       if (ctn && gl.canvas && ctn.contains(gl.canvas)) {
           ctn.removeChild(gl.canvas);
       }
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      // Aggressive cleanup to prevent memory leaks
+      const extension = gl.getExtension('WEBGL_lose_context');
+      if (extension) extension.loseContext();
     };
   }, [
     focal,
