@@ -218,7 +218,12 @@ export default function Galaxy({
   useEffect(() => {
     if (!ctnDom.current) return;
     const ctn = ctnDom.current;
+    
+    // Mobile Performance Optimization: Cap DPR at 1.5
+    const dpr = Math.min(window.devicePixelRatio, 1.5);
+
     const renderer = new Renderer({
+      dpr,
       alpha: transparent,
       premultipliedAlpha: false
     });
