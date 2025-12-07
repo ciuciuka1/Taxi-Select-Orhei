@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ro" class="scroll-smooth">
+<html lang="ro">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="https://fonts.gstatic.com/s/i/materialicons/local_taxi/v1/24px.svg" />
@@ -191,15 +191,17 @@
         padding: 0;
         overscroll-behavior-y: none; /* Prevents rubber-band effect on mobile */
         -webkit-overflow-scrolling: touch;
+        /* Hardware acceleration for scrolling container */
+        will-change: scroll-position; 
       }
 
       /* Hide default cursor on desktop to allow custom cursor */
       @media (hover: hover) and (pointer: fine) {
         body {
-          cursor: none;
+          cursor: none !important;
         }
         a, button, input, select, textarea, [role="button"] {
-          cursor: none; /* Ensure cursor stays hidden on interactive elements */
+          cursor: none !important; /* Ensure cursor stays hidden on interactive elements */
         }
       }
 

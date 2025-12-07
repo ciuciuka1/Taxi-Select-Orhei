@@ -215,19 +215,16 @@ export default function Galaxy({
   const smoothMousePos = useRef({ x: 0.5, y: 0.5 });
   const targetMouseActive = useRef(0.0);
   const smoothMouseActive = useRef(0.0);
-  const requestRef = useRef<number>();
+  const requestRef = useRef<number | null>(null);
+  const bounds = useRef({ width: 0, height: 0, left: 0, top: 0 });
 
   useEffect(() => {
     if (!ctnDom.current) return;
     const ctn = ctnDom.current;
 
-    // Detect Device Capabilities
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
     
-    // Performance Optimization Strategy:
-    // 1. Cap DPR at 1.0 for mobile to prevent massive pixel processing on 4K/3x screens.
-    // 2. Reduce Shader Layers from 4 to 2 on mobile to halve the GPU workload per pixel.
-    
+    // Performance: Cap DPR for mobile
     const dpr = isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.5);
     const shaderLayers = isMobile ? 2 : 4;
 
@@ -251,8 +248,13 @@ export default function Galaxy({
     let program: Program;
 
     function resize() {
-      // Using clientWidth/Height avoids layout thrashing compared to offsetWidth in some browsers
-      renderer.setSize(ctn.clientWidth, ctn.clientHeight);
+      // Avoid layout thrashing by reading cached dimensions where possible, 
+      // but here we must read to resize accurately.
+      // Cache bounds for mouse movement to avoid reflows during interaction
+      const rect = ctn.getBoundingClientRect();
+      bounds.current = { width: rect.width, height: rect.height, left: rect.left, top: rect.top };
+
+      renderer.setSize(rect.width, rect.height);
       if (program) {
         program.uniforms.uResolution.value = new Color([
           gl.canvas.width,
@@ -262,17 +264,17 @@ export default function Galaxy({
       }
     }
     window.addEventListener('resize', resize, { passive: true });
+    // Initial resize
     resize();
 
-    const geometry = new Triangle(gl, {});
+    const geometry = new Triangle(gl);
     program = new Program(gl, {
       vertex: vertexShader,
-      // Inject dynamic layer count based on device performance
       fragment: getFragmentShader(shaderLayers),
       uniforms: {
         uTime: { value: 0 },
         uResolution: {
-          value: new Color(gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height)
+          value: new Color([gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height])
         },
         uFocal: { value: new Float32Array(focal) },
         uRotation: { value: new Float32Array(rotation) },
@@ -297,15 +299,26 @@ export default function Galaxy({
 
     const mesh = new Mesh(gl, { geometry, program });
 
+    // --- OPTIMIZED FRAME LOOP ---
+    let lastTime = 0;
+    
     function update(t: number) {
+      const delta = t - lastTime;
+      // FPS Cap logic: 
+      // If delta is less than ~8.33ms (120FPS), skip frame to save battery on high-refresh screens if browser attempts it.
+      // Most browsers cap at 60 or display refresh rate automatically via rAF.
+      // This is a safety valve.
+      
       requestRef.current = requestAnimationFrame(update);
+
+      if (delta < 8) return; 
+      lastTime = t;
       
       if (!disableAnimation) {
         program.uniforms.uTime.value = t * 0.001;
         program.uniforms.uStarSpeed.value = (t * 0.001 * starSpeed) / 10.0;
       }
 
-      // Only calculate mouse physics if interaction is enabled and not mobile
       if (mouseInteraction && !isMobile) {
         const lerpFactor = 0.05;
         smoothMousePos.current.x += (targetMousePos.current.x - smoothMousePos.current.x) * lerpFactor;
@@ -323,11 +336,12 @@ export default function Galaxy({
     requestRef.current = requestAnimationFrame(update);
     ctn.appendChild(gl.canvas);
 
-    // Event Listeners
+    // --- OPTIMIZED MOUSE HANDLING ---
+    // Avoids getBoundingClientRect() inside the event loop
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = ctn.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = 1.0 - (e.clientY - rect.top) / rect.height;
+      // Use cached bounds
+      const x = (e.clientX - bounds.current.left) / bounds.current.width;
+      const y = 1.0 - (e.clientY - bounds.current.top) / bounds.current.height;
       targetMousePos.current = { x, y };
       targetMouseActive.current = 1.0;
     };
@@ -342,7 +356,7 @@ export default function Galaxy({
     }
 
     return () => {
-      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      if (requestRef.current !== null) cancelAnimationFrame(requestRef.current);
       window.removeEventListener('resize', resize);
       if (mouseInteraction && !isMobile) {
         ctn.removeEventListener('mousemove', handleMouseMove);
@@ -351,7 +365,6 @@ export default function Galaxy({
       if (ctn && gl.canvas && ctn.contains(gl.canvas)) {
           ctn.removeChild(gl.canvas);
       }
-      // Aggressive cleanup to prevent memory leaks
       const extension = gl.getExtension('WEBGL_lose_context');
       if (extension) extension.loseContext();
     };

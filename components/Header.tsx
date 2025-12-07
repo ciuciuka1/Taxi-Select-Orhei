@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Language, TranslationStructure } from '../types';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -16,29 +16,29 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
   // Cheie unică pentru a forța re-randarea widgetului meteo la cerere
   const [weatherKey, setWeatherKey] = useState(0); 
   const location = useLocation();
+  const scrollRef = useRef(0);
 
   useEffect(() => {
-    let lastScrollY = window.scrollY;
     let ticking = false;
 
-    const updateScroll = () => {
-      const scrollY = window.scrollY;
-      if (Math.abs(scrollY - lastScrollY) > 10 || scrollY < 50) {
-         setIsScrolled(scrollY > 50);
-         lastScrollY = scrollY;
-      }
-      ticking = false;
-    };
-
-    const handleScroll = () => {
+    const onScroll = () => {
+      scrollRef.current = window.scrollY;
       if (!ticking) {
-        window.requestAnimationFrame(updateScroll);
+        window.requestAnimationFrame(() => {
+          const scrollY = scrollRef.current;
+          // Optimized state update to minimize re-renders
+          setIsScrolled((prev) => {
+             const shouldBeScrolled = scrollY > 50;
+             return prev !== shouldBeScrolled ? shouldBeScrolled : prev;
+          });
+          ticking = false;
+        });
         ticking = true;
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   // Close mobile menu on route change
@@ -79,7 +79,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
 
   return (
     <header
-      className={`fixed w-full top-0 z-40 transition-all duration-500 border-b ${
+      className={`fixed w-full top-0 z-40 transition-all duration-500 border-b will-change-transform ${
         mobileMenuOpen
           ? 'bg-brand-dark border-white/10' 
           : isScrolled 
