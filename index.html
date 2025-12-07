@@ -6,15 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#020617" />
     
-    <!-- SEO PRIMARY METADATA -->
-    <title>Taxi Select Orhei - Comandă Taxi Rapid | 0 235 66 6 66</title>
-    <meta name="description" content="Cel mai rapid Taxi din Orhei. Disponibil 24/7, mașini confortabile, transfer aeroport Chișinău și curse interurbane. Siguranță și prețuri corecte. Sună acum!" />
-    <meta name="keywords" content="taxi orhei, taxi select, taxi 66666, taxi moldova, transport pasageri orhei, taxi aeroport chisinau, taxi ieftin orhei" />
+    <!-- SEO PRIMARY METADATA (LOCAL OPTIMIZED) -->
+    <title>Taxi Orhei - Taxi Select | 0 235 66 6 66 | Cel mai Rapid</title>
+    <meta name="description" content="Comandă Taxi în Orhei. Cel mai rapid serviciu de taxi, disponibil 24/7. Transfer Aeroport Chișinău, curse interurbane și locale. Mașini curate, șoferi profesioniști. Sună la 0 235 66 6 66." />
+    <meta name="keywords" content="taxi orhei, taxi select, numar taxi orhei, taxi ieftin orhei, taxi chisinau orhei, transfer aeroport, taxi 66666, transport pasageri orhei" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="author" content="Taxi Select Orhei" />
     <link rel="canonical" href="https://taxiselect-orhei.md/" />
 
-    <!-- GEO TAGS FOR LOCAL SEO (Vital for Taxi) -->
+    <!-- GEO TAGS FOR LOCAL SEO (Vital for Orhei) -->
     <meta name="geo.region" content="MD-OR" />
     <meta name="geo.placename" content="Orhei" />
     <meta name="geo.position" content="47.3831;28.8231" />
@@ -26,7 +26,7 @@
     <meta property="og:description" content="Comandă taxi în Orhei la orice oră. Servicii premium la prețuri standard. 0 235 66 6 66." />
     <meta property="og:url" content="https://taxiselect-orhei.md/" />
     <meta property="og:image" content="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=1200&q=80" />
-    <meta property="business:contact_data:street_address" content="Orhei" />
+    <meta property="business:contact_data:street_address" content="Strada Vasile Lupu" />
     <meta property="business:contact_data:locality" content="Orhei" />
     <meta property="business:contact_data:country_name" content="Moldova" />
     <meta property="business:contact_data:phone_number" content="+37323566666" />
@@ -191,6 +191,16 @@
         padding: 0;
         overscroll-behavior-y: none; /* Prevents rubber-band effect on mobile */
         -webkit-overflow-scrolling: touch;
+      }
+
+      /* Hide default cursor on desktop to allow custom cursor */
+      @media (hover: hover) and (pointer: fine) {
+        body {
+          cursor: none;
+        }
+        a, button, input, select, textarea, [role="button"] {
+          cursor: none; /* Ensure cursor stays hidden on interactive elements */
+        }
       }
 
       /* Custom Premium Scrollbar */

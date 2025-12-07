@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { TranslationStructure, Language } from '../types';
 
 interface WeatherData {
   temperature: number;
@@ -7,7 +8,12 @@ interface WeatherData {
   windSpeed: number;
 }
 
-const WeatherWidget: React.FC = () => {
+interface Props {
+  t?: TranslationStructure;
+  lang?: Language;
+}
+
+const WeatherWidget: React.FC<Props> = ({ t, lang }) => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -40,39 +46,41 @@ const WeatherWidget: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // LOGICA PENTRU DESCRIEREA TEXTUALĂ COMPLETĂ (24 TIPURI)
+  // LOGICA PENTRU DESCRIEREA TEXTUALĂ COMPLETĂ (24 TIPURI) - TRANSLATED
   const getWeatherDescription = (code: number, temp: number, wind: number) => {
-    if (temp >= 30) return "Caniculă";
-    if (temp <= -10) return "Ger";
-    if (wind > 60 && code >= 95) return "Cod Roșu: Furtună Violenta";
-    if (wind > 80) return "Vânt Puternic (Rafale)";
+    if (!t) return "Loading..."; 
+
+    if (temp >= 30) return t.weather.heat;
+    if (temp <= -10) return t.weather.cold;
+    if (wind > 60 && code >= 95) return t.weather.redCode;
+    if (wind > 80) return t.weather.strongWind;
 
     switch (code) {
-      case 0: return "Senin";
-      case 1: return "Majoritar Senin";
-      case 2: return "Parțial Noros";
-      case 3: return "Noros (Acoperit)";
-      case 45: case 48: return "Ceață";
-      case 51: return "Burniță Slabă";
-      case 53: return "Burniță Moderată";
-      case 55: return "Burniță Densă";
-      case 56: case 57: return "Gheață (Ploaie Înghețată)";
-      case 61: return "Ploaie Slabă";
-      case 63: return "Ploaie Moderată";
-      case 65: return "Ploaie Torențială";
-      case 66: case 67: return "Ploaie Înghețată";
-      case 71: return "Ninsoare Slabă";
-      case 73: return "Ninsoare Moderată";
-      case 75: return "Ninsoare Abundentă";
-      case 77: return "Grindină";
-      case 80: return "Averse (Ploaie Rapidă)";
-      case 81: return "Averse Moderate";
-      case 82: return "Ploaie Torențială (Aversă)";
-      case 85: return "Lapoviță";
-      case 86: return "Viscol"; 
-      case 95: return "Furtună cu descărcări electrice";
-      case 96: case 99: return "Furtună Violenta cu Grindină";
-      default: return "Vreme Variabilă";
+      case 0: return t.weather.clear;
+      case 1: return t.weather.mainlyClear;
+      case 2: return t.weather.partlyCloudy;
+      case 3: return t.weather.overcast;
+      case 45: case 48: return t.weather.fog;
+      case 51: return t.weather.drizzleLight;
+      case 53: return t.weather.drizzleMod;
+      case 55: return t.weather.drizzleDense;
+      case 56: case 57: return t.weather.freezingRain; 
+      case 61: return t.weather.rainLight;
+      case 63: return t.weather.rainMod;
+      case 65: return t.weather.rainHeavy;
+      case 66: case 67: return t.weather.freezingRain;
+      case 71: return t.weather.snowLight;
+      case 73: return t.weather.snowMod;
+      case 75: return t.weather.snowHeavy;
+      case 77: return t.weather.hail;
+      case 80: return t.weather.showersLight; 
+      case 81: return t.weather.showersMod;
+      case 82: return t.weather.showersHeavy;
+      case 85: return t.weather.sleet;
+      case 86: return t.weather.blizzard;
+      case 95: return t.weather.thunder;
+      case 96: case 99: return t.weather.thunderHail;
+      default: return t.weather.variable;
     }
   };
 
@@ -295,10 +303,9 @@ const WeatherWidget: React.FC = () => {
   };
 
   // CONSTANTE PENTRU UNIFORMIZARE DESIGN
-  // Eliminated fixed height/width constraints to allow auto-sizing based on content padding
   const baseContainerClasses = "rounded-full flex items-center gap-2 pl-5 pr-2 py-2 border backdrop-blur-xl shadow-lg ring-1 select-none w-fit h-auto transition-all duration-300";
 
-  if (loading) {
+  if (loading || !weather) {
      return (
         <div className="relative group z-50 animate-fadeInUp">
           <div className={`${baseContainerClasses} border-white/5 bg-brand-dark/50 ring-white/5`}>
@@ -311,8 +318,6 @@ const WeatherWidget: React.FC = () => {
         </div>
      );
   }
-
-  if (!weather) return null;
 
   return (
     <div className="relative group cursor-help select-none z-50 animate-fadeInUp">
@@ -344,7 +349,9 @@ const WeatherWidget: React.FC = () => {
 
       {/* Tooltip Detaliat */}
       <div className="absolute top-full right-0 mt-3 w-max px-4 py-2 bg-[#0a0a0a]/95 text-white text-xs font-medium rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none border border-white/10 shadow-2xl transform translate-y-2 group-hover:translate-y-0 z-[100] backdrop-blur-xl">
-        <span className="uppercase tracking-wide text-brand-gold block text-[10px] mb-0.5">Vremea Acum</span>
+        <span className="uppercase tracking-wide text-brand-gold block text-[10px] mb-0.5">
+            {t ? t.weather.label : "Vremea Acum"}
+        </span>
         <span className="text-sm font-bold block">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</span>
         <div className="absolute -top-1 right-8 w-2 h-2 bg-[#0a0a0a]/95 border-t border-l border-white/10 transform rotate-45"></div>
       </div>

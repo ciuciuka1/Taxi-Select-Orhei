@@ -327,7 +327,7 @@ export default function Galaxy({
         ctn.removeEventListener('mousemove', handleMouseMove);
         ctn.removeEventListener('mouseleave', handleMouseLeave);
       }
-      if (ctn.contains(gl.canvas)) {
+      if (ctn && gl.canvas && ctn.contains(gl.canvas)) {
           ctn.removeChild(gl.canvas);
       }
       gl.getExtension('WEBGL_lose_context')?.loseContext();

@@ -107,7 +107,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
           
           <div className="hidden xs:block origin-left">
             {/* Folosim key pentru a forța componenta să se reîncarce complet când dăm click pe Home/Logo */}
-            <WeatherWidget key={weatherKey} />
+            <WeatherWidget key={weatherKey} t={t} lang={lang} />
           </div>
         </div>
 
@@ -136,7 +136,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
         <div className="flex items-center gap-4 md:hidden relative z-50">
            <div className="xs:hidden">
              {/* Și pe mobil forțăm refresh */}
-             <WeatherWidget key={`mobile-${weatherKey}`} />
+             <WeatherWidget key={`mobile-${weatherKey}`} t={t} lang={lang} />
            </div>
            
           {/* Mobile Toggle */}

@@ -79,6 +79,37 @@ export interface TranslationStructure {
     s2Title: string;
     s2Text: string;
   };
+  weather: {
+    heat: string;
+    cold: string;
+    redCode: string;
+    strongWind: string;
+    clear: string;
+    mainlyClear: string;
+    partlyCloudy: string;
+    overcast: string;
+    fog: string;
+    drizzleLight: string;
+    drizzleMod: string;
+    drizzleDense: string;
+    freezingRain: string;
+    rainLight: string;
+    rainMod: string;
+    rainHeavy: string;
+    snowLight: string;
+    snowMod: string;
+    snowHeavy: string;
+    hail: string;
+    showersLight: string;
+    showersMod: string;
+    showersHeavy: string;
+    sleet: string;
+    blizzard: string;
+    thunder: string;
+    thunderHail: string;
+    variable: string;
+    label: string;
+  };
 }
 
 export interface SeoProps {

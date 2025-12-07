@@ -12,12 +12,13 @@ const PulseCallButton: React.FC = () => {
       
       {/* iPhone 17 Pro Chassis - Compact & Elegant */}
       {/* Added animate-wiggle-7s here to vibrate the phone body every 7s. Stops on hover. */}
+      {/* Added animate-pulse-slow to the container to breathe */}
       <div className="relative transition-all duration-300 ease-out transform group-hover:-translate-y-1 group-hover:scale-[1.02] animate-wiggle-7s group-hover:animate-none
                       w-[52px] h-[108px] rounded-[18px] border-[2px] border-[#4a4a4a] bg-[#1a1a1a] shadow-2xl shadow-black/70 ring-1 ring-white/10
                       md:w-[64px] md:h-[132px] md:rounded-[22px] md:border-[2.5px]">
         
         {/* Screen Area - OLED Black */}
-        <div className="absolute inset-0 bg-brand-dark rounded-[16px] md:rounded-[19px] overflow-hidden flex flex-col items-center w-full h-full border-[1px] border-black">
+        <div className="absolute inset-0 bg-brand-dark rounded-[16px] md:rounded-[19px] overflow-hidden flex flex-col items-center w-full h-full border-[1px] border-black animate-pulse-slow">
             
             {/* Glass Reflection/Shine */}
             <div className="absolute inset-0 bg-gradient-to-tr from-white/5 via-transparent to-transparent pointer-events-none z-20 opacity-50"></div>
