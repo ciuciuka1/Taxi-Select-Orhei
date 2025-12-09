@@ -74,19 +74,22 @@ vec3 hsv2rgb(vec3 c) {
 float Star(vec2 uv, float flare) {
   float d = length(uv);
   
-  // Scale the coordinate space effectively making the star larger or smaller
-  float effectiveD = d / uSize;
+  // OPTIMIZED STAR LOGIC
+  // Removed the expensive 1.0/d "aura" calculation.
+  // Instead, we define a solid radius based on uSize.
+  // This creates a crisp, clean star dot which is extremely fast to render.
   
-  // Sharp drop-off, minimal glow (Aura removal)
-  // Using effectiveD scales the "core" of the star
-  float m = (0.02 * uGlowIntensity) / effectiveD; 
+  float radius = uSize * 0.04; 
   
-  float rays = smoothstep(0.0, 1.0, 1.0 - abs(uv.x * uv.y * 1000.0));
-  m += rays * flare * uGlowIntensity;
+  // smoothstep creates a nice soft edge (anti-aliasing) without the heavy cost of a glow gradient.
+  // From radius (0.0 opacity) to 20% of radius (1.0 opacity / core).
+  float m = smoothstep(radius, radius * 0.2, d);
   
-  // Cut off distant glow to save fill-rate performance
-  m *= smoothstep(0.5 * uSize, 0.0, d); 
-  return m;
+  // Apply a small power curve to make the core "hotter" and look more like a light source
+  m = pow(m, 1.5);
+  
+  // Boost brightness slightly to compensate for lack of aura
+  return m * 2.0;
 }
 
 vec3 StarLayer(vec2 uv) {
