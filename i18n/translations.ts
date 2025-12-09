@@ -10,8 +10,8 @@ export const translations: Record<Language, TranslationStructure> = {
       dispatcher: "Dispecerat 24/7",
     },
     hero: {
-      title: "Rapiditate. Siguranță. Confort.",
-      subtitle: "Serviciul tău de încredere în Orhei și împrejurimi.",
+      title: "Rapiditate. Siguranță. Excelență.",
+      subtitle: "Redefinim standardele de mobilitate în Orhei. Servicii premium 24/7 pentru tine.",
       cta: "Comandă Taxi",
     },
     home: {
@@ -67,7 +67,7 @@ export const translations: Record<Language, TranslationStructure> = {
       intro: "Acest regulament este elaborat în strictă conformitate cu Codul Transporturilor Rutiere al Republicii Moldova și Legea Nr. 105 privind Protecția Consumatorilor.",
       p1Title: "1. Drepturile și Obligațiile Transportatorului",
       p1Text: "Compania asigură transportul pasagerilor cu autovehicule autorizate, dotate cu aparat de taxat (taximetru) verificat metrologic. Șoferul are dreptul legal de a refuza cursa în următoarele situații: clientul se află în stare avansată de ebrietate sau sub influența substanțelor interzise, este agresiv, sau poartă haine murdare/urât mirositoare care pot păta salonul autovehiculului.",
-      p2Title: "2. Tarife, Plată și Bon Fiscal",
+      p2Title: "2. Таrife, Plată și Bon Fiscal",
       p2Text: "Tariful aplicat este cel afișat pe portiera autovehiculului și înregistrat de aparatul de taxat. Conform legislației în vigoare, la finalul cursei, șoferul este OBLIGAT să emită și să înmâneze pasagerului bonul fiscal. Pasagerul are dreptul să refuze plata cursei dacă șoferul refuză eliberarea bonului fiscal pe suport de hârtie.",
       p3Title: "3. Bagaje, Animale și Siguranță",
       p3Text: "Pasagerii sunt obligați să poarte centura de siguranță (inclusiv pe bancheta din spate). Transportul animalelor de companie este permis doar în cuști speciale sau cu dispozitive de protecție pentru a nu murdări tapițeria. Compania nu răspunde pentru obiectele uitate în mașină, însă încurajăm șoferii să le returneze la dispecerat.",
@@ -88,7 +88,7 @@ export const translations: Record<Language, TranslationStructure> = {
       clear: "Senin",
       mainlyClear: "Majoritar Senin",
       partlyCloudy: "Parțial Noros",
-      overcast: "Noros (Acoperit)",
+      overcast: "Noros",
       fog: "Ceață",
       drizzleLight: "Burniță Slabă",
       drizzleMod: "Burniță Moderată",
@@ -121,8 +121,8 @@ export const translations: Record<Language, TranslationStructure> = {
       dispatcher: "Диспетчер 24/7",
     },
     hero: {
-      title: "Скорость. Безопасность. Комфорт.",
-      subtitle: "Ваша надежная служба такси в Оргееве.",
+      title: "Скорость. Безопасность. Совершенство.",
+      subtitle: "Новый стандарт мобильности в Оргееве. Премиум сервис 24/7 для вас.",
       cta: "Заказать такси",
     },
     home: {
@@ -232,8 +232,8 @@ export const translations: Record<Language, TranslationStructure> = {
       dispatcher: "Dispatch 24/7",
     },
     hero: {
-      title: "Speed. Safety. Comfort.",
-      subtitle: "Your trusted taxi service in Orhei city.",
+      title: "Speed. Safety. Excellence.",
+      subtitle: "Redefining mobility standards in Orhei. Premium 24/7 service for you.",
       cta: "Order Taxi",
     },
     home: {
@@ -310,7 +310,7 @@ export const translations: Record<Language, TranslationStructure> = {
       clear: "Clear",
       mainlyClear: "Mainly Clear",
       partlyCloudy: "Partly Cloudy",
-      overcast: "Overcast",
+      overcast: "Noros",
       fog: "Fog",
       drizzleLight: "Light Drizzle",
       drizzleMod: "Moderate Drizzle",

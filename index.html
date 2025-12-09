@@ -80,6 +80,7 @@
               'fog-flow': 'fog-flow 6s linear infinite',
               'twinkle': 'twinkle 3s ease-in-out infinite',
               'preloader-hide': 'fadeOut 0.5s ease-in-out forwards',
+              'gradient-x': 'gradient-x 4s ease infinite',
             },
             keyframes: {
               fadeInUp: {
@@ -176,6 +177,16 @@
                 '25%': { transform: 'translate(-1px, 2px) rotate(-1deg)' },
                 '30%': { transform: 'translate(1px, -2px) rotate(1deg)' },
                 '35%': { transform: 'translate(0, 0) rotate(0deg)' },
+              },
+              'gradient-x': {
+                '0%, 100%': {
+                  'background-size': '200% 200%',
+                  'background-position': 'left center'
+                },
+                '50%': {
+                  'background-size': '200% 200%',
+                  'background-position': 'right center'
+                },
               }
             }
           }

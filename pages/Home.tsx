@@ -32,8 +32,8 @@ const Home: React.FC<Props> = ({ t }) => {
         {/* Content Layer */}
         <div className="relative z-10 container mx-auto px-4 h-full flex flex-col items-center justify-center">
           <div className="max-w-4xl mx-auto text-center perspective-1000 mt-0 md:mt-0">
-            {/* Title with Brand Gradient */}
-            <h1 className="font-serif text-4xl xs:text-5xl md:text-6xl lg:text-7xl font-bold mb-3 xs:mb-4 md:mb-6 leading-tight drop-shadow-[0_4px_6px_rgba(0,0,0,0.9)] animate-fadeInUp text-transparent bg-clip-text bg-gradient-to-r from-white via-brand-gold to-brand-orange pb-2" style={{ animationDelay: '0.1s' }}>
+            {/* Title with Brand Gradient - Added animate-gradient-x and bg sizing for dynamic shimmer */}
+            <h1 className="font-serif text-4xl xs:text-5xl md:text-6xl lg:text-7xl font-bold mb-3 xs:mb-4 md:mb-6 leading-tight drop-shadow-[0_4px_6px_rgba(0,0,0,0.9)] animate-fadeInUp text-transparent bg-clip-text bg-gradient-to-r from-white via-brand-gold to-brand-orange bg-[length:200%_auto] animate-gradient-x pb-2" style={{ animationDelay: '0.1s' }}>
               {t.hero.title}
             </h1>
             

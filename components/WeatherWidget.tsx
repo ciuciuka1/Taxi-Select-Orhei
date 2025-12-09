@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { TranslationStructure, Language } from '../types';
 
@@ -20,6 +20,7 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const gradientId = useMemo(() => `liquid-grad-${Math.random().toString(36).substr(2, 9)}`, []);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -98,6 +99,57 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
       case 96: case 99: return t.weather.thunderHail;
       default: return t.weather.variable;
     }
+  };
+
+  // --- THERMOMETER LOGIC ---
+  const getThermometerColor = (temp: number) => {
+      if (temp <= 0) return '#60A5FA'; // Blue-400
+      if (temp <= 10) return '#22D3EE'; // Cyan-400
+      if (temp <= 20) return '#ffffff'; // White (Comfort/Spring)
+      if (temp <= 30) return '#FACC15'; // Yellow-400
+      return '#EF4444'; // Red-500
+  };
+
+  const getThermometer = (temp: number) => {
+      // Logic pentru inaltime lichid adaptiva
+      const minTemp = -10; 
+      const maxTemp = 40;
+      const clampedTemp = Math.max(minTemp, Math.min(temp, maxTemp));
+      // Calculeaza procentul (0 la 100)
+      const percent = ((clampedTemp - minTemp) / (maxTemp - minTemp)) * 100;
+      // Asigura o vizibilitate minima a lichidului (de ex 15%)
+      const drawPercent = Math.max(percent, 15);
+      
+      const height = 14; // inaltime tija
+      const fillH = (drawPercent / 100) * height;
+      const y = 16 - fillH; // 16 e baza tijei
+      
+      const color = getThermometerColor(temp);
+
+      return (
+        <svg width="14" height="28" viewBox="0 0 14 28" className="filter drop-shadow-md mr-1 opacity-90 overflow-visible">
+            <defs>
+                <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={color} stopOpacity="1" />
+                    <stop offset="100%" stopColor={color} stopOpacity="0.6" />
+                </linearGradient>
+            </defs>
+            {/* Glass Tube */}
+            <path d="M7 2 C 8.65 2 10 3.35 10 5 V 18 C 10 18.5 10.1 19 10.3 19.5 A 6 6 0 1 1 3.7 19.5 C 3.9 19 4 18.5 4 18 V 5 C 4 3.35 5.35 2 7 2 Z" 
+                  fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
+            
+            {/* Bulb */}
+            <circle cx="7" cy="21" r="3.5" fill={`url(#${gradientId})`} />
+            
+            {/* Stem Liquid */}
+            <rect x="5.5" y={y} width="3" height={fillH + 1} fill={`url(#${gradientId})`} rx="1.5" />
+            
+            {/* Marks */}
+            <line x1="10" y1="5" x2="11.5" y2="5" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
+            <line x1="10" y1="10" x2="11.5" y2="10" stroke="rgba(255,255,255,0.25)" strokeWidth="0.8" />
+            <line x1="10" y1="15" x2="11.5" y2="15" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
+        </svg>
+      );
   };
 
   // --- GRAFICĂ METEO ---
@@ -312,7 +364,7 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
     return null;
   };
 
-  const baseContainerClasses = "rounded-full flex items-center gap-2 pl-5 pr-2 py-2 border backdrop-blur-xl shadow-lg ring-1 select-none w-fit h-auto transition-all duration-300 cursor-pointer active:scale-95";
+  const baseContainerClasses = "rounded-full flex items-center gap-2 pl-4 pr-2 py-2 border backdrop-blur-xl shadow-lg ring-1 select-none w-fit h-auto transition-all duration-300 cursor-pointer active:scale-95";
 
   if (loading || !weather) {
      return (
@@ -341,20 +393,25 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
             "from-brand-dark/80 to-brand-slate/80 border-white/10 ring-white/5 hover:ring-brand-gold/30"
         }`}>
           
-          <div className="flex flex-col items-end justify-center">
-            <span className={`text-lg font-bold font-serif leading-none tracking-tight shadow-black drop-shadow-md ${
-                weather.temperature >= 30 ? "text-red-400" :
-                weather.temperature <= -10 ? "text-blue-300" :
-                "text-white"
-            }`}>
-              {weather.temperature}°C
-            </span>
-            <span className="text-[10px] text-brand-gold font-bold uppercase tracking-widest mt-0.5 opacity-90 whitespace-nowrap">
-              Orhei
-            </span>
+          <div className="flex items-center gap-1">
+              {/* Thermometer next to temp */}
+              {getThermometer(weather.temperature)}
+              
+              <div className="flex flex-col items-end justify-center">
+                <span className={`text-lg font-bold font-serif leading-none tracking-tight shadow-black drop-shadow-md ${
+                    weather.temperature >= 30 ? "text-red-400" :
+                    weather.temperature <= -10 ? "text-blue-300" :
+                    "text-white"
+                }`}>
+                  {weather.temperature}°C
+                </span>
+                <span className="text-[10px] text-brand-gold font-bold uppercase tracking-widest mt-0.5 opacity-90 whitespace-nowrap">
+                  Orhei
+                </span>
+              </div>
           </div>
 
-          <div className="transform group-hover:scale-110 transition-transform duration-500 ease-out shrink-0 ml-2">
+          <div className="transform group-hover:scale-110 transition-transform duration-500 ease-out shrink-0 ml-1">
             {getWeatherIcon(weather.weatherCode, weather.isDay, weather.temperature, weather.windSpeed)}
           </div>
         </div>
@@ -399,7 +456,10 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
                     {getWeatherIcon(weather.weatherCode, weather.isDay, weather.temperature, weather.windSpeed)}
                  </div>
                  {/* Increased size for emphasis since marketing text is gone */}
-                 <h2 className="text-5xl font-serif font-bold text-white mb-2">{weather.temperature}°C</h2>
+                 <div className="flex items-center gap-3">
+                    <div className="transform scale-150">{getThermometer(weather.temperature)}</div>
+                    <h2 className="text-5xl font-serif font-bold text-white mb-2">{weather.temperature}°C</h2>
+                 </div>
                  <p className="text-brand-gold text-sm uppercase tracking-widest font-medium">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</p>
              </div>
 
