@@ -9,6 +9,7 @@ import Footer from './components/Footer';
 import PulseCallButton from './components/PulseCallButton';
 import SecurityWrapper from './components/SecurityWrapper';
 import Preloader from './components/Preloader';
+import CookieConsent from './components/CookieConsent';
 
 // Pages
 import Home from './pages/Home';
@@ -95,6 +96,7 @@ const App: React.FC = () => {
 
           <Footer t={t} />
           <PulseCallButton />
+          <CookieConsent />
         </div>
       </HashRouter>
     </SecurityWrapper>
