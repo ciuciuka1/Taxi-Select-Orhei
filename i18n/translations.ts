@@ -9,6 +9,7 @@ export const translations: Record<Language, TranslationStructure> = {
       about: "Despre Noi",
       contact: "Contact",
       dispatcher: "Dispecerat",
+      languageLabel: "Limbă",
     },
     hero: {
       title: "Taxi SELECT",
@@ -60,7 +61,7 @@ export const translations: Record<Language, TranslationStructure> = {
       privacy: "Confidențialitate",
     },
     meta: {
-      title: "Taxi Select Orhei - 0 235 66 6 66 - Servicii Premium de Transport",
+      title: "Taxi SELECT",
       description: "Cel mai rapid și sigur taxi din Orhei. Deservim orașul și localitățile vecine (Peresecina, Ivancea, Pelivan). Transfer Aeroport Chișinău. Tel: 0 235 66 6 66."
     },
     terms: {
@@ -115,7 +116,10 @@ export const translations: Record<Language, TranslationStructure> = {
       thunder: "Furtună",
       thunderHail: "Furtună cu Grindină",
       variable: "Vreme Variabilă",
-      label: "Meteo Orhei"
+      label: "Meteo Orhei",
+      wind: "Vânt",
+      humidity: "Umiditate",
+      city: "Orhei"
     }
   },
   ru: {
@@ -125,6 +129,7 @@ export const translations: Record<Language, TranslationStructure> = {
       about: "О нас",
       contact: "Контакты",
       dispatcher: "Диспетчер",
+      languageLabel: "Язык",
     },
     hero: {
       title: "Taxi SELECT",
@@ -176,7 +181,7 @@ export const translations: Record<Language, TranslationStructure> = {
       privacy: "Конфиденциальность",
     },
     meta: {
-      title: "Такси Select Оргеев - 0 235 66 6 66 - Премиум такси",
+      title: "Taxi SELECT",
       description: "Самое быстрое такси в Оргееве и районе. Обслуживаем Пересечино, Иванчу, Пеливан. Круглосуточно, трансфер в аэропорт. Тел: 0 235 66 6 66."
     },
     terms: {
@@ -231,7 +236,10 @@ export const translations: Record<Language, TranslationStructure> = {
       thunder: "Гроза",
       thunderHail: "Гроза с Градом",
       variable: "Переменная",
-      label: "Погода"
+      label: "Погода",
+      wind: "Ветер",
+      humidity: "Влажность",
+      city: "Оргеев"
     }
   },
   en: {
@@ -241,6 +249,7 @@ export const translations: Record<Language, TranslationStructure> = {
       about: "About Us",
       contact: "Contact",
       dispatcher: "Dispatch",
+      languageLabel: "Language",
     },
     hero: {
       title: "Taxi SELECT",
@@ -292,7 +301,7 @@ export const translations: Record<Language, TranslationStructure> = {
       privacy: "Privacy",
     },
     meta: {
-      title: "Taxi Select Orhei - 0 235 66 6 66 - Premium Taxi Service",
+      title: "Taxi SELECT",
       description: "The fastest and safest taxi in Orhei. Serving the city and surrounding districts (Peresecina, Ivancea, Pelivan). Airport Transfer available. Call: 0 235 66 6 66."
     },
     terms: {
@@ -347,7 +356,10 @@ export const translations: Record<Language, TranslationStructure> = {
       thunder: "Thunderstorm",
       thunderHail: "Hailstorm",
       variable: "Variable",
-      label: "Orhei Weather"
+      label: "Orhei Weather",
+      wind: "Wind",
+      humidity: "Humidity",
+      city: "Orhei"
     }
   }
 };

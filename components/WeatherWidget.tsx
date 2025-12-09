@@ -424,7 +424,7 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
                   {weather.temperature}°C
                 </span>
                 <span className="text-[10px] text-brand-gold font-bold uppercase tracking-widest mt-0.5 opacity-90 whitespace-nowrap">
-                  Orhei
+                  {t ? t.weather.city : "Orhei"}
                 </span>
               </div>
           </div>
@@ -484,17 +484,17 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
              {/* Grid Details */}
              <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="bg-white/5 rounded-xl p-4 flex flex-col items-center border border-white/5 shadow-inner">
-                   <span className="text-gray-400 text-[10px] uppercase mb-1 tracking-wider">Vânt</span>
+                   <span className="text-gray-400 text-[10px] uppercase mb-1 tracking-wider">{t ? t.weather.wind : "Vânt"}</span>
                    <span className="text-white font-bold text-xl">{weather.windSpeed} <span className="text-sm font-normal text-gray-400">km/h</span></span>
                 </div>
                 <div className="bg-white/5 rounded-xl p-4 flex flex-col items-center border border-white/5 shadow-inner">
-                   <span className="text-gray-400 text-[10px] uppercase mb-1 tracking-wider">Umiditate</span>
+                   <span className="text-gray-400 text-[10px] uppercase mb-1 tracking-wider">{t ? t.weather.humidity : "Umiditate"}</span>
                    <span className="text-white font-bold text-xl">{weather.humidity}<span className="text-sm font-normal text-gray-400">%</span></span>
                 </div>
              </div>
 
              <div className="mt-6 text-center border-t border-white/5 pt-4">
-                <p className="text-[10px] text-gray-500 uppercase tracking-[0.3em]">Orhei • Taxi Select</p>
+                <p className="text-[10px] text-gray-500 uppercase tracking-[0.3em]">{t ? t.weather.city : "Orhei"} • Taxi Select</p>
              </div>
           </div>
         </div>,

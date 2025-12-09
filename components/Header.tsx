@@ -198,7 +198,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
                 className={`flex flex-col space-y-6 mt-8 transition-all duration-700 delay-300 ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
             >
               <div className="flex items-center justify-between border-t border-white/10 pt-6">
-                <span className="text-gray-400 text-sm uppercase tracking-wider font-medium">Language</span>
+                <span className="text-gray-400 text-sm uppercase tracking-wider font-medium">{t.nav.languageLabel}</span>
                 <LanguageSwitcher currentLang={lang} setLang={setLang} />
               </div>
 

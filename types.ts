@@ -7,6 +7,7 @@ export interface TranslationStructure {
     about: string;
     contact: string;
     dispatcher: string;
+    languageLabel: string;
   };
   hero: {
     title: string;
@@ -114,6 +115,9 @@ export interface TranslationStructure {
     thunderHail: string;
     variable: string;
     label: string;
+    wind: string;
+    humidity: string;
+    city: string;
   };
 }
 
