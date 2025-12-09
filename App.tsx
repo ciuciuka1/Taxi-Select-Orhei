@@ -96,7 +96,7 @@ const App: React.FC = () => {
 
           <Footer t={t} />
           <PulseCallButton />
-          <CookieConsent />
+          <CookieConsent t={t} />
         </div>
       </HashRouter>
     </SecurityWrapper>

@@ -79,6 +79,11 @@ export interface TranslationStructure {
     s2Title: string;
     s2Text: string;
   };
+  cookies: {
+    text: string;
+    link: string;
+    button: string;
+  };
   weather: {
     heat: string;
     cold: string;

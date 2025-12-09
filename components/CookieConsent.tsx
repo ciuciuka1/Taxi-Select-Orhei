@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { TranslationStructure } from '../types';
 
-const CookieConsent: React.FC = () => {
+interface Props {
+  t: TranslationStructure;
+}
+
+const CookieConsent: React.FC<Props> = ({ t }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -25,10 +30,9 @@ const CookieConsent: React.FC = () => {
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-gray-300 text-sm md:text-base text-center md:text-left">
             <p>
-              Folosim cookie-uri pentru a vă oferi cea mai bună experiență pe site-ul nostru (reținerea limbii preferate). 
-              Continuând să navigați, sunteți de acord cu{' '}
+              {t.cookies.text}
               <Link to="/privacy" className="text-brand-gold hover:underline font-medium">
-                Politica de Confidențialitate
+                {t.cookies.link}
               </Link>.
             </p>
           </div>
@@ -36,7 +40,7 @@ const CookieConsent: React.FC = () => {
             onClick={handleAccept}
             className="whitespace-nowrap bg-brand-gold hover:bg-yellow-400 text-brand-dark font-bold py-2 px-8 rounded-full transition-all transform active:scale-95 shadow-lg shadow-brand-gold/20"
           >
-            Acceptă
+            {t.cookies.button}
           </button>
         </div>
       </div>
