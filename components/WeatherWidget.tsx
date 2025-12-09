@@ -112,24 +112,28 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
 
   const getThermometer = (temp: number) => {
       // PROPORTIONAL LOGIC
-      // We map the temperature to a pixel height range inside the svg.
-      // Visual scale: -10°C (bottom of stem) to 40°C (top of stem).
-      const minScale = -10;
-      const maxScale = 40;
+      // Scale: -10°C to 40°C
+      const minTemp = -10;
+      const maxTemp = 40;
+      const range = maxTemp - minTemp; // 50 degrees total
       
-      const clampedTemp = Math.max(minScale, Math.min(temp, maxScale));
-      const percent = (clampedTemp - minScale) / (maxScale - minScale); // 0.0 to 1.0
+      const clampedTemp = Math.max(minTemp, Math.min(temp, maxTemp));
+      const percent = (clampedTemp - minTemp) / range; // 0.0 to 1.0
 
-      // Geometry Constants (based on viewBox 0 0 14 28)
-      const stemTopY = 4;        // Where the liquid stops at 40°C
-      const stemBottomY = 17.5;  // Where the stem meets the bulb (at -10°C)
-      const maxLiquidHeight = stemBottomY - stemTopY; // Total travel distance (13.5px)
+      // SVG Coordinates (ViewBox 0 0 14 28)
+      // Top Mark (40°C) -> y = 4
+      // Bottom Mark (-10°C) -> y = 18 (Just above bulb body)
+      const topYFull = 4;
+      const topYEmpty = 18;
+      const totalHeight = topYEmpty - topYFull; // 14 pixels travel
 
-      const liquidHeight = maxLiquidHeight * percent;
-      const liquidY = stemBottomY - liquidHeight;
-
+      const liquidY = topYEmpty - (percent * totalHeight);
       const color = getThermometerColor(temp);
 
+      // Path Geometries:
+      // Glass: Top Cap (y=3, r=2.5), Stem connects at y=17.3 to Bulb (r=4.5)
+      // Liquid: Top Cap (r=1.25), Stem connects at y=18.3 to Bulb (r=3.0)
+      
       return (
         <svg width="14" height="28" viewBox="0 0 14 28" className="filter drop-shadow-md mr-1 opacity-90 overflow-visible">
             <defs>
@@ -139,40 +143,29 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
                 </linearGradient>
             </defs>
             
-            {/* Glass Tube Container - Centered and Symmetrical */}
-            {/* Stem width ~5px (4.5 to 9.5). Bulb matches stem curvature. */}
+            {/* Glass Tube Container - Unified Path */}
             <path 
-                d="M4.5 5 C 4.5 3.5 5.5 2 7 2 C 8.5 2 9.5 3.5 9.5 5 V 16.5 C 11.2 17.2 12.5 18.8 12.5 21 C 12.5 23.5 10 25.5 7 25.5 C 4 25.5 1.5 23.5 1.5 21 C 1.5 18.8 2.8 17.2 4.5 16.5 V 5 Z" 
+                d="M 4.5 3 A 2.5 2.5 0 0 1 9.5 3 V 17.3 A 4.5 4.5 0 1 1 4.5 17.3 V 3 Z" 
                 fill="rgba(255,255,255,0.1)" 
                 stroke="rgba(255,255,255,0.4)" 
                 strokeWidth="1" 
             />
             
-            {/* Liquid Bulb - Always full */}
-            {/* Centered at 7, 21. Radius 3.5 fills the bottom glass nicely */}
-            <circle cx="7" cy="21" r="3.5" fill={`url(#${gradientId})`} />
-            
-            {/* Liquid Stem - Variable Height */}
-            {/* Width 3px (5.5 to 8.5), centered inside the 5px glass stem */}
-            {/* Height extends +4px downwards to overlap into the bulb ensuring seamless connection */}
-            <rect 
-                x="5.5" 
-                y={liquidY} 
-                width="3" 
-                height={Math.max(0, liquidHeight + 4)} 
-                fill={`url(#${gradientId})`} 
-                rx="1.5" 
+            {/* Liquid (Mercury) - Unified Path for seamless join */}
+            <path
+                d={`M 5.75 ${liquidY} A 1.25 1.25 0 0 1 8.25 ${liquidY} L 8.25 18.3 A 3 3 0 1 1 5.75 18.3 Z`}
+                fill={`url(#${gradientId})`}
             />
             
             {/* Measurement Marks - Correctly positioned based on Scale */}
-            {/* Top Mark (40°C) at y=4 */}
-            <line x1="9.5" y1="4" x2="11.5" y2="4" stroke="rgba(255,255,255,0.5)" strokeWidth="0.8" />
+            {/* 40°C -> y=4 */}
+            <line x1="9.5" y1="4" x2="11.5" y2="4" stroke="rgba(255,255,255,0.6)" strokeWidth="0.8" />
             
-            {/* Mid Mark (15°C) - Approx midpoint y=10.75 */}
-            <line x1="9.5" y1="10.75" x2="11.5" y2="10.75" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8" />
+            {/* 15°C -> Midpoint (25/50 degrees) -> y=11 */}
+            <line x1="9.5" y1="11" x2="11.5" y2="11" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8" />
             
-            {/* Low Mark (-10°C) at y=17.5 */}
-            <line x1="9.5" y1="17.5" x2="11.5" y2="17.5" stroke="rgba(255,255,255,0.5)" strokeWidth="0.8" />
+            {/* -10°C -> y=18 */}
+            <line x1="9.5" y1="18" x2="11.5" y2="18" stroke="rgba(255,255,255,0.6)" strokeWidth="0.8" />
         </svg>
       );
   };
