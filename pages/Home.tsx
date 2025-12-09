@@ -148,7 +148,7 @@ const Home: React.FC<Props> = ({ t }) => {
               {/* Right Column - 2 Stacked Cards */}
               <div className="md:col-span-1 flex flex-col gap-4 md:gap-6 h-[500px] md:h-auto">
                  
-                 {/* Top Right - Intercity (Open Road) */}
+                 {/* Top Right - Intercity (Open Road) - REMOVED BADGE AS REQUESTED */}
                  <div className="relative flex-1 rounded-3xl overflow-hidden shadow-xl group bg-gray-900">
                     <img 
                        src="https://images.unsplash.com/photo-1763477892730-ccf12297a7d0?q=80&w=1075&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
@@ -157,15 +157,7 @@ const Home: React.FC<Props> = ({ t }) => {
                        loading="lazy"
                     />
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
-                    <div className="absolute bottom-6 left-6 z-10">
-                       <div className="flex items-center gap-2 bg-brand-dark/80 backdrop-blur-md px-4 py-2 rounded-full text-white text-xs font-bold tracking-widest uppercase shadow-lg cursor-default">
-                          <svg className="w-4 h-4 text-brand-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                             <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          {t.services.interBadge}
-                       </div>
-                    </div>
+                    {/* Badge Removed here */}
                  </div>
 
                  {/* Bottom Right - Safety (Red Seatbelt) */}
@@ -224,8 +216,9 @@ const Home: React.FC<Props> = ({ t }) => {
                    <div className="h-1 w-24 bg-brand-gold mx-auto mt-4 rounded-full shadow-[0_0_15px_#F5C45E] group-hover:w-48 transition-all duration-500"></div>
                 </a>
 
+                {/* UPDATED TEXT: Replaced "Raion" with "Moldova" for premium feel */}
                 <span className="text-gray-400 text-sm md:text-lg tracking-[0.3em] uppercase font-light">
-                   Orhei • Raion • Aeroport
+                   Orhei • Moldova • Aeroport
                 </span>
 
                 <div className="mt-10">

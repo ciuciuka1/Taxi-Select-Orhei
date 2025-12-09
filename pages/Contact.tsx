@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TranslationStructure } from '../types';
 import SeoHead from '../components/SeoHead';
@@ -21,9 +22,16 @@ const Contact: React.FC<Props> = ({ t }) => {
              {/* Decorative Background Glow */}
              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-brand-gold/10 blur-[50px] rounded-full"></div>
 
-             <h1 className="font-serif text-3xl md:text-5xl font-bold text-white mb-6 relative z-10">
-                {t.contact.title}
-             </h1>
+             {/* Clickable Action Title "Comandă Acum" */}
+             <div className="relative z-10 mb-6">
+                <a 
+                   href="tel:+37323566666"
+                   className="font-serif text-3xl md:text-5xl font-bold text-white hover:text-brand-gold transition-colors duration-300 cursor-pointer inline-block active:scale-95 ease-out"
+                >
+                   {t.contact.title}
+                </a>
+             </div>
+
              <p className="text-gray-300 mb-10 text-base md:text-lg font-light tracking-wide relative z-10">
                 {t.contact.text}
              </p>

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TranslationStructure } from '../types';
 import SeoHead from '../components/SeoHead';
@@ -70,7 +71,7 @@ const Services: React.FC<Props> = ({ t }) => {
             </div>
           </div>
 
-          {/* Intercity */}
+          {/* Intercity - REMOVED BADGE AS REQUESTED */}
            <div className="grid md:grid-cols-2 gap-12 items-center group">
             <div className="order-2 md:order-1 relative overflow-hidden rounded-xl shadow-2xl border border-white/10">
               <img 
@@ -80,10 +81,7 @@ const Services: React.FC<Props> = ({ t }) => {
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 to-transparent"></div>
-              {/* Badge overlay */}
-              <div className="absolute bottom-4 left-4 bg-brand-red/90 backdrop-blur px-4 py-1 rounded text-white font-bold text-sm">
-                {t.services.interBadge}
-              </div>
+              {/* Badge removed here */}
             </div>
             <div className="order-1 md:order-2">
               <h2 className="text-3xl font-serif font-bold text-brand-red mb-4">{t.services.inter}</h2>
