@@ -4,8 +4,8 @@ import Galaxy from './Galaxy';
 const HyperCanvas: React.FC = () => {
   const options = useMemo(() => ({
     hueShift: 20, // Gold/Orange tone
-    density: 2.0, // Reduced density for performance
-    size: 5.0,    // Large particles to compensate for no aura
+    density: 1.0, // Reduced density for performance
+    size: 4.0,    // Slightly smaller particles for better balance
     glowIntensity: 0.2, // Balanced intensity: visible but not a blurry aura
     starSpeed: 2.5, // Increased speed for faster movement
     rotationSpeed: 0.05,
