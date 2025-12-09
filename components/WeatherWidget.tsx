@@ -1,4 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { TranslationStructure, Language } from '../types';
 
 interface WeatherData {
@@ -6,6 +8,7 @@ interface WeatherData {
   weatherCode: number;
   isDay: boolean;
   windSpeed: number;
+  humidity: number;
 }
 
 interface Props {
@@ -13,15 +16,28 @@ interface Props {
   lang?: Language;
 }
 
-const WeatherWidget: React.FC<Props> = ({ t, lang }) => {
+const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (showModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showModal]);
 
   const fetchWeather = async () => {
     try {
       const uniqueParam = `${Date.now()}`;
       const response = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=47.3831&longitude=28.8231&current=temperature_2m,weather_code,is_day,wind_speed_10m&timezone=auto&timeformat=unixtime&t=${uniqueParam}`
+        `https://api.open-meteo.com/v1/forecast?latitude=47.3831&longitude=28.8231&current=temperature_2m,relative_humidity_2m,weather_code,is_day,wind_speed_10m&timezone=auto&timeformat=unixtime&t=${uniqueParam}`
       );
       
       if (!response.ok) throw new Error('Weather API Error');
@@ -31,7 +47,8 @@ const WeatherWidget: React.FC<Props> = ({ t, lang }) => {
         temperature: Math.round(data.current.temperature_2m),
         weatherCode: data.current.weather_code,
         isDay: data.current.is_day === 1,
-        windSpeed: data.current.wind_speed_10m
+        windSpeed: Math.round(data.current.wind_speed_10m),
+        humidity: Math.round(data.current.relative_humidity_2m)
       });
     } catch (error) {
       console.error("Failed to fetch weather", error);
@@ -46,7 +63,6 @@ const WeatherWidget: React.FC<Props> = ({ t, lang }) => {
     return () => clearInterval(interval);
   }, []);
 
-  // LOGICA PENTRU DESCRIEREA TEXTUALĂ COMPLETĂ (24 TIPURI) - TRANSLATED
   const getWeatherDescription = (code: number, temp: number, wind: number) => {
     if (!t) return "Loading..."; 
 
@@ -84,11 +100,10 @@ const WeatherWidget: React.FC<Props> = ({ t, lang }) => {
     }
   };
 
-  // --- GRAFICĂ METEO "ULTRA-REALISTĂ" ---
+  // --- GRAFICĂ METEO ---
   const getWeatherIcon = (code: number, isDay: boolean, temp: number, wind: number) => {
     const iconClass = "w-10 h-10 md:w-12 md:h-12 filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]"; 
 
-    // DEFINIȚII GRADIENTS & FILTRE
     const defs = (
       <defs>
         <radialGradient id="sunCore" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
@@ -107,11 +122,6 @@ const WeatherWidget: React.FC<Props> = ({ t, lang }) => {
         <linearGradient id="cloudDarkStorm" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="#475569" />
           <stop offset="100%" stopColor="#0F172A" />
-        </linearGradient>
-        <linearGradient id="rainNeon" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#22D3EE" stopOpacity="0" />
-          <stop offset="50%" stopColor="#06B6D4" stopOpacity="1" />
-          <stop offset="100%" stopColor="#0891B2" stopOpacity="0" />
         </linearGradient>
         <radialGradient id="moonSurface" cx="50%" cy="50%" r="50%">
             <stop offset="40%" stopColor="#F8FAFC" />
@@ -302,8 +312,7 @@ const WeatherWidget: React.FC<Props> = ({ t, lang }) => {
     return null;
   };
 
-  // CONSTANTE PENTRU UNIFORMIZARE DESIGN
-  const baseContainerClasses = "rounded-full flex items-center gap-2 pl-5 pr-2 py-2 border backdrop-blur-xl shadow-lg ring-1 select-none w-fit h-auto transition-all duration-300";
+  const baseContainerClasses = "rounded-full flex items-center gap-2 pl-5 pr-2 py-2 border backdrop-blur-xl shadow-lg ring-1 select-none w-fit h-auto transition-all duration-300 cursor-pointer active:scale-95";
 
   if (loading || !weather) {
      return (
@@ -320,42 +329,100 @@ const WeatherWidget: React.FC<Props> = ({ t, lang }) => {
   }
 
   return (
-    <div className="relative group cursor-help select-none z-50 animate-fadeInUp">
-      <div className={`${baseContainerClasses} bg-gradient-to-r ${
-          weather.temperature >= 30 ? "from-red-900/80 to-brand-dark/80 border-red-500/30 ring-red-500/20" :
-          weather.temperature <= -10 ? "from-blue-900/80 to-brand-dark/80 border-blue-500/30 ring-blue-500/20" :
-          "from-brand-dark/80 to-brand-slate/80 border-white/10 ring-white/5 hover:ring-brand-gold/30"
-      }`}>
-        
-        {/* Info Text */}
-        <div className="flex flex-col items-end justify-center">
-          <span className={`text-lg font-bold font-serif leading-none tracking-tight shadow-black drop-shadow-md ${
-              weather.temperature >= 30 ? "text-red-400" :
-              weather.temperature <= -10 ? "text-blue-300" :
-              "text-white"
-          }`}>
-            {weather.temperature}°C
-          </span>
-          <span className="text-[10px] text-brand-gold font-bold uppercase tracking-widest mt-0.5 opacity-90 whitespace-nowrap">
-            Orhei
-          </span>
+    <>
+      {/* --- WIDGET PRINCIPAL --- */}
+      <div 
+        className="relative group z-50 animate-fadeInUp" 
+        onClick={() => setShowModal(true)} // Enable Click for Modal
+      >
+        <div className={`${baseContainerClasses} bg-gradient-to-r ${
+            weather.temperature >= 30 ? "from-red-900/80 to-brand-dark/80 border-red-500/30 ring-red-500/20" :
+            weather.temperature <= -10 ? "from-blue-900/80 to-brand-dark/80 border-blue-500/30 ring-blue-500/20" :
+            "from-brand-dark/80 to-brand-slate/80 border-white/10 ring-white/5 hover:ring-brand-gold/30"
+        }`}>
+          
+          <div className="flex flex-col items-end justify-center">
+            <span className={`text-lg font-bold font-serif leading-none tracking-tight shadow-black drop-shadow-md ${
+                weather.temperature >= 30 ? "text-red-400" :
+                weather.temperature <= -10 ? "text-blue-300" :
+                "text-white"
+            }`}>
+              {weather.temperature}°C
+            </span>
+            <span className="text-[10px] text-brand-gold font-bold uppercase tracking-widest mt-0.5 opacity-90 whitespace-nowrap">
+              Orhei
+            </span>
+          </div>
+
+          <div className="transform group-hover:scale-110 transition-transform duration-500 ease-out shrink-0 ml-2">
+            {getWeatherIcon(weather.weatherCode, weather.isDay, weather.temperature, weather.windSpeed)}
+          </div>
         </div>
 
-        {/* Icon */}
-        <div className="transform group-hover:scale-110 transition-transform duration-500 ease-out shrink-0 ml-2">
-          {getWeatherIcon(weather.weatherCode, weather.isDay, weather.temperature, weather.windSpeed)}
+        {/* --- TOOLTIP DESKTOP (Rămâne la hover) --- */}
+        <div className="hidden md:block absolute top-full right-0 mt-3 w-max px-4 py-2 bg-[#0a0a0a]/95 text-white text-xs font-medium rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none border border-white/10 shadow-2xl transform translate-y-2 group-hover:translate-y-0 z-[100] backdrop-blur-xl">
+          <span className="uppercase tracking-wide text-brand-gold block text-[10px] mb-0.5">
+              {t ? t.weather.label : "Vremea Acum"}
+          </span>
+          <span className="text-sm font-bold block">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</span>
+          <div className="absolute -top-1 right-8 w-2 h-2 bg-[#0a0a0a]/95 border-t border-l border-white/10 transform rotate-45"></div>
         </div>
       </div>
 
-      {/* Tooltip Detaliat */}
-      <div className="absolute top-full right-0 mt-3 w-max px-4 py-2 bg-[#0a0a0a]/95 text-white text-xs font-medium rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none border border-white/10 shadow-2xl transform translate-y-2 group-hover:translate-y-0 z-[100] backdrop-blur-xl">
-        <span className="uppercase tracking-wide text-brand-gold block text-[10px] mb-0.5">
-            {t ? t.weather.label : "Vremea Acum"}
-        </span>
-        <span className="text-sm font-bold block">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</span>
-        <div className="absolute -top-1 right-8 w-2 h-2 bg-[#0a0a0a]/95 border-t border-l border-white/10 transform rotate-45"></div>
-      </div>
-    </div>
+      {/* --- MODAL DETALIAT (PORTAL to BODY) --- */}
+      {showModal && createPortal(
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-pageFade cursor-pointer"
+          style={{ margin: 0 }} // Reset margin to be safe
+          onClick={() => setShowModal(false)}
+        >
+          <div 
+            className="bg-brand-dark/90 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-sm shadow-2xl relative overflow-hidden cursor-auto"
+            onClick={(e) => e.stopPropagation()} 
+          >
+             {/* Gradient Decor */}
+             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/10 blur-[50px] rounded-full"></div>
+             
+             {/* Close Button */}
+             <button 
+               onClick={() => setShowModal(false)}
+               className="absolute top-4 right-4 text-gray-400 hover:text-white p-2"
+             >
+               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+               </svg>
+             </button>
+
+             {/* Header */}
+             <div className="flex flex-col items-center mb-8 mt-2">
+                 <div className="scale-[1.8] mb-6">
+                    {getWeatherIcon(weather.weatherCode, weather.isDay, weather.temperature, weather.windSpeed)}
+                 </div>
+                 {/* Increased size for emphasis since marketing text is gone */}
+                 <h2 className="text-5xl font-serif font-bold text-white mb-2">{weather.temperature}°C</h2>
+                 <p className="text-brand-gold text-sm uppercase tracking-widest font-medium">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</p>
+             </div>
+
+             {/* Grid Details */}
+             <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="bg-white/5 rounded-xl p-4 flex flex-col items-center border border-white/5 shadow-inner">
+                   <span className="text-gray-400 text-[10px] uppercase mb-1 tracking-wider">Vânt</span>
+                   <span className="text-white font-bold text-xl">{weather.windSpeed} <span className="text-sm font-normal text-gray-400">km/h</span></span>
+                </div>
+                <div className="bg-white/5 rounded-xl p-4 flex flex-col items-center border border-white/5 shadow-inner">
+                   <span className="text-gray-400 text-[10px] uppercase mb-1 tracking-wider">Umiditate</span>
+                   <span className="text-white font-bold text-xl">{weather.humidity}<span className="text-sm font-normal text-gray-400">%</span></span>
+                </div>
+             </div>
+
+             <div className="mt-6 text-center border-t border-white/5 pt-4">
+                <p className="text-[10px] text-gray-500 uppercase tracking-[0.3em]">Orhei • Taxi Select</p>
+             </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   );
 };
 
