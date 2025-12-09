@@ -83,14 +83,6 @@ const About: React.FC<Props> = ({ t }) => {
             ))}
           </div>
 
-          {/* Decorative Element */}
-          <div className="mt-24 flex justify-center opacity-30">
-             <svg className="w-24 h-24 text-brand-gold animate-spin-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <circle cx="12" cy="12" r="10" strokeWidth="1" strokeDasharray="4 4"/>
-                <path d="M12 6v6l4 2" strokeWidth="1"/>
-             </svg>
-          </div>
-
         </div>
       </div>
     </>
