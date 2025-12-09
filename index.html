@@ -195,16 +195,6 @@
         will-change: scroll-position; 
       }
 
-      /* Hide default cursor on desktop to allow custom cursor */
-      @media (hover: hover) and (pointer: fine) {
-        body {
-          cursor: none !important;
-        }
-        a, button, input, select, textarea, [role="button"] {
-          cursor: none !important; /* Ensure cursor stays hidden on interactive elements */
-        }
-      }
-
       /* Custom Premium Scrollbar */
       ::-webkit-scrollbar {
         width: 10px;
@@ -244,7 +234,7 @@
 }
 </script>
 </head>
-  <!-- Added select-none to prevent text selection -->
+  <!-- Added select-none to prevent text selection, but kept default cursor -->
   <body class="bg-brand-dark text-white antialiased overflow-x-hidden selection:bg-transparent selection:text-white select-none" oncontextmenu="return false;">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>

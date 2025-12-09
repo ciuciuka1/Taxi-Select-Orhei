@@ -24,6 +24,7 @@ uniform vec2 uFocal;
 uniform vec2 uRotation;
 uniform float uStarSpeed;
 uniform float uDensity;
+uniform float uSize;
 uniform float uHueShift;
 uniform float uSpeed;
 uniform vec2 uMouse;
@@ -72,13 +73,19 @@ vec3 hsv2rgb(vec3 c) {
 
 float Star(vec2 uv, float flare) {
   float d = length(uv);
-  float m = (0.05 * uGlowIntensity) / d;
+  
+  // Scale the coordinate space effectively making the star larger or smaller
+  float effectiveD = d / uSize;
+  
+  // Sharp drop-off, minimal glow (Aura removal)
+  // Using effectiveD scales the "core" of the star
+  float m = (0.02 * uGlowIntensity) / effectiveD; 
+  
   float rays = smoothstep(0.0, 1.0, 1.0 - abs(uv.x * uv.y * 1000.0));
   m += rays * flare * uGlowIntensity;
-  uv *= MAT45;
-  rays = smoothstep(0.0, 1.0, 1.0 - abs(uv.x * uv.y * 1000.0));
-  m += rays * 0.3 * flare * uGlowIntensity;
-  m *= smoothstep(1.0, 0.2, d);
+  
+  // Cut off distant glow to save fill-rate performance
+  m *= smoothstep(0.5 * uSize, 0.0, d); 
   return m;
 }
 
@@ -88,6 +95,7 @@ vec3 StarLayer(vec2 uv) {
   vec2 gv = fract(uv) - 0.5; 
   vec2 id = floor(uv);
 
+  // 3x3 Loop - Optimized
   for (int y = -1; y <= 1; y++) {
     for (int x = -1; x <= 1; x++) {
       vec2 offset = vec2(float(x), float(y));
@@ -97,6 +105,7 @@ vec3 StarLayer(vec2 uv) {
       float glossLocal = tri(uStarSpeed / (PERIOD * seed + 1.0));
       float flareSize = smoothstep(0.9, 1.0, size) * glossLocal;
 
+      // Color logic
       float red = smoothstep(STAR_COLOR_CUTOFF, 1.0, Hash21(si + 1.0)) + STAR_COLOR_CUTOFF;
       float blu = smoothstep(STAR_COLOR_CUTOFF, 1.0, Hash21(si + 3.0)) + STAR_COLOR_CUTOFF;
       float grn = min(red, blu) * seed;
@@ -108,6 +117,7 @@ vec3 StarLayer(vec2 uv) {
       float val = max(max(base.r, base.g), base.b);
       base = hsv2rgb(vec3(hue, sat, val));
 
+      // Movement
       vec2 pad = vec2(tris(seed * 34.0 + uTime * uSpeed / 10.0), tris(seed * 38.0 + uTime * uSpeed / 30.0)) - 0.5;
 
       float star = Star(gv - offset - pad, flareSize);
@@ -128,31 +138,14 @@ void main() {
   vec2 focalPx = uFocal * uResolution.xy;
   vec2 uv = (vUv * uResolution.xy - focalPx) / uResolution.y;
 
-  vec2 mouseNorm = uMouse - vec2(0.5);
-  
-  if (uAutoCenterRepulsion > 0.0) {
-    vec2 centerUV = vec2(0.0, 0.0);
-    float centerDist = length(uv - centerUV);
-    vec2 repulsion = normalize(uv - centerUV) * (uAutoCenterRepulsion / (centerDist + 0.1));
-    uv += repulsion * 0.05;
-  } else if (uMouseRepulsion) {
-    vec2 mousePosUV = (uMouse * uResolution.xy - focalPx) / uResolution.y;
-    float mouseDist = length(uv - mousePosUV);
-    vec2 repulsion = normalize(uv - mousePosUV) * (uRepulsionStrength / (mouseDist + 0.1));
-    uv += repulsion * 0.05 * uMouseActiveFactor;
-  } else {
-    vec2 mouseOffset = mouseNorm * 0.1 * uMouseActiveFactor;
-    uv += mouseOffset;
-  }
-
+  // Rotation logic
   float autoRotAngle = uTime * uRotationSpeed;
   mat2 autoRot = mat2(cos(autoRotAngle), -sin(autoRotAngle), sin(autoRotAngle), cos(autoRotAngle));
   uv = autoRot * uv;
 
-  uv = mat2(uRotation.x, -uRotation.y, uRotation.y, uRotation.x) * uv;
-
   vec3 col = vec3(0.0);
 
+  // Layer loop
   for (float i = 0.0; i < 1.0; i += 1.0 / NUM_LAYER) {
     float depth = fract(i + uStarSpeed * uSpeed);
     float scale = mix(20.0 * uDensity, 0.5 * uDensity, depth);
@@ -176,6 +169,7 @@ interface GalaxyProps {
   rotation?: [number, number];
   starSpeed?: number;
   density?: number;
+  size?: number;
   hueShift?: number;
   disableAnimation?: boolean;
   speed?: number;
@@ -196,13 +190,14 @@ export default function Galaxy({
   rotation = [1.0, 0.0],
   starSpeed = 0.5,
   density = 1,
+  size = 1.0,
   hueShift = 140,
   disableAnimation = false,
   speed = 1.0,
-  mouseInteraction = true,
+  mouseInteraction = false,
   glowIntensity = 0.3,
   saturation = 0.0,
-  mouseRepulsion = true,
+  mouseRepulsion = false,
   repulsionStrength = 2,
   twinkleIntensity = 0.3,
   rotationSpeed = 0.1,
@@ -211,22 +206,22 @@ export default function Galaxy({
   ...rest
 }: GalaxyProps) {
   const ctnDom = useRef<HTMLDivElement>(null);
-  const targetMousePos = useRef({ x: 0.5, y: 0.5 });
-  const smoothMousePos = useRef({ x: 0.5, y: 0.5 });
-  const targetMouseActive = useRef(0.0);
-  const smoothMouseActive = useRef(0.0);
   const requestRef = useRef<number | null>(null);
-  const bounds = useRef({ width: 0, height: 0, left: 0, top: 0 });
 
   useEffect(() => {
     if (!ctnDom.current) return;
     const ctn = ctnDom.current;
 
+    // Detect capabilities
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
     
-    // Performance: Cap DPR for mobile
+    // ULTRA SMOOTH OPTIMIZATION
+    // 1. Mobile DPR = 1.0. High DPR on mobile shaders (3x Retina) destroys framerate. 
+    // 2. Desktop DPR = Cap at 1.5. 
     const dpr = isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.5);
-    const shaderLayers = isMobile ? 2 : 4;
+    
+    // Reduce complexity layers on mobile for guaranteed 60fps
+    const shaderLayers = isMobile ? 2 : 3;
 
     const renderer = new Renderer({
       dpr,
@@ -234,6 +229,7 @@ export default function Galaxy({
       premultipliedAlpha: false,
       width: ctn.offsetWidth,
       height: ctn.offsetHeight,
+      powerPreference: "high-performance", // Force GPU
     });
     const gl = renderer.gl;
 
@@ -248,12 +244,7 @@ export default function Galaxy({
     let program: Program;
 
     function resize() {
-      // Avoid layout thrashing by reading cached dimensions where possible, 
-      // but here we must read to resize accurately.
-      // Cache bounds for mouse movement to avoid reflows during interaction
       const rect = ctn.getBoundingClientRect();
-      bounds.current = { width: rect.width, height: rect.height, left: rect.left, top: rect.top };
-
       renderer.setSize(rect.width, rect.height);
       if (program) {
         program.uniforms.uResolution.value = new Color([
@@ -264,7 +255,6 @@ export default function Galaxy({
       }
     }
     window.addEventListener('resize', resize, { passive: true });
-    // Initial resize
     resize();
 
     const geometry = new Triangle(gl);
@@ -280,11 +270,10 @@ export default function Galaxy({
         uRotation: { value: new Float32Array(rotation) },
         uStarSpeed: { value: starSpeed },
         uDensity: { value: density },
+        uSize: { value: size },
         uHueShift: { value: hueShift },
         uSpeed: { value: speed },
-        uMouse: {
-          value: new Float32Array([smoothMousePos.current.x, smoothMousePos.current.y])
-        },
+        uMouse: { value: new Float32Array([0.5, 0.5]) },
         uGlowIntensity: { value: glowIntensity },
         uSaturation: { value: saturation },
         uMouseRepulsion: { value: mouseRepulsion },
@@ -299,69 +288,26 @@ export default function Galaxy({
 
     const mesh = new Mesh(gl, { geometry, program });
 
-    // --- OPTIMIZED FRAME LOOP ---
-    let lastTime = 0;
-    
+    // --- NATIVE REFRESH RATE LOOP ---
+    // Do not limit delta manually. requestAnimationFrame automatically matches 
+    // the device refresh rate (60hz, 120hz, 144hz, etc) for maximum smoothness.
     function update(t: number) {
-      const delta = t - lastTime;
-      // FPS Cap logic: 
-      // If delta is less than ~8.33ms (120FPS), skip frame to save battery on high-refresh screens if browser attempts it.
-      // Most browsers cap at 60 or display refresh rate automatically via rAF.
-      // This is a safety valve.
-      
       requestRef.current = requestAnimationFrame(update);
-
-      if (delta < 8) return; 
-      lastTime = t;
       
       if (!disableAnimation) {
         program.uniforms.uTime.value = t * 0.001;
         program.uniforms.uStarSpeed.value = (t * 0.001 * starSpeed) / 10.0;
       }
-
-      if (mouseInteraction && !isMobile) {
-        const lerpFactor = 0.05;
-        smoothMousePos.current.x += (targetMousePos.current.x - smoothMousePos.current.x) * lerpFactor;
-        smoothMousePos.current.y += (targetMousePos.current.y - smoothMousePos.current.y) * lerpFactor;
-        smoothMouseActive.current += (targetMouseActive.current - smoothMouseActive.current) * lerpFactor;
-
-        program.uniforms.uMouse.value[0] = smoothMousePos.current.x;
-        program.uniforms.uMouse.value[1] = smoothMousePos.current.y;
-        program.uniforms.uMouseActiveFactor.value = smoothMouseActive.current;
-      }
-
+      
       renderer.render({ scene: mesh });
     }
     
     requestRef.current = requestAnimationFrame(update);
     ctn.appendChild(gl.canvas);
 
-    // --- OPTIMIZED MOUSE HANDLING ---
-    // Avoids getBoundingClientRect() inside the event loop
-    const handleMouseMove = (e: MouseEvent) => {
-      // Use cached bounds
-      const x = (e.clientX - bounds.current.left) / bounds.current.width;
-      const y = 1.0 - (e.clientY - bounds.current.top) / bounds.current.height;
-      targetMousePos.current = { x, y };
-      targetMouseActive.current = 1.0;
-    };
-
-    const handleMouseLeave = () => {
-      targetMouseActive.current = 0.0;
-    };
-
-    if (mouseInteraction && !isMobile) {
-      ctn.addEventListener('mousemove', handleMouseMove, { passive: true });
-      ctn.addEventListener('mouseleave', handleMouseLeave, { passive: true });
-    }
-
     return () => {
       if (requestRef.current !== null) cancelAnimationFrame(requestRef.current);
       window.removeEventListener('resize', resize);
-      if (mouseInteraction && !isMobile) {
-        ctn.removeEventListener('mousemove', handleMouseMove);
-        ctn.removeEventListener('mouseleave', handleMouseLeave);
-      }
       if (ctn && gl.canvas && ctn.contains(gl.canvas)) {
           ctn.removeChild(gl.canvas);
       }
@@ -373,6 +319,7 @@ export default function Galaxy({
     rotation,
     starSpeed,
     density,
+    size,
     hueShift,
     disableAnimation,
     speed,

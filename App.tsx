@@ -9,7 +9,6 @@ import Footer from './components/Footer';
 import PulseCallButton from './components/PulseCallButton';
 import SecurityWrapper from './components/SecurityWrapper';
 import Preloader from './components/Preloader';
-import Spotlight from './components/Spotlight';
 
 // Pages
 import Home from './pages/Home';
@@ -82,7 +81,6 @@ const App: React.FC = () => {
   return (
     <SecurityWrapper>
        <Preloader isLoading={loading} />
-       <Spotlight />
       
       <HashRouter>
         <ScrollToTop />
