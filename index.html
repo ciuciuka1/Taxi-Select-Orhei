@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ro">
   <head>
@@ -214,8 +215,20 @@
         padding: 0;
         overscroll-behavior-y: none; /* Prevents rubber-band effect on mobile */
         -webkit-overflow-scrolling: touch;
-        /* Hardware acceleration for scrolling container */
-        will-change: scroll-position; 
+        will-change: scroll-position;
+      }
+      
+      /* PERFORMANCE OPTIMIZATION: GPU Layer Promotion */
+      /* By adding will-change: transform, we tell the browser to keep these on separate layers */
+      .animate-float, 
+      .animate-pulse-slow, 
+      .animate-vibrate-smooth, 
+      .animate-fadeInUp, 
+      .animate-gradient-x,
+      .group:hover .group-hover\:scale-110,
+      .hover\:scale-105:hover {
+          will-change: transform, opacity;
+          backface-visibility: hidden; /* Fixes flickering in some browsers */
       }
 
       /* Custom Premium Scrollbar */
