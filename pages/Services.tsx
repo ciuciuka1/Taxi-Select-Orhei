@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TranslationStructure } from '../types';
 import SeoHead from '../components/SeoHead';
@@ -15,7 +14,7 @@ const Services: React.FC<Props> = ({ t }) => {
         description={t.services.interDesc}
         path="services"
       />
-      <div className="pt-32 pb-20 px-6 relative z-10 bg-brand-dark min-h-screen">
+      <section className="pt-32 pb-20 px-6 relative z-10 bg-brand-dark min-h-screen" aria-label="Lista Servicii Taxi">
         <div className="container mx-auto max-w-5xl">
           <h1 className="font-serif text-4xl md:text-5xl font-bold text-white mb-16 text-center drop-shadow-lg">
             {t.services.title}
@@ -26,9 +25,10 @@ const Services: React.FC<Props> = ({ t }) => {
             <div className="order-2 md:order-1 relative overflow-hidden rounded-xl shadow-2xl border border-white/10">
               <img 
                 src="https://images.unsplash.com/photo-1618668129934-3e5a9e8bb9d0?q=80&w=1056&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                alt="Orhei City Night Taxi" 
+                alt="Taxi Orhei Urban Night - Serviciu Transport Local Rapid" 
                 className="w-full h-[300px] object-cover transition-transform duration-700 group-hover:scale-110"
                 loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 to-transparent"></div>
             </div>
@@ -63,9 +63,10 @@ const Services: React.FC<Props> = ({ t }) => {
             <div className="relative overflow-hidden rounded-xl shadow-2xl border border-white/10">
               <img 
                 src="https://images.unsplash.com/photo-1556388158-158ea5ccacbd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                alt="Airport Transfer Service" 
+                alt="Transfer Aeroport Chisinau Orhei - Taxi Aeroport" 
                 className="w-full h-[300px] object-cover transition-transform duration-700 group-hover:scale-110"
                 loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 to-transparent"></div>
             </div>
@@ -76,9 +77,10 @@ const Services: React.FC<Props> = ({ t }) => {
             <div className="order-2 md:order-1 relative overflow-hidden rounded-xl shadow-2xl border border-white/10">
               <img 
                 src="https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                alt="Intercity Taxi Travel" 
+                alt="Taxi Interurban Moldova - Orhei spre toate satele" 
                 className="w-full h-[300px] object-cover transition-transform duration-700 group-hover:scale-110"
                 loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 to-transparent"></div>
               {/* Badge removed here */}
@@ -92,7 +94,7 @@ const Services: React.FC<Props> = ({ t }) => {
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 };

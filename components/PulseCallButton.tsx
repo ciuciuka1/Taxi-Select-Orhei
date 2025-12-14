@@ -5,7 +5,8 @@ const PulseCallButton: React.FC = () => {
     <a
       href="tel:+37323566666"
       className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-[100] group flex flex-col items-center justify-center origin-bottom-right animate-float hover:animate-none"
-      aria-label="Call Taxi Select Orhei"
+      aria-label="Call Taxi Select Orhei Now"
+      title="Sună la Taxi Select Orhei: 0235 66 6 66"
     >
       {/* Glow Effect - Enhanced breathing and significant expansion on hover (scale-135) */}
       <div className="absolute inset-0 bg-brand-gold/30 rounded-[20px] blur-xl group-hover:bg-brand-gold/50 transition-all duration-500 scale-90 group-hover:scale-135 animate-pulse-slow"></div>
@@ -44,6 +45,7 @@ const PulseCallButton: React.FC = () => {
                             xmlns="http://www.w3.org/2000/svg" 
                             className="h-4 w-4 md:h-5 md:w-5 text-white group-hover:text-green-600 fill-current transition-colors duration-300 animate-pulse" 
                             viewBox="0 0 24 24"
+                            aria-hidden="true"
                         >
                             <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.91.97.97 0 007.61 3H4.21a1 1 0 00-.98 1.05c.2 10.53 8.67 19.01 19.23 19.21a1 1 0 001.05-.98v-3.39a.99.99 0 00-.5-2.51z"/>
                         </svg>

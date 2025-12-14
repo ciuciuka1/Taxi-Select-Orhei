@@ -1,4 +1,3 @@
-
 import React, { Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { TranslationStructure } from '../types';
@@ -17,7 +16,7 @@ const Home: React.FC<Props> = ({ t }) => {
       <SeoHead title={t.meta.title} description={t.meta.description} />
       
       {/* Hero Section - Strict Full Screen Adaptive (100svh) */}
-      <section className="relative h-[100svh] w-full flex flex-col items-center justify-center overflow-hidden bg-brand-dark">
+      <section className="relative h-[100svh] w-full flex flex-col items-center justify-center overflow-hidden bg-brand-dark" aria-label="Hero Section Taxi Select">
         
         {/* Animation Layer - Absolute to stay in Hero */}
         <div className="absolute inset-0 z-0 bg-brand-dark">
@@ -37,18 +36,20 @@ const Home: React.FC<Props> = ({ t }) => {
               {t.hero.title}
             </h1>
             
-            <p className="text-base xs:text-lg md:text-2xl text-gray-100 mb-6 xs:mb-8 md:mb-10 font-light tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] animate-fadeInUp px-2" style={{ animationDelay: '0.3s' }}>
+            <h2 className="text-base xs:text-lg md:text-2xl text-gray-100 mb-6 xs:mb-8 md:mb-10 font-light tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] animate-fadeInUp px-2" style={{ animationDelay: '0.3s' }}>
               {t.hero.subtitle}
-            </p>
+            </h2>
             
             <div className="animate-fadeInUp mt-2 md:mt-12" style={{ animationDelay: '0.5s' }}>
               <a 
                 href="tel:+37323566666"
                 className="inline-flex items-center justify-center bg-gradient-to-r from-brand-gold to-brand-orange hover:from-brand-gold hover:to-yellow-500 text-brand-dark font-bold text-lg md:text-xl px-8 py-3 md:px-12 md:py-4 rounded-full transition-all duration-100 transform hover:scale-105 active:scale-95 active:duration-75 shadow-[0_0_20px_rgba(245,196,94,0.4)] hover:shadow-[0_0_40px_rgba(245,196,94,0.6)] border-2 border-transparent relative overflow-hidden group ring-2 ring-brand-gold/50 ring-offset-2 ring-offset-brand-dark"
+                aria-label="Comandă Taxi Acum - Call Taxi Select"
+                role="button"
               >
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out rotate-12 scale-150"></div>
                 <span className="relative z-10 flex items-center tracking-wider whitespace-nowrap">
-                   <svg className="w-5 h-5 mr-3 fill-current animate-pulse" viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.91.97.97 0 007.61 3H4.21a1 1 0 00-.98 1.05c.2 10.53 8.67 19.01 19.23 19.21a1 1 0 001.05-.98v-3.39a.99.99 0 00-.5-2.51z"/></svg>
+                   <svg className="w-5 h-5 mr-3 fill-current animate-pulse" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.91.97.97 0 007.61 3H4.21a1 1 0 00-.98 1.05c.2 10.53 8.67 19.01 19.23 19.21a1 1 0 001.05-.98v-3.39a.99.99 0 00-.5-2.51z"/></svg>
                   {t.hero.cta} 
                 </span>
               </a>
@@ -57,7 +58,7 @@ const Home: React.FC<Props> = ({ t }) => {
         </div>
         
         {/* Scroll Indicator */}
-        <div className="absolute bottom-8 xs:bottom-12 left-1/2 transform -translate-x-1/2 animate-bounce opacity-70 z-20 pointer-events-none">
+        <div className="absolute bottom-8 xs:bottom-12 left-1/2 transform -translate-x-1/2 animate-bounce opacity-70 z-20 pointer-events-none" aria-hidden="true">
           <svg className="w-6 h-6 md:w-8 md:h-8 text-white drop-shadow-lg" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
             <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
           </svg>
@@ -65,7 +66,7 @@ const Home: React.FC<Props> = ({ t }) => {
       </section>
 
       {/* Services & Bento Grid */}
-      <section className="relative z-10 bg-brand-dark py-20 md:py-24 px-4 md:px-6 border-t border-white/5 shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
+      <section className="relative z-10 bg-brand-dark py-20 md:py-24 px-4 md:px-6 border-t border-white/5 shadow-[0_-20px_40px_rgba(0,0,0,0.5)]" aria-label="Servicii Taxi Orhei">
         <div className="container mx-auto">
           
           {/* Service Cards - Full Background Poster Style - Removed Borders */}
@@ -75,25 +76,26 @@ const Home: React.FC<Props> = ({ t }) => {
                 title: t.services.city, 
                 desc: t.services.cityDesc, 
                 image: "https://images.unsplash.com/photo-1432611185496-76ccd1dc5efe?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                alt: "Taxi in Orhei Oras - Rapid si Ieftin" 
+                alt: "Taxi Orhei Urban - Servicii Taxi Rapid Oras Peresecina" 
               },
               { 
                 title: t.services.inter, 
                 desc: t.services.interDesc, 
                 image: "https://images.unsplash.com/photo-1641907624750-d08806c872c4?q=80&w=824&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                alt: "Taxi Interurban Moldova Raionul Orhei" 
+                alt: "Taxi Interurban Moldova - Transport Pasageri Raionul Orhei" 
               },
               { 
                 title: t.services.airport, 
                 desc: t.services.airportDesc, 
                 image: "https://images.unsplash.com/photo-1635668422708-11c28ca70419?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                alt: "Transfer Aeroport Chisinau Orhei Taxi" 
+                alt: "Transfer Aeroport Chisinau Taxi - Orhei spre Aeroport" 
               }
             ].map((service, idx) => (
               <Link 
                 to="/services" 
                 key={idx}
                 className="group relative overflow-hidden rounded-3xl h-[400px] shadow-xl transition-all duration-300 hover:shadow-brand-gold/20 hover:-translate-y-2 active:scale-95 active:duration-75 flex flex-col justify-end"
+                aria-label={`Vezi detalii despre ${service.title}`}
               >
                 {/* Background Image */}
                 <img 
@@ -101,6 +103,7 @@ const Home: React.FC<Props> = ({ t }) => {
                   alt={service.alt} 
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   loading="lazy"
+                  decoding="async"
                 />
 
                 {/* Gradient Overlay for readability */}
@@ -129,16 +132,17 @@ const Home: React.FC<Props> = ({ t }) => {
                  {/* SINGLE IMAGE - NO FRAME - OBJECT COVER */}
                  <img 
                     src="https://images.unsplash.com/photo-1644436767671-506bf9d8d706?q=80&w=861&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                    alt="Taxi Premium Experience Orhei" 
+                    alt="Experienta Premium Taxi Select Orhei - GPS Navigation" 
                     className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
                     loading="lazy"
+                    decoding="async"
                  />
 
                  <div className="absolute bottom-0 left-0 p-8 md:p-10 w-full z-30 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
                     <div className="w-12 h-1 bg-brand-gold mb-4 rounded-full"></div>
-                    <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-3 drop-shadow-lg">
+                    <h3 className="text-3xl md:text-4xl font-serif font-bold text-white mb-3 drop-shadow-lg">
                       {t.home.experience}
-                    </h2>
+                    </h3>
                     <p className="text-gray-200 text-sm md:text-base font-light mb-0 drop-shadow-md max-w-md">
                       {t.home.experienceDesc}
                     </p>
@@ -148,13 +152,14 @@ const Home: React.FC<Props> = ({ t }) => {
               {/* Right Column - 2 Stacked Cards */}
               <div className="md:col-span-1 flex flex-col gap-4 md:gap-6 h-[500px] md:h-auto">
                  
-                 {/* Top Right - Intercity (Open Road) - REMOVED BADGE AS REQUESTED */}
+                 {/* Top Right - Intercity (Open Road) */}
                  <div className="relative flex-1 rounded-3xl overflow-hidden shadow-xl group bg-gray-900">
                     <img 
                        src="https://images.unsplash.com/photo-1763477892730-ccf12297a7d0?q=80&w=1075&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                       alt="Drumuri nationale Moldova Taxi" 
+                       alt="Drumuri nationale Moldova Taxi Travel" 
                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                        loading="lazy"
+                       decoding="async"
                     />
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
                     {/* Badge Removed here */}
@@ -164,9 +169,10 @@ const Home: React.FC<Props> = ({ t }) => {
                  <div className="relative flex-1 rounded-3xl overflow-hidden shadow-xl group bg-gray-900">
                     <img 
                        src="https://images.unsplash.com/photo-1760466871236-ff1d1c94ecad?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                       alt="Siguranta Pasageri Taxi Orhei" 
+                       alt="Siguranta Pasageri Taxi Orhei Seatbelt" 
                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-90"
                        loading="lazy"
+                       decoding="async"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
                     <div className="absolute bottom-6 left-6 z-10">
@@ -196,6 +202,8 @@ const Home: React.FC<Props> = ({ t }) => {
                     backgroundSize: 'cover',
                     backgroundPosition: 'center 30%'
                   }}
+                  role="img"
+                  aria-label="Peisaj muntos Moldova Taxi fundal"
                 ></div>
                 
                 {/* Overlay Gradients for Toblerone Effect */}
@@ -209,7 +217,7 @@ const Home: React.FC<Props> = ({ t }) => {
                    Taxi Select
                 </h3>
                 
-                <a href="tel:+37323566666" className="block group cursor-pointer mb-8 active:scale-95 transition-transform duration-100">
+                <a href="tel:+37323566666" className="block group cursor-pointer mb-8 active:scale-95 transition-transform duration-100" aria-label="Sună Dispatcher 0235 66 6 66">
                    <span className="font-serif text-6xl md:text-9xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white via-[#e5e5e5] to-[#999] drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)] transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-105 inline-block">
                       66 6 66
                    </span>
@@ -225,6 +233,7 @@ const Home: React.FC<Props> = ({ t }) => {
                    <a 
                       href="tel:+37323566666" 
                       className="group inline-flex items-center gap-3 bg-gradient-to-r from-brand-gold to-brand-orange hover:from-white hover:to-white text-brand-dark font-bold py-4 px-10 rounded-full transition-all duration-300 shadow-[0_0_30px_rgba(245,196,94,0.3)] hover:shadow-[0_0_50px_rgba(255,255,255,0.5)] active:scale-95 active:duration-75"
+                      aria-label="Buton Apel Rapid Taxi"
                    >
                       <div className="bg-brand-dark/10 p-2 rounded-full group-hover:bg-brand-dark/20 transition-colors">
                          <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.91.97.97 0 007.61 3H4.21a1 1 0 00-.98 1.05c.2 10.53 8.67 19.01 19.23 19.21a1 1 0 001.05-.98v-3.39a.99.99 0 00-.5-2.51z"/></svg>

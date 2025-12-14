@@ -86,6 +86,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
             ? 'bg-brand-dark/90 backdrop-blur-md shadow-lg py-2 border-white/5' 
             : 'bg-transparent py-4 md:py-6 border-transparent'
       }`}
+      role="banner"
     >
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center gap-6 md:gap-16 lg:gap-24 relative">
         
@@ -95,7 +96,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
             to="/" 
             className="relative group flex flex-col active:scale-95 transition-transform duration-75" 
             onClick={(e) => handleNavClick('/', e)}
-            aria-label="Taxi Select Home"
+            aria-label="Taxi Select Orhei Home Page"
           >
               <span className="font-serif text-2xl md:text-3xl font-bold text-white tracking-wide group-hover:scale-105 transition-transform duration-300 drop-shadow-lg">
                 TAXI<span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-orange">SELECT</span>
@@ -112,7 +113,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
         </div>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center space-x-8 shrink-0 ml-auto">
+        <nav className="hidden md:flex items-center space-x-8 shrink-0 ml-auto" aria-label="Main Navigation">
           {navLinks.map((link) => (
             <Link
               key={link.path}
@@ -121,6 +122,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
               className={`text-sm font-medium tracking-wide transition-all duration-300 relative group py-2 active:scale-95 duration-75 ${
                 location.pathname === link.path ? 'text-brand-gold' : 'text-white hover:text-brand-gold'
               }`}
+              aria-current={location.pathname === link.path ? 'page' : undefined}
             >
               {link.label}
               <span className={`absolute bottom-0 left-0 h-0.5 bg-brand-gold transition-all duration-300 ${
@@ -145,6 +147,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Închide Meniul" : "Deschide Meniul"}
             aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
           >
              <div className="w-6 h-6 relative flex items-center justify-center">
                 <span className={`absolute h-0.5 w-6 bg-current transform transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 delay-75' : '-translate-y-2'}`}></span>
@@ -156,6 +159,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
 
         {/* Mobile Menu Overlay */}
         <div
+          id="mobile-menu"
           className={`fixed inset-0 bg-brand-dark z-40 flex flex-col transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] md:hidden ${
             mobileMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
           }`}
@@ -205,7 +209,7 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
               <div className="bg-white/5 rounded-xl p-5 border border-white/10 flex items-center justify-between group hover:bg-white/10 transition-colors active:scale-95 duration-75">
                  <div>
                    <p className="text-gray-400 text-xs uppercase mb-1 tracking-widest">{t.nav.dispatcher}</p>
-                   <a href="tel:+37323566666" className="text-2xl font-bold text-white block font-serif tracking-wide">0 235 66 6 66</a>
+                   <a href="tel:+37323566666" className="text-2xl font-bold text-white block font-serif tracking-wide" aria-label="Call Dispatcher">0 235 66 6 66</a>
                  </div>
                  {/* Mobile Menu Button - Reverted to Brand Gold */}
                  <div className="w-12 h-12 rounded-full bg-brand-gold text-brand-dark flex items-center justify-center shadow-lg shadow-brand-gold/20 group-hover:scale-110 transition-transform">
@@ -217,8 +221,9 @@ const Header: React.FC<Props> = ({ t, lang, setLang }) => {
                   <a 
                     href="https://www.facebook.com/profile.php?id=61558158336366" 
                     target="_blank" 
-                    rel="noopener noreferrer"
+                    rel="noopener noreferrer nofollow"
                     className="text-sm text-gray-500 hover:text-brand-gold transition-colors flex items-center justify-center gap-2 active:scale-95 duration-75"
+                    aria-label="Vizitează Taxi Select pe Facebook"
                   >
                     <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                     Facebook

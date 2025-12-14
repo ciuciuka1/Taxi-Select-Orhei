@@ -3,10 +3,9 @@ import { SeoProps } from '../types';
 
 const SeoHead: React.FC<SeoProps> = ({ title, description, path = '' }) => {
   useEffect(() => {
-    // Update Title
+    // 1. DYNAMIC META TITLE & DESCRIPTION OPTIMIZATION
     document.title = title;
 
-    // Update Meta Description
     let metaDescription = document.querySelector('meta[name="description"]');
     if (!metaDescription) {
       metaDescription = document.createElement('meta');
@@ -15,7 +14,7 @@ const SeoHead: React.FC<SeoProps> = ({ title, description, path = '' }) => {
     }
     metaDescription.setAttribute('content', description);
 
-    // Open Graph Tags
+    // 2. OPEN GRAPH & CANONICAL TAGS INJECTION
     const setMetaTag = (property: string, content: string) => {
       let tag = document.querySelector(`meta[property="${property}"]`);
       if (!tag) {
@@ -26,20 +25,36 @@ const SeoHead: React.FC<SeoProps> = ({ title, description, path = '' }) => {
       tag.setAttribute('content', content);
     };
 
+    const url = `https://taxiselect-orhei.md/${path}`;
     setMetaTag('og:title', title);
     setMetaTag('og:description', description);
     setMetaTag('og:type', 'website');
-    setMetaTag('og:url', `https://taxiselect-orhei.md/${path}`);
+    setMetaTag('og:url', url);
     setMetaTag('og:image', 'https://images.unsplash.com/photo-1618668129934-3e5a9e8bb9d0?auto=format&fit=crop&w=1200&q=80');
+    setMetaTag('og:site_name', 'Taxi Select Orhei');
 
-    // JSON-LD for LocalBusiness (Super Optimized for Orhei & Surrounding Villages - ~45km Radius)
+    // Update Canonical
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', url);
+
+    // 3. ADVANCED JSON-LD STRUCTURED DATA (THE SEO ENGINE)
     const jsonLdScript = document.getElementById('json-ld-struct');
-    const structuredData = {
+    
+    // Schema Layer 1: The Local Business (E-E-A-T Core)
+    const localBusinessSchema = {
       "@context": "https://schema.org",
       "@type": "TaxiService",
       "name": "Taxi Select Orhei",
       "alternateName": ["Taxi Orhei 66666", "Такси Оргеев", "Taxi Orhei", "Cab Orhei", "Taxi Select"],
-      "image": "https://images.unsplash.com/photo-1618668129934-3e5a9e8bb9d0?auto=format&fit=crop&w=1200&q=80",
+      "image": [
+        "https://images.unsplash.com/photo-1618668129934-3e5a9e8bb9d0?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=1200&q=80"
+      ],
       "telephone": "+37323566666",
       "url": "https://taxiselect-orhei.md",
       "priceRange": "$$",
@@ -54,7 +69,7 @@ const SeoHead: React.FC<SeoProps> = ({ title, description, path = '' }) => {
         "addressCountry": "MD"
       },
       "areaServed": [
-        { "@type": "City", "name": "Orhei" },
+        { "@type": "City", "name": "Orhei", "sameAs": "https://en.wikipedia.org/wiki/Orhei" },
         { "@type": "City", "name": "Peresecina" },
         { "@type": "City", "name": "Ivancea" },
         { "@type": "City", "name": "Pelivan" },
@@ -63,7 +78,7 @@ const SeoHead: React.FC<SeoProps> = ({ title, description, path = '' }) => {
         { "@type": "City", "name": "Brănești" },
         { "@type": "City", "name": "Susleni" },
         { "@type": "City", "name": "Isacova" },
-        { "@type": "Place", "name": "Orheiul Vechi" },
+        { "@type": "Place", "name": "Orheiul Vechi", "sameAs": "https://en.wikipedia.org/wiki/Old_Orhei" },
         { "@type": "City", "name": "Trebujeni" },
         { "@type": "City", "name": "Butuceni" },
         { "@type": "City", "name": "Chiperceni" },
@@ -90,7 +105,8 @@ const SeoHead: React.FC<SeoProps> = ({ title, description, path = '' }) => {
         { "@type": "City", "name": "Vîșcăuți" },
         { "@type": "City", "name": "Bulăiești" },
         { "@type": "City", "name": "Mîrzaci" },
-        { "@type": "AdministrativeArea", "name": "Raionul Orhei" }
+        { "@type": "AdministrativeArea", "name": "Raionul Orhei" },
+        { "@type": "AdministrativeArea", "name": "Moldova", "sameAs": "https://en.wikipedia.org/wiki/Moldova" }
       ],
       "geo": {
         "@type": "GeoCoordinates",
@@ -99,9 +115,7 @@ const SeoHead: React.FC<SeoProps> = ({ title, description, path = '' }) => {
       },
       "openingHoursSpecification": {
         "@type": "OpeningHoursSpecification",
-        "dayOfWeek": [
-          "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
-        ],
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
         "opens": "00:00",
         "closes": "23:59"
       },
@@ -124,8 +138,73 @@ const SeoHead: React.FC<SeoProps> = ({ title, description, path = '' }) => {
           "@type": "Reservation",
           "name": "Comandă Taxi Orhei"
         }
+      },
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Servicii Taxi",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Taxi Urban Orhei",
+              "description": "Transport rapid în orașul Orhei."
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Transfer Aeroport Chișinău",
+              "description": "Transfer privat Orhei - Aeroport Internațional Chișinău."
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Transport Interurban Moldova",
+              "description": "Curse taxi spre orice localitate din Moldova."
+            }
+          }
+        ]
       }
     };
+
+    // Schema Layer 2: WebSite (For Sitelinks Search Box)
+    const websiteSchema = {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Taxi Select Orhei",
+      "url": "https://taxiselect-orhei.md",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://taxiselect-orhei.md/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    };
+
+    // Schema Layer 3: Breadcrumbs (For Rich Snippets navigation)
+    const breadcrumbSchema = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Acasă",
+          "item": "https://taxiselect-orhei.md/"
+        },
+        ...(path ? [{
+          "@type": "ListItem",
+          "position": 2,
+          "name": path.charAt(0).toUpperCase() + path.slice(1),
+          "item": `https://taxiselect-orhei.md/${path}`
+        }] : [])
+      ]
+    };
+
+    const structuredData = [localBusinessSchema, websiteSchema, breadcrumbSchema];
 
     if (jsonLdScript) {
       jsonLdScript.textContent = JSON.stringify(structuredData);

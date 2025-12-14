@@ -13,6 +13,7 @@ const About: React.FC<Props> = ({ t }) => {
       desc: t.about.safetyDesc,
       // Image: Professional mechanic/car detail, conveying technical safety
       image: "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=800&q=80",
+      alt: "Siguranta Trafic Taxi Select - Inspectie Tehnica Auto",
       accent: "border-brand-gold"
     },
     {
@@ -20,6 +21,7 @@ const About: React.FC<Props> = ({ t }) => {
       desc: t.about.comfortDesc,
       // Image: Luxury leather interior close-up
       image: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80",
+      alt: "Confort Taxi Orhei - Interior Piele Curat",
       accent: "border-white"
     },
     {
@@ -27,6 +29,7 @@ const About: React.FC<Props> = ({ t }) => {
       desc: t.about.localDesc,
       // Image: Green rolling hills and winding road - optimal representation of Orhei/Moldova landscape
       image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
+      alt: "Peisaj Orhei Moldova - Rute Locale Optimizate",
       accent: "border-brand-orange"
     }
   ];
@@ -42,17 +45,17 @@ const About: React.FC<Props> = ({ t }) => {
         <div className="container mx-auto max-w-6xl">
           
           {/* Header */}
-          <div className="text-center mb-16 animate-fadeInUp">
+          <section className="text-center mb-16 animate-fadeInUp">
             <h1 className="font-serif text-4xl md:text-6xl font-bold text-white mb-6">
               {t.about.title}
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto font-light leading-relaxed">
               {t.about.desc}
             </p>
-          </div>
+          </section>
           
           {/* 3-Column Feature Grid */}
-          <div className="grid md:grid-cols-3 gap-8">
+          <section className="grid md:grid-cols-3 gap-8" aria-label="Valorile Noastre">
             {features.map((feature, index) => (
               <div 
                 key={index} 
@@ -63,8 +66,10 @@ const About: React.FC<Props> = ({ t }) => {
                 <div className="h-64 overflow-hidden relative">
                   <img 
                     src={feature.image} 
-                    alt={feature.title}
+                    alt={feature.alt}
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 saturate-[0.8] group-hover:saturate-100"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-brand-slate via-transparent to-transparent opacity-90"></div>
                 </div>
@@ -81,7 +86,7 @@ const About: React.FC<Props> = ({ t }) => {
                 </div>
               </div>
             ))}
-          </div>
+          </section>
 
         </div>
       </div>
