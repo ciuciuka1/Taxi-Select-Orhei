@@ -61,8 +61,8 @@ export const translations: Record<Language, TranslationStructure> = {
       privacy: "Confidențialitate",
     },
     meta: {
-      title: "Taxi SELECT",
-      description: "Cel mai rapid și sigur taxi din Orhei. Deservim orașul și localitățile vecine (Peresecina, Ivancea, Pelivan). Transfer Aeroport Chișinău. Tel: 0 235 66 6 66."
+      title: "Taxi SELECT Orhei | 0235 66 6 66 | Rapid & Ieftin",
+      description: "🚖 Comandă Taxi Select Orhei (0 235 66 6 66). Cel mai rapid și ieftin taxi din Raionul Orhei. Deservim: Peresecina, Ivancea, Pelivan. Transfer Aeroport Chișinău 24/7."
     },
     terms: {
       title: "Termeni și Condiții",
@@ -181,8 +181,8 @@ export const translations: Record<Language, TranslationStructure> = {
       privacy: "Конфиденциальность",
     },
     meta: {
-      title: "Taxi SELECT",
-      description: "Самое быстрое такси в Оргееве и районе. Обслуживаем Пересечино, Иванчу, Пеливан. Круглосуточно, трансфер в аэропорт. Тел: 0 235 66 6 66."
+      title: "Такси Select Оргеев | 0235 66 6 66 | Быстро и Надежно",
+      description: "🚖 Заказ такси в Оргееве 24/7. Самое быстрое такси: Пересечино, Иванча, Пеливан. Трансфер в аэропорт Кишинева. Тел: 0 235 66 6 66."
     },
     terms: {
       title: "Условия и Правила",
@@ -301,8 +301,8 @@ export const translations: Record<Language, TranslationStructure> = {
       privacy: "Privacy",
     },
     meta: {
-      title: "Taxi SELECT",
-      description: "The fastest and safest taxi in Orhei. Serving the city and surrounding districts (Peresecina, Ivancea, Pelivan). Airport Transfer available. Call: 0 235 66 6 66."
+      title: "Taxi SELECT Orhei | 0235 66 6 66 | Best Cab Service",
+      description: "🚖 The fastest and safest taxi in Orhei. Serving Peresecina, Ivancea, Pelivan. Airport Transfer Chisinau available. Call: 0 235 66 6 66."
     },
     terms: {
       title: "Terms & Conditions",

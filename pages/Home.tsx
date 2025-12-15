@@ -76,19 +76,19 @@ const Home: React.FC<Props> = ({ t }) => {
                 title: t.services.city, 
                 desc: t.services.cityDesc, 
                 image: "https://images.unsplash.com/photo-1432611185496-76ccd1dc5efe?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                alt: "Taxi Orhei Urban - Servicii Taxi Rapid Oras Peresecina" 
+                alt: "Taxi Orhei Urban - Servicii Taxi Rapid Oras Peresecina - Masina Confortabila" 
               },
               { 
                 title: t.services.inter, 
                 desc: t.services.interDesc, 
                 image: "https://images.unsplash.com/photo-1641907624750-d08806c872c4?q=80&w=824&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                alt: "Taxi Interurban Moldova - Transport Pasageri Raionul Orhei" 
+                alt: "Taxi Interurban Moldova - Transport Pasageri Raionul Orhei la Chisinau" 
               },
               { 
                 title: t.services.airport, 
                 desc: t.services.airportDesc, 
                 image: "https://images.unsplash.com/photo-1635668422708-11c28ca70419?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                alt: "Transfer Aeroport Chisinau Taxi - Orhei spre Aeroport" 
+                alt: "Transfer Aeroport Chisinau Taxi - Orhei spre Aeroport Pret Bun" 
               }
             ].map((service, idx) => (
               <Link 
@@ -132,7 +132,7 @@ const Home: React.FC<Props> = ({ t }) => {
                  {/* SINGLE IMAGE - NO FRAME - OBJECT COVER */}
                  <img 
                     src="https://images.unsplash.com/photo-1644436767671-506bf9d8d706?q=80&w=861&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                    alt="Experienta Premium Taxi Select Orhei - GPS Navigation" 
+                    alt="Experienta Premium Taxi Select Orhei - GPS Navigation Harta Orhei" 
                     className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
                     loading="lazy"
                     decoding="async"
@@ -156,7 +156,7 @@ const Home: React.FC<Props> = ({ t }) => {
                  <div className="relative flex-1 rounded-3xl overflow-hidden shadow-xl group bg-gray-900">
                     <img 
                        src="https://images.unsplash.com/photo-1763477892730-ccf12297a7d0?q=80&w=1075&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                       alt="Drumuri nationale Moldova Taxi Travel" 
+                       alt="Drumuri nationale Moldova Taxi Travel Orhei Chisinau" 
                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                        loading="lazy"
                        decoding="async"
@@ -169,7 +169,7 @@ const Home: React.FC<Props> = ({ t }) => {
                  <div className="relative flex-1 rounded-3xl overflow-hidden shadow-xl group bg-gray-900">
                     <img 
                        src="https://images.unsplash.com/photo-1760466871236-ff1d1c94ecad?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                       alt="Siguranta Pasageri Taxi Orhei Seatbelt" 
+                       alt="Siguranta Pasageri Taxi Orhei Seatbelt Centura Siguranta" 
                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-90"
                        loading="lazy"
                        decoding="async"

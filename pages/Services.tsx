@@ -25,7 +25,7 @@ const Services: React.FC<Props> = ({ t }) => {
             <div className="order-2 md:order-1 relative overflow-hidden rounded-xl shadow-2xl border border-white/10">
               <img 
                 src="https://images.unsplash.com/photo-1618668129934-3e5a9e8bb9d0?q=80&w=1056&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                alt="Taxi Orhei Urban Night - Serviciu Transport Local Rapid" 
+                alt="Taxi Orhei Urban Night - Serviciu Transport Local Rapid Ieftin" 
                 className="w-full h-[300px] object-cover transition-transform duration-700 group-hover:scale-110"
                 loading="lazy"
                 decoding="async"
@@ -63,7 +63,7 @@ const Services: React.FC<Props> = ({ t }) => {
             <div className="relative overflow-hidden rounded-xl shadow-2xl border border-white/10">
               <img 
                 src="https://images.unsplash.com/photo-1556388158-158ea5ccacbd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                alt="Transfer Aeroport Chisinau Orhei - Taxi Aeroport" 
+                alt="Transfer Aeroport Chisinau Orhei - Taxi Aeroport Pret - Transport Pasageri KIV" 
                 className="w-full h-[300px] object-cover transition-transform duration-700 group-hover:scale-110"
                 loading="lazy"
                 decoding="async"
@@ -77,7 +77,7 @@ const Services: React.FC<Props> = ({ t }) => {
             <div className="order-2 md:order-1 relative overflow-hidden rounded-xl shadow-2xl border border-white/10">
               <img 
                 src="https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                alt="Taxi Interurban Moldova - Orhei spre toate satele" 
+                alt="Taxi Interurban Moldova - Orhei spre toate satele Peresecina Ivancea Pelivan" 
                 className="w-full h-[300px] object-cover transition-transform duration-700 group-hover:scale-110"
                 loading="lazy"
                 decoding="async"
