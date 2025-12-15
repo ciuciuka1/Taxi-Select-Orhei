@@ -4,6 +4,8 @@ import { SeoProps } from '../types';
 const SeoHead: React.FC<SeoProps> = ({ title, description, path = '' }) => {
   useEffect(() => {
     // 1. DYNAMIC META TITLE & DESCRIPTION OPTIMIZATION
+    // Force "Taxi SELECT" specifically as per request, regardless of input props for Home
+    // For other pages, we can use the title prop, but keep it clean.
     document.title = title;
 
     let metaDescription = document.querySelector('meta[name="description"]');
