@@ -1,3 +1,4 @@
+
 export type Language = 'ro' | 'ru' | 'en';
 
 export interface TranslationStructure {
@@ -118,6 +119,13 @@ export interface TranslationStructure {
     wind: string;
     humidity: string;
     city: string;
+  };
+  seo: {
+    areaTitle: string;
+    areaText: string;
+    villages: string;
+    routes: string;
+    keywords: string;
   };
 }
 

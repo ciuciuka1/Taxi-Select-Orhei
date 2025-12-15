@@ -243,6 +243,17 @@ const Home: React.FC<Props> = ({ t }) => {
                 </div>
              </div>
           </div>
+          
+          {/* SEO FOOTER SECTION (INVISIBLE) - Matching background color, zero height, overflow hidden */}
+          <div className="h-px w-full overflow-hidden opacity-[0.01] pointer-events-none select-none text-brand-dark bg-brand-dark" aria-hidden="true">
+             <h4 className="text-brand-dark text-[1px]">{t.seo.areaTitle}</h4>
+             <p className="text-brand-dark text-[1px]">
+                {t.seo.areaText} {t.seo.villages}
+             </p>
+             <p className="text-brand-dark text-[1px]">
+                {t.seo.routes} {t.seo.keywords}
+             </p>
+          </div>
 
         </div>
       </section>

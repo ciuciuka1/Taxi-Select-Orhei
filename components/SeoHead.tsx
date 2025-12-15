@@ -4,8 +4,6 @@ import { SeoProps } from '../types';
 const SeoHead: React.FC<SeoProps> = ({ title, description, path = '' }) => {
   useEffect(() => {
     // 1. DYNAMIC META TITLE & DESCRIPTION OPTIMIZATION
-    // Force "Taxi SELECT" specifically as per request, regardless of input props for Home
-    // For other pages, we can use the title prop, but keep it clean.
     document.title = title;
 
     let metaDescription = document.querySelector('meta[name="description"]');
@@ -52,7 +50,7 @@ const SeoHead: React.FC<SeoProps> = ({ title, description, path = '' }) => {
       "@context": "https://schema.org",
       "@type": "TaxiService",
       "name": "Taxi Select Orhei",
-      "alternateName": ["Taxi Orhei 66666", "Такси Оргеев", "Taxi Orhei", "Cab Orhei", "Taxi Select", "Taxi Ieftin Orhei", "Taxi Rapid Orhei"],
+      "alternateName": ["Taxi Orhei 66666", "Такси Оргеев", "Taxi Orhei", "Cab Orhei", "Taxi Select", "Taxi Ieftin Orhei", "Taxi Rapid Orhei", "Transfer Aeroport Orhei"],
       "image": [
         "https://images.unsplash.com/photo-1618668129934-3e5a9e8bb9d0?auto=format&fit=crop&w=1200&q=80",
         "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=1200&q=80"
@@ -70,7 +68,7 @@ const SeoHead: React.FC<SeoProps> = ({ title, description, path = '' }) => {
         "postalCode": "3500",
         "addressCountry": "MD"
       },
-      // Aggressive Area Coverage for Local Indexing
+      // Massive Area Coverage for Local Indexing
       "areaServed": [
         { "@type": "City", "name": "Orhei" },
         { "@type": "City", "name": "Peresecina" },
@@ -103,7 +101,6 @@ const SeoHead: React.FC<SeoProps> = ({ title, description, path = '' }) => {
         { "@type": "City", "name": "Cihoreni" },
         { "@type": "City", "name": "Sirota" },
         { "@type": "City", "name": "Zorile" },
-        { "@type": "City", "name": "Jora de Mijloc" },
         { "@type": "City", "name": "Lopatna" },
         { "@type": "City", "name": "Vîșcăuți" },
         { "@type": "City", "name": "Bulăiești" },
@@ -111,6 +108,16 @@ const SeoHead: React.FC<SeoProps> = ({ title, description, path = '' }) => {
         { "@type": "AdministrativeArea", "name": "Raionul Orhei" },
         { "@type": "AdministrativeArea", "name": "Moldova" }
       ],
+      // NEW: GeoCircle defining exact service radius (High impact for "Taxi near me")
+      "serviceArea": {
+        "@type": "GeoCircle",
+        "geoMidpoint": {
+            "@type": "GeoCoordinates",
+            "latitude": 47.3831,
+            "longitude": 28.8231
+        },
+        "geoRadius": "30000" // 30km radius coverage
+      },
       "geo": {
         "@type": "GeoCoordinates",
         "latitude": 47.3831,

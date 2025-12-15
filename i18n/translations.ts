@@ -120,6 +120,14 @@ export const translations: Record<Language, TranslationStructure> = {
       wind: "Vânt",
       humidity: "Umiditate",
       city: "Orhei"
+    },
+    // NEW SEO SECTION
+    seo: {
+      areaTitle: "Acoperire Raională Taxi Select",
+      areaText: "Taxi Select Orhei (0235 66666) asigură transport rapid de pasageri în următoarele localități din Raionul Orhei și împrejurimi:",
+      villages: "Peresecina, Ivancea, Pelivan, Mitoc, Brănești, Furceni, Trebujeni (Orheiul Vechi), Butuceni, Susleni, Jora de Mijloc, Jora de Jos, Lopatna, Vîșcăuți, Bulăiești, Mîrzaci, Mîrzești, Step-Soci, Budăi, Seliște, Lucășeuca, Mana, Curchi, Vatici, Tabăra, Camencea, Donici, Pocșești, Teleșeu, Sămănanca, Puțintei, Viprova, Ghetlova, Hulboaca, Noroceni, Morozeni, Breanova, Ghenadie, Neculăieuca, Biești, Cihoreni, Sirota, Crihana, Cucuruzeni, Zorile, Ocnița-Răzeși, Ocnița-Țărani.",
+      routes: "Rute frecvente: Taxi Orhei - Chișinău (Aeroport), Taxi Orhei - Bălți, Taxi Orhei - Rezina. Servicii de transport colete, transport angajați, taxi petreceri, transfer gară auto.",
+      keywords: "taxi ieftin orhei, numar taxi orhei, taxi 14999 orhei alternativă, taxi 14099 orhei alternativă, taxi rapid, taxi non stop"
     }
   },
   ru: {
@@ -240,6 +248,13 @@ export const translations: Record<Language, TranslationStructure> = {
       wind: "Ветер",
       humidity: "Влажность",
       city: "Оргеев"
+    },
+    seo: {
+      areaTitle: "Зона покрытия Taxi Select Оргеев",
+      areaText: "Taxi Select (0235 66666) обеспечивает быстрые пассажирские перевозки в Оргееве и окрестностях:",
+      villages: "Пересечино, Иванча, Пеливан, Миток, Брэнешть, Фурчень, Требужень (Старый Оргеев), Бутучень, Суслень, Жора, Лопатна, Вышкэуць, Булэешть, Мырзач, Степ-Сочь, Будэй, Селиште, Лукашеука, Мана, Курки, Ватич, Табара, Каменча, Донич, Покшешть, Телешеу, Самананка, Пуцинтей, Випрова, Гетлова, Хулбоака, Норочень, Морожень, Бренова, Генадие, Некулэеука, Биешть, Чихорень, Сирота, Крихана, Кукурузень, Зориле.",
+      routes: "Популярные маршруты: Такси Оргеев - Кишинев (Аэропорт), Оргеев - Бельцы, Оргеев - Резина.",
+      keywords: "дешевое такси оргеев, номер такси оргеев, такси 14999 оргеев, такси круглосуточно"
     }
   },
   en: {
@@ -360,6 +375,13 @@ export const translations: Record<Language, TranslationStructure> = {
       wind: "Wind",
       humidity: "Humidity",
       city: "Orhei"
+    },
+    seo: {
+      areaTitle: "Taxi Select Coverage Area",
+      areaText: "Taxi Select provides fast passenger transport in Orhei District:",
+      villages: "Peresecina, Ivancea, Pelivan, Mitoc, Branesti, Furceni, Trebujeni (Old Orhei), Butuceni, Susleni, Jora de Mijloc, Lopatna.",
+      routes: "Frequent routes: Taxi Orhei - Chisinau (Airport), Orhei - Balti. Courier services, employee transport.",
+      keywords: "cheap taxi orhei, taxi number orhei, airport transfer moldova"
     }
   }
 };
