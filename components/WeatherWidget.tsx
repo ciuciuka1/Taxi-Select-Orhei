@@ -3,6 +3,13 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { TranslationStructure, Language } from '../types';
 
+interface DailyForecast {
+  date: string;
+  maxTemp: number;
+  minTemp: number;
+  weatherCode: number;
+}
+
 interface WeatherData {
   temperature: number;
   apparentTemperature: number;
@@ -10,6 +17,7 @@ interface WeatherData {
   isDay: boolean;
   windSpeed: number;
   humidity: number;
+  daily: DailyForecast[];
 }
 
 interface Props {
@@ -23,7 +31,6 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
   const [showModal, setShowModal] = useState(false);
   const gradientId = useMemo(() => `liquid-grad-${Math.random().toString(36).substr(2, 9)}`, []);
 
-  // Lock body scroll when modal is open
   useEffect(() => {
     if (showModal) {
       document.body.style.overflow = 'hidden';
@@ -39,19 +46,27 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
     try {
       const uniqueParam = `${Date.now()}`;
       const response = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=47.3831&longitude=28.8231&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,is_day,wind_speed_10m&timezone=auto&timeformat=unixtime&t=${uniqueParam}`
+        `https://api.open-meteo.com/v1/forecast?latitude=47.3831&longitude=28.8231&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,is_day,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&timeformat=unixtime&t=${uniqueParam}`
       );
       
       if (!response.ok) throw new Error('Weather API Error');
       const data = await response.json();
       
+      const dailyForecasts: DailyForecast[] = data.daily.time.slice(1, 4).map((time: number, idx: number) => ({
+        date: new Date(time * 1000).toISOString(),
+        maxTemp: Math.round(data.daily.temperature_2m_max[idx + 1]),
+        minTemp: Math.round(data.daily.temperature_2m_min[idx + 1]),
+        weatherCode: data.daily.weather_code[idx + 1]
+      }));
+
       setWeather({
         temperature: Math.round(data.current.temperature_2m),
         apparentTemperature: Math.round(data.current.apparent_temperature),
         weatherCode: data.current.weather_code,
         isDay: data.current.is_day === 1,
         windSpeed: Math.round(data.current.wind_speed_10m),
-        humidity: Math.round(data.current.relative_humidity_2m)
+        humidity: Math.round(data.current.relative_humidity_2m),
+        daily: dailyForecasts
       });
     } catch (error) {
       console.error("Failed to fetch weather", error);
@@ -62,16 +77,14 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
 
   useEffect(() => {
     fetchWeather();
-    const interval = setInterval(fetchWeather, 60000); 
+    const interval = setInterval(fetchWeather, 300000); // 5 mins
     return () => clearInterval(interval);
   }, []);
 
   const getWeatherDescription = (code: number, temp: number, wind: number) => {
-    if (!t) return "Loading..."; 
-
-    if (temp >= 30) return t.weather.heat;
-    if (temp <= -10) return t.weather.cold;
-    if (wind > 60 && code >= 95) return t.weather.redCode;
+    if (!t) return "..."; 
+    if (temp >= 35) return t.weather.heat;
+    if (temp <= -15) return t.weather.cold;
     if (wind > 80) return t.weather.strongWind;
 
     switch (code) {
@@ -80,430 +93,216 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
       case 2: return t.weather.partlyCloudy;
       case 3: return t.weather.overcast;
       case 45: case 48: return t.weather.fog;
-      case 51: return t.weather.drizzleLight;
-      case 53: return t.weather.drizzleMod;
-      case 55: return t.weather.drizzleDense;
-      case 56: case 57: return t.weather.freezingRain; 
+      case 51: case 53: case 55: return t.weather.drizzleMod;
       case 61: return t.weather.rainLight;
       case 63: return t.weather.rainMod;
       case 65: return t.weather.rainHeavy;
-      case 66: case 67: return t.weather.freezingRain;
-      case 71: return t.weather.snowLight;
-      case 73: return t.weather.snowMod;
-      case 75: return t.weather.snowHeavy;
-      case 77: return t.weather.hail;
-      case 80: return t.weather.showersLight; 
-      case 81: return t.weather.showersMod;
-      case 82: return t.weather.showersHeavy;
-      case 85: return t.weather.sleet;
-      case 86: return t.weather.blizzard;
-      case 95: return t.weather.thunder;
-      case 96: case 99: return t.weather.thunderHail;
+      case 71: case 73: case 75: return t.weather.snowMod;
+      case 95: case 96: case 99: return t.weather.thunder;
       default: return t.weather.variable;
     }
   };
 
-  // --- THERMOMETER LOGIC ---
-  const getThermometerColor = (temp: number) => {
-      if (temp <= 0) return '#60A5FA'; // Blue-400
-      if (temp <= 10) return '#22D3EE'; // Cyan-400
-      if (temp <= 20) return '#ffffff'; // White (Comfort/Spring)
-      if (temp <= 30) return '#FACC15'; // Yellow-400
-      return '#EF4444'; // Red-500
+  const getDayName = (dateStr: string) => {
+    if (!t) return "";
+    const date = new Date(dateStr);
+    return t.weather.days[date.getDay()];
   };
 
-  const getThermometer = (temp: number) => {
-      // PROPORTIONAL LOGIC
-      // Scale: -10°C to 40°C
-      const minTemp = -10;
-      const maxTemp = 40;
-      const range = maxTemp - minTemp; // 50 degrees total
-      
-      const clampedTemp = Math.max(minTemp, Math.min(temp, maxTemp));
-      const percent = (clampedTemp - minTemp) / range; // 0.0 to 1.0
+  const getThermometer = (temp: number, isSmall = false) => {
+    const minTemp = -10, maxTemp = 40;
+    const percent = Math.max(0, Math.min(1, (temp - minTemp) / (maxTemp - minTemp)));
+    const color = temp <= 0 ? '#60A5FA' : temp <= 15 ? '#22D3EE' : temp <= 25 ? '#FFFFFF' : temp <= 32 ? '#FACC15' : '#EF4444';
+    const scale = isSmall ? 0.7 : 1;
+    const liquidY = 18 - (percent * 14);
 
-      // SVG Coordinates (ViewBox 0 0 14 28)
-      // Top Mark (40°C) -> y = 4
-      // Bottom Mark (-10°C) -> y = 18 (Just above bulb body)
-      const topYFull = 4;
-      const topYEmpty = 18;
-      const totalHeight = topYEmpty - topYFull; // 14 pixels travel
-
-      const liquidY = topYEmpty - (percent * totalHeight);
-      const color = getThermometerColor(temp);
-
-      // Path Geometries:
-      // Glass: Top Cap (y=3, r=2.5), Stem connects at y=17.3 to Bulb (r=4.5)
-      // Liquid: Top Cap (r=1.25), Stem connects at y=18.3 to Bulb (r=3.0)
-      
-      return (
-        <svg width="14" height="28" viewBox="0 0 14 28" className="filter drop-shadow-md mr-1 opacity-90 overflow-visible">
-            <defs>
-                <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={color} stopOpacity="1" />
-                    <stop offset="100%" stopColor={color} stopOpacity="0.7" />
-                </linearGradient>
-            </defs>
-            
-            {/* Glass Tube Container - Unified Path */}
-            <path 
-                d="M 4.5 3 A 2.5 2.5 0 0 1 9.5 3 V 17.3 A 4.5 4.5 0 1 1 4.5 17.3 V 3 Z" 
-                fill="rgba(255,255,255,0.1)" 
-                stroke="rgba(255,255,255,0.4)" 
-                strokeWidth="1" 
-            />
-            
-            {/* Liquid (Mercury) - Unified Path for seamless join */}
-            <path
-                d={`M 5.75 ${liquidY} A 1.25 1.25 0 0 1 8.25 ${liquidY} L 8.25 18.3 A 3 3 0 1 1 5.75 18.3 Z`}
-                fill={`url(#${gradientId})`}
-            />
-            
-            {/* Measurement Marks - Correctly positioned based on Scale */}
-            {/* 40°C -> y=4 */}
-            <line x1="9.5" y1="4" x2="11.5" y2="4" stroke="rgba(255,255,255,0.6)" strokeWidth="0.8" />
-            
-            {/* 15°C -> Midpoint (25/50 degrees) -> y=11 */}
-            <line x1="9.5" y1="11" x2="11.5" y2="11" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8" />
-            
-            {/* -10°C -> y=18 */}
-            <line x1="9.5" y1="18" x2="11.5" y2="18" stroke="rgba(255,255,255,0.6)" strokeWidth="0.8" />
-        </svg>
-      );
+    return (
+      <svg width={14 * scale} height={28 * scale} viewBox="0 0 14 28" className="overflow-visible filter drop-shadow-md">
+        <defs>
+          <linearGradient id={gradientId + (isSmall ? 's' : 'b')} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={color} stopOpacity="0.5" />
+          </linearGradient>
+        </defs>
+        <path d="M 4.5 3 A 2.5 2.5 0 0 1 9.5 3 V 17.3 A 4.5 4.5 0 1 1 4.5 17.3 V 3 Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+        <path d={`M 5.75 ${liquidY} A 1.25 1.25 0 0 1 8.25 ${liquidY} L 8.25 18.3 A 3 3 0 1 1 5.75 18.3 Z`} fill={`url(#${gradientId + (isSmall ? 's' : 'b')})`} />
+      </svg>
+    );
   };
 
-  // --- GRAFICĂ METEO ---
-  const getWeatherIcon = (code: number, isDay: boolean, temp: number, wind: number) => {
-    const iconClass = "w-10 h-10 md:w-12 md:h-12 filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]"; 
+  const getWeatherIcon = (code: number, isDay: boolean, temp: number, isMini = false) => {
+    const size = isMini ? "w-8 h-8" : "w-10 h-10 md:w-12 md:h-12";
+    const iconClass = `${size} filter drop-shadow-lg`;
 
-    const defs = (
-      <defs>
-        <radialGradient id="sunCore" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-            <stop offset="0%" stopColor="#FFF7ED" />
-            <stop offset="40%" stopColor="#F59E0B" />
-            <stop offset="100%" stopColor="#B45309" />
-        </radialGradient>
-        <linearGradient id="cloudWhite" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#FFFFFF" />
-          <stop offset="100%" stopColor="#CBD5E1" />
-        </linearGradient>
-        <linearGradient id="cloudGrey" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#94A3B8" />
-          <stop offset="100%" stopColor="#334155" />
-        </linearGradient>
-        <linearGradient id="cloudDarkStorm" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#475569" />
-          <stop offset="100%" stopColor="#0F172A" />
-        </linearGradient>
-        <radialGradient id="moonSurface" cx="50%" cy="50%" r="50%">
-            <stop offset="40%" stopColor="#F8FAFC" />
-            <stop offset="100%" stopColor="#94A3B8" />
-        </radialGradient>
-        <radialGradient id="heatGlow" cx="50%" cy="50%" r="50%">
-           <stop offset="0%" stopColor="#EF4444" stopOpacity="0.4" />
-           <stop offset="100%" stopColor="#EF4444" stopOpacity="0" />
-        </radialGradient>
-      </defs>
+    const Cloud = ({ fill = "white", opacity = 1, className = "" }) => (
+      <path d="M25,30 a10,10 0 0,1 18,0 a8,8 0 0,1 6,7 a5,5 0 0,1 -2,9 h-25 a8,8 0 0,1 -8,-8 a8,8 0 0,1 8,-8 z" fill={fill} opacity={opacity} className={className} />
     );
 
-    const CloudPath = ({ x=0, y=0, scale=1, opacity=1, fill="url(#cloudWhite)", className="" }: any) => (
-       <g transform={`translate(${x}, ${y}) scale(${scale})`} opacity={opacity} className={className}>
-          <path d="M25,30 a10,10 0 0,1 18,0 a8,8 0 0,1 6,7 a5,5 0 0,1 -2,9 h-25 a8,8 0 0,1 -8,-8 a8,8 0 0,1 8,-8 z" fill={fill} />
-       </g>
+    // Extreme Heat
+    if (temp >= 35) return (
+      <svg className={iconClass} viewBox="0 0 64 64">
+        <circle cx="32" cy="32" r="28" fill="#EF4444" opacity="0.2" className="animate-pulse" />
+        <circle cx="32" cy="32" r="14" fill="#F59E0B" className="animate-heat-wave" />
+      </svg>
     );
 
-    if (temp >= 30) {
-      return (
-        <svg className={iconClass} viewBox="0 0 64 64">
-           {defs}
-           <circle cx="32" cy="32" r="28" fill="url(#heatGlow)" className="animate-pulse-slow" />
-           <circle cx="32" cy="32" r="14" fill="url(#sunCore)" className="animate-heat-wave drop-shadow-[0_0_20px_rgba(249,115,22,0.8)]" />
-           <path d="M10 50 Q 15 45, 20 50 T 30 50" stroke="#EF4444" fill="none" opacity="0.6" className="animate-fog-flow" />
-           <path d="M34 55 Q 39 50, 44 55 T 54 55" stroke="#EF4444" fill="none" opacity="0.6" className="animate-fog-flow" style={{animationDelay:'0.5s'}} />
-        </svg>
-      );
-    }
-
-    if (temp <= -10) {
-      return (
-        <svg className={iconClass} viewBox="0 0 64 64">
-           {defs}
-           <circle cx="32" cy="32" r="25" fill="#3B82F6" opacity="0.2" className="animate-cold-pulse" />
-           <path d="M32 10 L32 54 M10 32 L54 32 M16 16 L48 48 M16 48 L48 16" stroke="white" strokeWidth="2" strokeLinecap="round" className="animate-spin-slow" />
-           <circle cx="32" cy="32" r="5" fill="white" />
-        </svg>
-      );
-    }
-
-    if (code >= 95) {
-      return (
-        <svg className={iconClass} viewBox="0 0 64 64">
-           {defs}
-           <rect x="0" y="0" width="64" height="64" fill="white" className="animate-flash" opacity="0.1" />
-           <CloudPath x={2} y={2} scale={1.1} fill="url(#cloudDarkStorm)" />
-           <path d="M34 32 L26 44 H34 L30 58" stroke="#FACC15" strokeWidth="3" fill="none" className="animate-flash drop-shadow-[0_0_10px_rgba(250,204,21,1)]" strokeLinecap="round" strokeLinejoin="round" />
-           <line x1="18" y1="45" x2="14" y2="58" stroke="#06B6D4" strokeWidth="2.5" strokeLinecap="round" className="animate-rain-heavy" />
-           <line x1="48" y1="45" x2="44" y2="58" stroke="#06B6D4" strokeWidth="2.5" strokeLinecap="round" className="animate-rain-heavy" style={{animationDelay: '0.2s'}} />
-        </svg>
-      );
-    }
-
-    if (code >= 80 && code <= 82) {
-      return (
-        <svg className={iconClass} viewBox="0 0 64 64">
-           {defs}
-           <CloudPath x={6} y={-4} scale={0.9} fill="url(#cloudDarkStorm)" opacity={0.9} />
-           <CloudPath x={0} y={0} fill="url(#cloudGrey)" />
-           <g>
-             <line x1="20" y1="40" x2="15" y2="55" stroke="#22D3EE" strokeWidth="3" strokeLinecap="round" className="animate-rain-heavy" style={{animationDelay: '0s'}} />
-             <line x1="32" y1="38" x2="27" y2="53" stroke="#22D3EE" strokeWidth="3" strokeLinecap="round" className="animate-rain-heavy" style={{animationDelay: '0.1s'}} />
-             <line x1="44" y1="40" x2="39" y2="55" stroke="#22D3EE" strokeWidth="3" strokeLinecap="round" className="animate-rain-heavy" style={{animationDelay: '0.2s'}} />
-             <line x1="26" y1="45" x2="21" y2="60" stroke="#22D3EE" strokeWidth="3" strokeLinecap="round" className="animate-rain-heavy" style={{animationDelay: '0.15s'}} />
-           </g>
-        </svg>
-      );
-    }
-
-    if (code >= 61 && code <= 65) {
-      return (
-        <svg className={iconClass} viewBox="0 0 64 64">
-          {defs}
-          <CloudPath x={0} y={0} fill="url(#cloudGrey)" />
-          <g> 
-            <line x1="22" y1="42" x2="22" y2="54" stroke="#06B6D4" strokeWidth="2" strokeLinecap="round" className="animate-rain-drop" style={{animationDuration: '0.9s'}} />
-            <line x1="32" y1="40" x2="32" y2="52" stroke="#06B6D4" strokeWidth="2" strokeLinecap="round" className="animate-rain-drop" style={{animationDuration: '1.1s', animationDelay: '0.3s'}} />
-            <line x1="42" y1="42" x2="42" y2="54" stroke="#06B6D4" strokeWidth="2" strokeLinecap="round" className="animate-rain-drop" style={{animationDuration: '1.0s', animationDelay: '0.6s'}} />
-          </g>
-        </svg>
-      );
-    }
-
-    if ([56, 57, 66, 67, 85].includes(code)) {
-       return (
-        <svg className={iconClass} viewBox="0 0 64 64">
-           {defs}
-           <CloudPath x={0} y={0} fill="url(#cloudGrey)" />
-           <line x1="25" y1="42" x2="25" y2="52" stroke="#06B6D4" strokeWidth="2" className="animate-rain-drop" />
-           <circle cx="38" cy="48" r="2" fill="white" className="animate-snow-fall" />
-           <line x1="38" y1="46" x2="38" y2="50" stroke="white" strokeWidth="1" className="animate-snow-fall" />
-           <line x1="36" y1="48" x2="40" y2="48" stroke="white" strokeWidth="1" className="animate-snow-fall" />
-        </svg>
-       );
-    }
-
-    if (code >= 51 && code <= 55) {
-      return (
-        <svg className={iconClass} viewBox="0 0 64 64">
-          {defs}
-          <CloudPath x={0} y={0} fill={isDay ? "url(#cloudWhite)" : "url(#cloudGrey)"} />
-          <g> 
-            <line x1="24" y1="42" x2="24" y2="46" stroke="#22D3EE" strokeWidth="1.5" strokeLinecap="round" className="animate-rain-drop" />
-            <line x1="32" y1="44" x2="32" y2="48" stroke="#22D3EE" strokeWidth="1.5" strokeLinecap="round" className="animate-rain-drop" style={{animationDelay: '0.5s'}} />
-            <line x1="40" y1="42" x2="40" y2="46" stroke="#22D3EE" strokeWidth="1.5" strokeLinecap="round" className="animate-rain-drop" style={{animationDelay: '0.2s'}} />
-          </g>
-        </svg>
-      );
-    }
-
-    if ((code >= 71 && code <= 77) || code === 86) {
-       const isBlizzard = code === 86 || wind > 40;
-       return (
-        <svg className={iconClass} viewBox="0 0 64 64">
-           {defs}
-           <CloudPath x={0} y={0} fill={isDay ? "url(#cloudWhite)" : "url(#cloudGrey)"} />
-           <g fill="white" className={isBlizzard ? "animate-blizzard" : "animate-snow-fall"}>
-              <circle cx="20" cy="45" r="2" />
-              <circle cx="32" cy="50" r="2.5" />
-              <circle cx="44" cy="45" r="2" />
-              {isBlizzard && <circle cx="54" cy="48" r="2" />}
-           </g>
-        </svg>
-       );
-    }
-
-    if (code === 45 || code === 48) {
-      return (
-        <svg className={iconClass} viewBox="0 0 64 64">
-           {defs}
-           <path d="M12 35h40" stroke="#94A3B8" strokeWidth="4" strokeLinecap="round" className="animate-fog-flow" style={{animationDuration: '4s'}} opacity="0.7" />
-           <path d="M8 45h48" stroke="#94A3B8" strokeWidth="5" strokeLinecap="round" className="animate-fog-flow" style={{animationDuration: '6s', animationDirection: 'reverse'}} opacity="0.5" />
-        </svg>
-      );
-    }
-
-    if (code === 3) {
-        return (
-            <svg className={iconClass} viewBox="0 0 64 64">
-                {defs}
-                <CloudPath x={8} y={-5} scale={0.9} fill="url(#cloudGrey)" className="animate-drift-reverse" />
-                <CloudPath x={-2} y={5} fill="url(#cloudWhite)" className="animate-drift" />
-            </svg>
-        );
-    }
-
-    if (code === 1 || code === 2) {
-        return (
-            <svg className={iconClass} viewBox="0 0 64 64">
-                {defs}
-                <g transform="translate(6, -6)">
-                   {isDay ? (
-                       <g className="animate-pulse-glow">
-                          <circle cx="32" cy="32" r="12" fill="url(#sunCore)" />
-                       </g>
-                   ) : (
-                       <circle cx="32" cy="32" r="10" fill="url(#moonSurface)" />
-                   )}
-                </g>
-                <CloudPath x={-2} y={8} scale={0.95} className="animate-float" fill="url(#cloudWhite)" />
-            </svg>
-        );
-    }
-
-    if (isDay) {
+    // Weather Codes
+    switch (code) {
+      case 0: // Clear
         return (
           <svg className={iconClass} viewBox="0 0 64 64">
-            {defs}
-            <circle cx="32" cy="32" r="14" fill="url(#sunCore)" className="animate-pulse-glow drop-shadow-[0_0_20px_rgba(245,158,11,0.7)]" />
-            <g className="animate-sun-spin origin-[32px_32px]">
-              {[...Array(12)].map((_, i) => (
-                <line key={i} x1="32" y1="8" x2="32" y2="2" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round" transform={`rotate(${i * 30} 32 32)`} />
-              ))}
-            </g>
+            {isDay ? (
+              <g className="animate-pulse-glow">
+                <circle cx="32" cy="32" r="14" fill="#F59E0B" />
+                <g className="animate-spin-slow origin-center">
+                   {[...Array(8)].map((_, i) => <line key={i} x1="32" y1="8" x2="32" y2="2" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" transform={`rotate(${i * 45} 32 32)`} />)}
+                </g>
+              </g>
+            ) : (
+              <circle cx="32" cy="32" r="12" fill="#F8FAFC" className="animate-float" />
+            )}
           </svg>
         );
-    } else {
+      case 1: case 2: // Partly Cloudy
         return (
-            <svg className={iconClass} viewBox="0 0 64 64">
-                {defs}
-                <circle cx="32" cy="32" r="12" fill="url(#moonSurface)" className="drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] animate-float" />
-                <circle cx="10" cy="15" r="1" fill="white" className="animate-twinkle" />
-                <circle cx="50" cy="10" r="1.5" fill="white" className="animate-twinkle" style={{animationDelay: '1s'}} />
-            </svg>
+          <svg className={iconClass} viewBox="0 0 64 64">
+            <circle cx="42" cy="22" r="10" fill={isDay ? "#F59E0B" : "#F8FAFC"} />
+            <Cloud fill="#CBD5E1" className="animate-float" />
+          </svg>
         );
+      case 3: // Overcast
+        return (
+          <svg className={iconClass} viewBox="0 0 64 64">
+            <g transform="translate(8, -4) scale(0.9)"><Cloud fill="#94A3B8" className="animate-drift-reverse" /></g>
+            <Cloud fill="white" className="animate-drift" />
+          </svg>
+        );
+      case 45: case 48: // Fog
+        return (
+          <svg className={iconClass} viewBox="0 0 64 64">
+            <line x1="10" y1="30" x2="54" y2="30" stroke="#94A3B8" strokeWidth="4" strokeLinecap="round" className="animate-fog-flow" />
+            <line x1="15" y1="40" x2="49" y2="40" stroke="#94A3B8" strokeWidth="4" strokeLinecap="round" className="animate-fog-flow" style={{animationDelay: '1s'}} />
+            <line x1="8" y1="50" x2="56" y2="50" stroke="#94A3B8" strokeWidth="4" strokeLinecap="round" className="animate-fog-flow" style={{animationDelay: '0.5s'}} />
+          </svg>
+        );
+      case 51: case 53: case 55: case 61: case 63: case 65: case 80: case 81: case 82: // Rain
+        const isHeavy = code === 65 || code === 82;
+        return (
+          <svg className={iconClass} viewBox="0 0 64 64">
+            <Cloud fill="#64748B" />
+            <line x1="22" y1="42" x2="20" y2="52" stroke="#06B6D4" strokeWidth="2.5" className={isHeavy ? "animate-rain-heavy" : "animate-rain-drop"} />
+            <line x1="32" y1="45" x2="30" y2="55" stroke="#06B6D4" strokeWidth="2.5" className={isHeavy ? "animate-rain-heavy" : "animate-rain-drop"} style={{animationDelay: '0.2s'}} />
+            <line x1="42" y1="42" x2="40" y2="52" stroke="#06B6D4" strokeWidth="2.5" className={isHeavy ? "animate-rain-heavy" : "animate-rain-drop"} style={{animationDelay: '0.4s'}} />
+          </svg>
+        );
+      case 71: case 73: case 75: case 85: case 86: // Snow
+        return (
+          <svg className={iconClass} viewBox="0 0 64 64">
+            <Cloud fill="#94A3B8" />
+            <circle cx="22" cy="45" r="2.5" fill="white" className="animate-snow-fall" />
+            <circle cx="32" cy="52" r="2.5" fill="white" className="animate-snow-fall" style={{animationDelay: '1s'}} />
+            <circle cx="42" cy="45" r="2.5" fill="white" className="animate-snow-fall" style={{animationDelay: '0.5s'}} />
+          </svg>
+        );
+      case 95: case 96: case 99: // Thunder
+        return (
+          <svg className={iconClass} viewBox="0 0 64 64">
+            <Cloud fill="#334155" />
+            <path d="M34 32 L26 44 H34 L30 58" stroke="#FACC15" strokeWidth="3" fill="none" className="animate-flash" strokeLinecap="round" />
+          </svg>
+        );
+      default:
+        return <svg className={iconClass} viewBox="0 0 64 64"><Cloud fill="white" /></svg>;
     }
-    return null;
   };
 
-  const baseContainerClasses = "rounded-full flex items-center gap-2 pl-4 pr-2 py-2 border backdrop-blur-xl shadow-lg ring-1 select-none w-fit h-auto transition-all duration-300 cursor-pointer active:scale-95";
-
-  if (loading || !weather) {
-     return (
-        <div className="relative group z-50 animate-fadeInUp">
-          <div className={`${baseContainerClasses} border-white/5 bg-brand-dark/50 ring-white/5`}>
-             <div className="flex flex-col items-end justify-center">
-                 <div className="h-4 w-8 bg-white/10 rounded animate-pulse mb-1"></div>
-                 <div className="h-2 w-10 bg-white/10 rounded animate-pulse"></div>
-             </div>
-             <div className="h-10 w-10 bg-white/10 rounded-full animate-pulse ml-1"></div>
-          </div>
-        </div>
-     );
-  }
+  if (loading || !weather) return (
+    <div className="relative z-50 animate-fadeInUp">
+      <div className="rounded-full flex items-center gap-2 pl-4 pr-3 py-2 border border-white/5 bg-brand-dark/50 ring-1 ring-white/5">
+        <div className="h-4 w-12 bg-white/10 rounded animate-pulse" />
+        <div className="h-10 w-10 bg-white/10 rounded-full animate-pulse" />
+      </div>
+    </div>
+  );
 
   return (
     <>
-      {/* --- WIDGET PRINCIPAL --- */}
-      <div 
-        className="relative group z-50 animate-fadeInUp" 
-        onClick={() => setShowModal(true)} // Enable Click for Modal
-      >
-        <div className={`${baseContainerClasses} bg-gradient-to-r ${
-            weather.temperature >= 30 ? "from-red-900/80 to-brand-dark/80 border-red-500/30 ring-red-500/20" :
-            weather.temperature <= -10 ? "from-blue-900/80 to-brand-dark/80 border-blue-500/30 ring-blue-500/20" :
-            "from-brand-dark/80 to-brand-slate/80 border-white/10 ring-white/5 hover:ring-brand-gold/30"
+      <div className="relative z-50 animate-fadeInUp group cursor-pointer" onClick={() => setShowModal(true)}>
+        <div className={`rounded-full flex items-center gap-2 pl-4 pr-3 py-2 border backdrop-blur-xl shadow-lg ring-1 transition-all duration-300 active:scale-95 ${
+            weather.temperature >= 35 ? "bg-red-900/60 border-red-500/30 ring-red-500/20" :
+            weather.temperature <= -10 ? "bg-blue-900/60 border-blue-500/30 ring-blue-500/20" :
+            "bg-brand-dark/70 border-white/10 ring-white/5"
         }`}>
-          
-          <div className="flex items-center gap-1">
-              {/* Thermometer next to temp */}
-              {getThermometer(weather.temperature)}
-              
-              <div className="flex flex-col items-end justify-center mr-1">
-                <span className={`text-lg font-bold font-serif leading-none tracking-tight shadow-black drop-shadow-md ${
-                    weather.temperature >= 30 ? "text-red-400" :
-                    weather.temperature <= -10 ? "text-blue-300" :
-                    "text-white"
-                }`}>
-                  {weather.temperature}°C
-                </span>
-                <span className="text-[10px] text-brand-gold font-bold uppercase tracking-widest mt-0.5 opacity-90 whitespace-nowrap">
-                  {t ? t.weather.city : "Orhei"}
-                </span>
+          <div className="flex items-center gap-1.5">
+            {getThermometer(weather.temperature)}
+            <div className="flex flex-col items-end">
+              <span className={`text-xl font-bold font-serif leading-none tracking-tight ${weather.temperature >= 35 ? "text-red-400" : "text-white"}`}>
+                {weather.temperature}°C
+              </span>
+              <div className="flex items-center gap-1 mt-0.5 opacity-80">
+                <span className="text-[7px] text-gray-400 uppercase font-black">{t?.weather.apparent}</span>
+                <span className="text-[9px] text-brand-gold font-black">{weather.apparentTemperature}°</span>
               </div>
+            </div>
           </div>
-
-          <div className="transform group-hover:scale-110 transition-transform duration-500 ease-out shrink-0 ml-1">
-            {getWeatherIcon(weather.weatherCode, weather.isDay, weather.temperature, weather.windSpeed)}
+          <div className="border-l border-white/10 pl-2 transform group-hover:scale-110 transition-transform duration-500">
+            {getWeatherIcon(weather.weatherCode, weather.isDay, weather.temperature)}
           </div>
-        </div>
-
-        {/* --- TOOLTIP DESKTOP (Rămâne la hover) --- */}
-        <div className="hidden md:block absolute top-full right-0 mt-3 w-max px-4 py-2 bg-[#0a0a0a]/95 text-white text-xs font-medium rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none border border-white/10 shadow-2xl transform translate-y-2 group-hover:translate-y-0 z-[100] backdrop-blur-xl">
-          <div className="flex flex-col">
-            <span className="uppercase tracking-wide text-brand-gold block text-[10px] mb-0.5">
-                {t ? t.weather.label : "Vremea Acum"}
-            </span>
-            <span className="text-sm font-bold block">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</span>
-            <span className="text-[10px] text-gray-400 mt-1">{t?.weather.apparent}: <span className="text-white font-bold">{weather.apparentTemperature}°C</span></span>
-          </div>
-          <div className="absolute -top-1 right-8 w-2 h-2 bg-[#0a0a0a]/95 border-t border-l border-white/10 transform rotate-45"></div>
         </div>
       </div>
 
-      {/* --- MODAL DETALIAT (PORTAL to BODY) --- */}
       {showModal && createPortal(
-        <div 
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-pageFade cursor-pointer"
-          style={{ margin: 0 }} // Reset margin to be safe
-          onClick={() => setShowModal(false)}
-        >
-          <div 
-            className="bg-brand-dark/90 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-sm shadow-2xl relative overflow-hidden cursor-auto"
-            onClick={(e) => e.stopPropagation()} 
-          >
-             {/* Gradient Decor */}
-             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/10 blur-[50px] rounded-full"></div>
-             
-             {/* Close Button */}
-             <button 
-               onClick={() => setShowModal(false)}
-               className="absolute top-4 right-4 text-gray-400 hover:text-white p-2"
-             >
-               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-               </svg>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-pageFade cursor-pointer" onClick={() => setShowModal(false)}>
+          <div className="bg-[#0f172a]/95 backdrop-blur-2xl border border-white/20 rounded-[32px] p-7 w-full max-w-sm shadow-2xl relative overflow-hidden cursor-auto" onClick={e => e.stopPropagation()}>
+             <div className="absolute top-0 right-0 w-48 h-48 bg-brand-gold/5 blur-[80px] rounded-full" />
+             <button onClick={() => setShowModal(false)} className="absolute top-5 right-5 text-gray-400 hover:text-white p-2 bg-white/5 rounded-full">
+               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M6 18L18 6M6 6l12 12" /></svg>
              </button>
 
-             {/* Header */}
-             <div className="flex flex-col items-center mb-8 mt-2">
-                 <div className="scale-[1.8] mb-6">
-                    {getWeatherIcon(weather.weatherCode, weather.isDay, weather.temperature, weather.windSpeed)}
-                 </div>
-                 {/* Increased size for emphasis since marketing text is gone */}
-                 <div className="flex items-center gap-3">
-                    <div className="transform scale-150">{getThermometer(weather.temperature)}</div>
+             <div className="flex flex-col items-center mb-8 mt-4">
+                 <div className="scale-[1.8] mb-8">{getWeatherIcon(weather.weatherCode, weather.isDay, weather.temperature)}</div>
+                 <div className="flex items-center gap-6">
+                    <div className="transform scale-[2] origin-right">{getThermometer(weather.temperature)}</div>
                     <div className="flex flex-col">
-                      <h2 className="text-5xl font-serif font-bold text-white leading-none">{weather.temperature}°C</h2>
-                      <p className="text-gray-400 text-sm mt-1">{t?.weather.apparent}: <span className="text-brand-gold font-bold">{weather.apparentTemperature}°C</span></p>
+                      <h2 className="text-6xl font-serif font-black text-white leading-none tracking-tighter">{weather.temperature}°C</h2>
+                      <p className="text-gray-400 text-sm mt-1.5">{t?.weather.apparent} <span className="text-brand-gold font-bold">{weather.apparentTemperature}°C</span></p>
                     </div>
                  </div>
-                 <p className="text-brand-gold text-sm uppercase tracking-widest font-medium mt-6">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</p>
+                 <p className="text-white text-base font-bold mt-8 bg-white/5 px-6 py-2 rounded-full border border-white/5">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</p>
              </div>
 
-             {/* Grid Details */}
-             <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="bg-white/5 rounded-xl p-4 flex flex-col items-center border border-white/5 shadow-inner">
-                   <span className="text-gray-400 text-[10px] uppercase mb-1 tracking-wider">{t ? t.weather.wind : "Vânt"}</span>
-                   <span className="text-white font-bold text-xl">{weather.windSpeed} <span className="text-sm font-normal text-gray-400">km/h</span></span>
+             <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="bg-white/5 rounded-2xl p-4 flex flex-col items-center border border-white/5">
+                   <span className="text-gray-500 text-[10px] uppercase font-black tracking-widest mb-1">{t?.weather.wind}</span>
+                   <span className="text-white font-bold text-xl">{weather.windSpeed} <span className="text-xs font-normal text-gray-500">km/h</span></span>
                 </div>
-                <div className="bg-white/5 rounded-xl p-4 flex flex-col items-center border border-white/5 shadow-inner">
-                   <span className="text-gray-400 text-[10px] uppercase mb-1 tracking-wider">{t ? t.weather.humidity : "Umiditate"}</span>
-                   <span className="text-white font-bold text-xl">{weather.humidity}<span className="text-sm font-normal text-gray-400">%</span></span>
+                <div className="bg-white/5 rounded-2xl p-4 flex flex-col items-center border border-white/5">
+                   <span className="text-gray-500 text-[10px] uppercase font-black tracking-widest mb-1">{t?.weather.humidity}</span>
+                   <span className="text-white font-bold text-xl">{weather.humidity}<span className="text-xs font-normal text-gray-500">%</span></span>
                 </div>
              </div>
 
-             <div className="mt-6 text-center border-t border-white/5 pt-4">
-                <p className="text-[10px] text-gray-500 uppercase tracking-[0.3em]">{t ? t.weather.city : "Orhei"} • Taxi Select</p>
+             <div className="pt-6 border-t border-white/10">
+                <h3 className="text-[11px] text-gray-400 uppercase tracking-[0.3em] font-black mb-5">{t?.weather.forecast}</h3>
+                <div className="space-y-3">
+                  {weather.daily.map((day, idx) => (
+                    <div key={idx} className="flex items-center justify-between bg-white/5 rounded-2xl px-4 py-3 border border-white/5 hover:bg-white/10 transition-all group">
+                      <span className="text-white font-bold text-sm w-12">{getDayName(day.date)}</span>
+                      <div className="flex-1 flex justify-center group-hover:scale-110 transition-transform">
+                        {getWeatherIcon(day.weatherCode, true, day.maxTemp, true)}
+                      </div>
+                      <div className="flex items-center gap-3 w-20 justify-end">
+                         <div className="flex flex-col items-end">
+                            <span className="text-white font-black text-sm">{day.maxTemp}°</span>
+                            <span className="text-gray-500 font-bold text-[10px]">{day.minTemp}°</span>
+                         </div>
+                         {getThermometer(day.maxTemp, true)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
              </div>
+             <div className="mt-8 text-center"><p className="text-[9px] text-brand-gold font-black tracking-widest">TAXI SELECT ORHEI</p></div>
           </div>
         </div>,
         document.body

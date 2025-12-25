@@ -120,6 +120,8 @@ export interface TranslationStructure {
     humidity: string;
     apparent: string;
     city: string;
+    forecast: string;
+    days: string[];
   };
   seo: {
     areaTitle: string;

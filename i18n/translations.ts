@@ -120,9 +120,10 @@ export const translations: Record<Language, TranslationStructure> = {
       wind: "Vânt",
       humidity: "Umiditate",
       apparent: "Resimțită",
-      city: "Orhei"
+      city: "Orhei",
+      forecast: "Prognoză 3 Zile",
+      days: ["Dum", "Lun", "Mar", "Mie", "Joi", "Vin", "Sâm"]
     },
-    // NEW SEO SECTION
     seo: {
       areaTitle: "Acoperire Raională Taxi Select",
       areaText: "Taxi Select Orhei (0235 66666) asigură transport rapid de pasageri în următoarele localități din Raionul Orhei și împrejurimi:",
@@ -249,7 +250,9 @@ export const translations: Record<Language, TranslationStructure> = {
       wind: "Ветер",
       humidity: "Влажность",
       apparent: "Ощущается",
-      city: "Оргеев"
+      city: "Оргеев",
+      forecast: "Прогноз на 3 дня",
+      days: ["Вск", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"]
     },
     seo: {
       areaTitle: "Зона покрытия Taxi Select Оргеев",
@@ -377,7 +380,9 @@ export const translations: Record<Language, TranslationStructure> = {
       wind: "Wind",
       humidity: "Humidity",
       apparent: "Feels like",
-      city: "Orhei"
+      city: "Orhei",
+      forecast: "3-Day Forecast",
+      days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     },
     seo: {
       areaTitle: "Taxi Select Coverage Area",
