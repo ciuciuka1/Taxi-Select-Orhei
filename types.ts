@@ -118,6 +118,7 @@ export interface TranslationStructure {
     label: string;
     wind: string;
     humidity: string;
+    apparent: string;
     city: string;
   };
   seo: {

@@ -5,6 +5,7 @@ import { TranslationStructure, Language } from '../types';
 
 interface WeatherData {
   temperature: number;
+  apparentTemperature: number;
   weatherCode: number;
   isDay: boolean;
   windSpeed: number;
@@ -38,7 +39,7 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
     try {
       const uniqueParam = `${Date.now()}`;
       const response = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=47.3831&longitude=28.8231&current=temperature_2m,relative_humidity_2m,weather_code,is_day,wind_speed_10m&timezone=auto&timeformat=unixtime&t=${uniqueParam}`
+        `https://api.open-meteo.com/v1/forecast?latitude=47.3831&longitude=28.8231&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,is_day,wind_speed_10m&timezone=auto&timeformat=unixtime&t=${uniqueParam}`
       );
       
       if (!response.ok) throw new Error('Weather API Error');
@@ -46,6 +47,7 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
       
       setWeather({
         temperature: Math.round(data.current.temperature_2m),
+        apparentTemperature: Math.round(data.current.apparent_temperature),
         weatherCode: data.current.weather_code,
         isDay: data.current.is_day === 1,
         windSpeed: Math.round(data.current.wind_speed_10m),
@@ -415,7 +417,7 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
               {/* Thermometer next to temp */}
               {getThermometer(weather.temperature)}
               
-              <div className="flex flex-col items-end justify-center">
+              <div className="flex flex-col items-end justify-center mr-1">
                 <span className={`text-lg font-bold font-serif leading-none tracking-tight shadow-black drop-shadow-md ${
                     weather.temperature >= 30 ? "text-red-400" :
                     weather.temperature <= -10 ? "text-blue-300" :
@@ -436,10 +438,13 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
 
         {/* --- TOOLTIP DESKTOP (Rămâne la hover) --- */}
         <div className="hidden md:block absolute top-full right-0 mt-3 w-max px-4 py-2 bg-[#0a0a0a]/95 text-white text-xs font-medium rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none border border-white/10 shadow-2xl transform translate-y-2 group-hover:translate-y-0 z-[100] backdrop-blur-xl">
-          <span className="uppercase tracking-wide text-brand-gold block text-[10px] mb-0.5">
-              {t ? t.weather.label : "Vremea Acum"}
-          </span>
-          <span className="text-sm font-bold block">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</span>
+          <div className="flex flex-col">
+            <span className="uppercase tracking-wide text-brand-gold block text-[10px] mb-0.5">
+                {t ? t.weather.label : "Vremea Acum"}
+            </span>
+            <span className="text-sm font-bold block">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</span>
+            <span className="text-[10px] text-gray-400 mt-1">{t?.weather.apparent}: <span className="text-white font-bold">{weather.apparentTemperature}°C</span></span>
+          </div>
           <div className="absolute -top-1 right-8 w-2 h-2 bg-[#0a0a0a]/95 border-t border-l border-white/10 transform rotate-45"></div>
         </div>
       </div>
@@ -476,9 +481,12 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
                  {/* Increased size for emphasis since marketing text is gone */}
                  <div className="flex items-center gap-3">
                     <div className="transform scale-150">{getThermometer(weather.temperature)}</div>
-                    <h2 className="text-5xl font-serif font-bold text-white mb-2">{weather.temperature}°C</h2>
+                    <div className="flex flex-col">
+                      <h2 className="text-5xl font-serif font-bold text-white leading-none">{weather.temperature}°C</h2>
+                      <p className="text-gray-400 text-sm mt-1">{t?.weather.apparent}: <span className="text-brand-gold font-bold">{weather.apparentTemperature}°C</span></p>
+                    </div>
                  </div>
-                 <p className="text-brand-gold text-sm uppercase tracking-widest font-medium">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</p>
+                 <p className="text-brand-gold text-sm uppercase tracking-widest font-medium mt-6">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</p>
              </div>
 
              {/* Grid Details */}

@@ -119,6 +119,7 @@ export const translations: Record<Language, TranslationStructure> = {
       label: "Meteo Orhei",
       wind: "Vânt",
       humidity: "Umiditate",
+      apparent: "Resimțită",
       city: "Orhei"
     },
     // NEW SEO SECTION
@@ -247,6 +248,7 @@ export const translations: Record<Language, TranslationStructure> = {
       label: "Погода",
       wind: "Ветер",
       humidity: "Влажность",
+      apparent: "Ощущается",
       city: "Оргеев"
     },
     seo: {
@@ -374,6 +376,7 @@ export const translations: Record<Language, TranslationStructure> = {
       label: "Orhei Weather",
       wind: "Wind",
       humidity: "Humidity",
+      apparent: "Feels like",
       city: "Orhei"
     },
     seo: {
