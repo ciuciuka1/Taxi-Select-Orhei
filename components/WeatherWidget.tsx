@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { TranslationStructure, Language } from '../types';
@@ -25,6 +24,9 @@ interface Props {
   lang?: Language;
 }
 
+const CACHE_KEY = 'taxi_select_weather_cache';
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
 const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,8 +44,27 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
     };
   }, [showModal]);
 
-  const fetchWeather = async () => {
+  const fetchWeather = async (forceRefresh = false) => {
     try {
+      // 1. Check Cache first unless forceRefresh is true
+      if (!forceRefresh) {
+        const cachedStr = localStorage.getItem(CACHE_KEY);
+        if (cachedStr) {
+          try {
+            const { data, timestamp } = JSON.parse(cachedStr);
+            if (Date.now() - timestamp < CACHE_DURATION) {
+              setWeather(data);
+              setLoading(false);
+              return;
+            }
+          } catch (e) {
+            console.warn("Malformed weather cache found, clearing...");
+            localStorage.removeItem(CACHE_KEY);
+          }
+        }
+      }
+
+      // 2. Fetch fresh data
       const uniqueParam = `${Date.now()}`;
       const response = await fetch(
         `https://api.open-meteo.com/v1/forecast?latitude=47.3831&longitude=28.8231&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,is_day,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&timeformat=unixtime&t=${uniqueParam}`
@@ -59,7 +80,7 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
         weatherCode: data.daily.weather_code[idx + 1]
       }));
 
-      setWeather({
+      const newWeatherData: WeatherData = {
         temperature: Math.round(data.current.temperature_2m),
         apparentTemperature: Math.round(data.current.apparent_temperature),
         weatherCode: data.current.weather_code,
@@ -67,7 +88,14 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
         windSpeed: Math.round(data.current.wind_speed_10m),
         humidity: Math.round(data.current.relative_humidity_2m),
         daily: dailyForecasts
-      });
+      };
+
+      // 3. Update state and cache
+      setWeather(newWeatherData);
+      localStorage.setItem(CACHE_KEY, JSON.stringify({
+        data: newWeatherData,
+        timestamp: Date.now()
+      }));
     } catch (error) {
       console.error("Failed to fetch weather", error);
     } finally {
@@ -77,7 +105,8 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
 
   useEffect(() => {
     fetchWeather();
-    const interval = setInterval(fetchWeather, 300000); // 5 mins
+    // Automatic refresh every 5 minutes
+    const interval = setInterval(() => fetchWeather(true), CACHE_DURATION);
     return () => clearInterval(interval);
   }, []);
 
