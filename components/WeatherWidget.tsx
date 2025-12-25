@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { TranslationStructure, Language } from '../types';
@@ -46,7 +47,6 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
 
   const fetchWeather = async (forceRefresh = false) => {
     try {
-      // 1. Check Cache first unless forceRefresh is true
       if (!forceRefresh) {
         const cachedStr = localStorage.getItem(CACHE_KEY);
         if (cachedStr) {
@@ -64,7 +64,6 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
         }
       }
 
-      // 2. Fetch fresh data
       const uniqueParam = `${Date.now()}`;
       const response = await fetch(
         `https://api.open-meteo.com/v1/forecast?latitude=47.3831&longitude=28.8231&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,is_day,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&timeformat=unixtime&t=${uniqueParam}`
@@ -90,7 +89,6 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
         daily: dailyForecasts
       };
 
-      // 3. Update state and cache
       setWeather(newWeatherData);
       localStorage.setItem(CACHE_KEY, JSON.stringify({
         data: newWeatherData,
@@ -105,7 +103,6 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
 
   useEffect(() => {
     fetchWeather();
-    // Automatic refresh every 5 minutes
     const interval = setInterval(() => fetchWeather(true), CACHE_DURATION);
     return () => clearInterval(interval);
   }, []);
@@ -167,7 +164,6 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
       <path d="M25,30 a10,10 0 0,1 18,0 a8,8 0 0,1 6,7 a5,5 0 0,1 -2,9 h-25 a8,8 0 0,1 -8,-8 a8,8 0 0,1 8,-8 z" fill={fill} opacity={opacity} className={className} />
     );
 
-    // Extreme Heat
     if (temp >= 35) return (
       <svg className={iconClass} viewBox="0 0 64 64">
         <circle cx="32" cy="32" r="28" fill="#EF4444" opacity="0.2" className="animate-pulse" />
@@ -175,7 +171,6 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
       </svg>
     );
 
-    // Weather Codes
     switch (code) {
       case 0: // Clear
         return (
@@ -277,49 +272,49 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
       </div>
 
       {showModal && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-md p-2 md:p-4 animate-pageFade cursor-pointer" onClick={() => setShowModal(false)}>
-          <div className="bg-[#0f172a]/95 backdrop-blur-2xl border border-white/20 rounded-[24px] md:rounded-[32px] p-5 md:p-7 w-full max-w-sm max-h-[92vh] shadow-2xl relative overflow-y-auto cursor-auto hide-scrollbar" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-pageFade cursor-pointer" onClick={() => setShowModal(false)}>
+          <div className="bg-[#0f172a]/95 backdrop-blur-2xl border border-white/20 rounded-[28px] md:rounded-[36px] p-5 md:p-8 w-full max-w-sm max-h-[96vh] shadow-2xl relative overflow-hidden flex flex-col cursor-auto" onClick={e => e.stopPropagation()}>
              <div className="absolute top-0 right-0 w-48 h-48 bg-brand-gold/5 blur-[80px] rounded-full pointer-events-none" />
-             <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-white p-2 bg-white/5 rounded-full z-10">
+             <button onClick={() => setShowModal(false)} className="absolute top-5 right-5 text-gray-400 hover:text-white p-2.5 bg-white/5 rounded-full z-10 transition-colors">
                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M6 18L18 6M6 6l12 12" /></svg>
              </button>
 
-             <div className="flex flex-col items-center mb-6 md:mb-8 mt-2 md:mt-4">
-                 <div className="scale-[1.4] md:scale-[1.8] mb-6 md:mb-8">{getWeatherIcon(weather.weatherCode, weather.isDay, weather.temperature)}</div>
-                 <div className="flex items-center gap-4 md:gap-6">
-                    <div className="transform scale-[1.5] md:scale-[2] origin-right">{getThermometer(weather.temperature)}</div>
+             <div className="flex flex-col items-center flex-shrink-0 mb-4 md:mb-6 mt-2 md:mt-4">
+                 <div className="scale-[1.2] md:scale-[1.5] mb-4 md:mb-6">{getWeatherIcon(weather.weatherCode, weather.isDay, weather.temperature)}</div>
+                 <div className="flex items-center gap-4 md:gap-5">
+                    <div className="transform scale-[1.3] md:scale-[1.8] origin-right">{getThermometer(weather.temperature)}</div>
                     <div className="flex flex-col">
-                      <h2 className="text-5xl md:text-6xl font-serif font-black text-white leading-none tracking-tighter">{weather.temperature}°C</h2>
-                      <p className="text-gray-400 text-xs md:text-sm mt-1.5">{t?.weather.apparent} <span className="text-brand-gold font-bold">{weather.apparentTemperature}°C</span></p>
+                      <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-black text-white leading-none tracking-tighter">{weather.temperature}°C</h2>
+                      <p className="text-gray-400 text-[10px] md:text-xs mt-1">{t?.weather.apparent} <span className="text-brand-gold font-bold">{weather.apparentTemperature}°C</span></p>
                     </div>
                  </div>
-                 <p className="text-white text-sm md:text-base font-bold mt-6 md:mt-8 bg-white/5 px-4 md:px-6 py-2 rounded-full border border-white/5 text-center">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</p>
+                 <p className="text-white text-xs md:text-sm font-bold mt-4 md:mt-6 bg-white/5 px-4 md:px-6 py-2 rounded-full border border-white/5 text-center">{getWeatherDescription(weather.weatherCode, weather.temperature, weather.windSpeed)}</p>
              </div>
 
-             <div className="grid grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
+             <div className="grid grid-cols-2 gap-3 mb-4 md:mb-6 flex-shrink-0">
                 <div className="bg-white/5 rounded-2xl p-3 md:p-4 flex flex-col items-center border border-white/5">
-                   <span className="text-gray-500 text-[9px] md:text-[10px] uppercase font-black tracking-widest mb-1">{t?.weather.wind}</span>
-                   <span className="text-white font-bold text-lg md:text-xl">{weather.windSpeed} <span className="text-[10px] md:text-xs font-normal text-gray-500">km/h</span></span>
+                   <span className="text-gray-500 text-[8px] md:text-[9px] uppercase font-black tracking-widest mb-1">{t?.weather.wind}</span>
+                   <span className="text-white font-bold text-base md:text-lg">{weather.windSpeed} <span className="text-[9px] md:text-[10px] font-normal text-gray-500">km/h</span></span>
                 </div>
                 <div className="bg-white/5 rounded-2xl p-3 md:p-4 flex flex-col items-center border border-white/5">
-                   <span className="text-gray-500 text-[9px] md:text-[10px] uppercase font-black tracking-widest mb-1">{t?.weather.humidity}</span>
-                   <span className="text-white font-bold text-lg md:text-xl">{weather.humidity}<span className="text-[10px] md:text-xs font-normal text-gray-500">%</span></span>
+                   <span className="text-gray-500 text-[8px] md:text-[9px] uppercase font-black tracking-widest mb-1">{t?.weather.humidity}</span>
+                   <span className="text-white font-bold text-base md:text-lg">{weather.humidity}<span className="text-[9px] md:text-[10px] font-normal text-gray-500">%</span></span>
                 </div>
              </div>
 
-             <div className="pt-4 md:pt-6 border-t border-white/10">
-                <h3 className="text-[10px] md:text-[11px] text-gray-400 uppercase tracking-[0.3em] font-black mb-4 md:mb-5">{t?.weather.forecast}</h3>
-                <div className="space-y-2 md:space-y-3">
+             <div className="flex-grow flex flex-col min-h-0 overflow-hidden">
+                <h3 className="text-[9px] md:text-[10px] text-gray-400 uppercase tracking-[0.2em] font-black mb-3 md:mb-4 flex-shrink-0">{t?.weather.forecast}</h3>
+                <div className="space-y-2 overflow-y-auto pr-1 hide-scrollbar">
                   {weather.daily.map((day, idx) => (
-                    <div key={idx} className="flex items-center justify-between bg-white/5 rounded-xl md:rounded-2xl px-3 md:px-4 py-2.5 md:py-3 border border-white/5 hover:bg-white/10 transition-all group">
-                      <span className="text-white font-bold text-xs md:text-sm w-10 md:w-12">{getDayName(day.date)}</span>
+                    <div key={idx} className="flex items-center justify-between bg-white/5 rounded-xl md:rounded-2xl px-3 py-2 border border-white/5 hover:bg-white/10 transition-all group">
+                      <span className="text-white font-bold text-xs w-10 md:w-12">{getDayName(day.date)}</span>
                       <div className="flex-1 flex justify-center group-hover:scale-110 transition-transform">
                         {getWeatherIcon(day.weatherCode, true, day.maxTemp, true)}
                       </div>
                       <div className="flex items-center gap-2 md:gap-3 w-16 md:w-20 justify-end">
                          <div className="flex flex-col items-end">
-                            <span className="text-white font-black text-xs md:text-sm">{day.maxTemp}°</span>
-                            <span className="text-gray-500 font-bold text-[9px] md:text-[10px]">{day.minTemp}°</span>
+                            <span className="text-white font-black text-xs">{day.maxTemp}°</span>
+                            <span className="text-gray-500 font-bold text-[9px]">{day.minTemp}°</span>
                          </div>
                          {getThermometer(day.maxTemp, true)}
                       </div>
@@ -327,7 +322,10 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
                   ))}
                 </div>
              </div>
-             <div className="mt-6 md:mt-8 text-center pb-2"><p className="text-[8px] md:text-[9px] text-brand-gold font-black tracking-widest uppercase">TAXI SELECT ORHEI</p></div>
+             
+             <div className="mt-4 md:mt-6 text-center flex-shrink-0 border-t border-white/5 pt-3">
+               <p className="text-[8px] md:text-[9px] text-brand-gold font-black tracking-widest uppercase">TAXI SELECT ORHEI</p>
+             </div>
           </div>
         </div>,
         document.body
