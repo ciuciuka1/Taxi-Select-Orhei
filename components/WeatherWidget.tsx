@@ -18,6 +18,7 @@ interface WeatherData {
   windSpeed: number;
   humidity: number;
   daily: DailyForecast[];
+  timestamp: number;
 }
 
 interface Props {
@@ -26,11 +27,24 @@ interface Props {
 }
 
 const CACHE_KEY = 'taxi_select_weather_cache';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+const CACHE_DURATION = 15 * 60 * 1000; // 15 minute cache duration
 
 const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
-  const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [loading, setLoading] = useState(true);
+  // ISR Logic: Initialize state directly from storage to prevent layout shift/loading spinner
+  const [weather, setWeather] = useState<WeatherData | null>(() => {
+    try {
+      const cachedStr = localStorage.getItem(CACHE_KEY);
+      if (cachedStr) {
+        const { data } = JSON.parse(cachedStr);
+        return data; // Optimistic UI: Return cached data instantly
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  });
+
+  const [loading, setLoading] = useState(!weather); // Only show loader if absolutely no cache exists
   const [showModal, setShowModal] = useState(false);
   const gradientId = useMemo(() => `liquid-grad-${Math.random().toString(36).substr(2, 9)}`, []);
 
@@ -47,20 +61,19 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
 
   const fetchWeather = async (forceRefresh = false) => {
     try {
-      if (!forceRefresh) {
+      // Revalidation Logic
+      if (!forceRefresh && weather) {
         const cachedStr = localStorage.getItem(CACHE_KEY);
         if (cachedStr) {
-          try {
-            const { data, timestamp } = JSON.parse(cachedStr);
-            if (Date.now() - timestamp < CACHE_DURATION) {
-              setWeather(data);
-              setLoading(false);
-              return;
-            }
-          } catch (e) {
-            console.warn("Malformed weather cache found, clearing...");
-            localStorage.removeItem(CACHE_KEY);
-          }
+           const { timestamp } = JSON.parse(cachedStr);
+           const isStale = Date.now() - timestamp > CACHE_DURATION;
+           
+           if (!isStale) {
+             setLoading(false);
+             return; // Cache is fresh enough, stop.
+           }
+           // If stale, continue to fetch below (Background Revalidation)
+           // console.log("Weather cache stale, revalidating in background...");
         }
       }
 
@@ -86,7 +99,8 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
         isDay: data.current.is_day === 1,
         windSpeed: Math.round(data.current.wind_speed_10m),
         humidity: Math.round(data.current.relative_humidity_2m),
-        daily: dailyForecasts
+        daily: dailyForecasts,
+        timestamp: Date.now()
       };
 
       setWeather(newWeatherData);
@@ -102,7 +116,10 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
   };
 
   useEffect(() => {
+    // Initial fetch (will only trigger network if stale)
     fetchWeather();
+    
+    // Polling for updates
     const interval = setInterval(() => fetchWeather(true), CACHE_DURATION);
     return () => clearInterval(interval);
   }, []);
@@ -240,7 +257,8 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
     }
   };
 
-  if (loading || !weather) return (
+  // Render Skeleton only if absolutely no data (first visit)
+  if (loading && !weather) return (
     <div className="relative z-50 animate-fadeInUp">
       <div className="rounded-full flex items-center gap-2 pl-4 pr-3 py-2 border border-white/5 bg-brand-dark/50 ring-1 ring-white/5">
         <div className="h-4 w-12 bg-white/10 rounded animate-pulse" />
@@ -248,6 +266,8 @@ const WeatherWidget: React.FC<Props> = ({ t, lang = 'ro' }) => {
       </div>
     </div>
   );
+
+  if (!weather) return null; // Fallback
 
   return (
     <>
